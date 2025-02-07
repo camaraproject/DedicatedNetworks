@@ -1,7 +1,7 @@
 # API Design Considerations
 
 ## Introduction
-The API design considerations are derived from the API usage scenarios (PR#12). The aim of the API is to hide telco specific complexity, while offering the needed capabilities. There may be different realization of the needed network capabilities, e.g. using shared network slices or even exclusive network slices.
+The API design considerations are derived from the API [usage scenarios](UsageScenarios.md). The aim of the API is to hide telco specific complexity, while offering the needed capabilities. There may be different realization of the needed network capabilities, e.g. using shared network slices or even exclusive network slices.
 
 ## General Considerations
 The API should allow combination with other CAMARA APIs, such as QOD, Connectivity Insights / Monitoring, etc.
@@ -22,6 +22,8 @@ Reservation of resources should allow for time and location (service area) limit
 
 The Network Provider should control the state transition from *requested* state to either *reserved*, *activated* or *terminated* state. The state transition from *reserved* to *activated* is triggered by the reservation start time. The state transition from *activated* to either *reserved* or *terminated* is triggered by the reservation end time. The API consumer should get notified upon state-transitions. 
 
+Note: Functionality to trigger state transition from *activated* back to *reserved* state is not in scope of the initial API, but mentioned for completeness.
+
 There can be different form of resources and capabilities: 
  - It is essential for many use-cases to reserve connectivity capacity, e.g. expressed in aggregated throughput
  - Several use cases require usage of different network capabilities, like for providing Quality on Demand (QOD) or connectivity monitoring, etc.  
@@ -37,3 +39,8 @@ Devices, which have access to the dedicated network, will use one of the pre-sel
 
 ## Considerations for Monitoring
 There are several potential relevant CAMARA APIs for monitoring, e.g. Connectivity Insights, Connectivity Insights Subscriptions, Session Insights, Device Status, Device Quality Indication, …
+
+## Assumptions for API usage
+There are several pre-steps outside of the Dedicated Network API scope. These are for example
+  - API consumer on-boarding, specifically obtaining API access credentials.
+  - information about other API features.

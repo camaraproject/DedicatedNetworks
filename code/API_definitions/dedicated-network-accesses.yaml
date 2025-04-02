@@ -25,6 +25,9 @@ paths:
         - Accesses
       summary: Get a list of device accesses to dedicated networks, optionally filtered for a given device and/or for a given dedicated network
       operationId: listNetworkAccesses
+      security:
+        - oAuth2:
+            - dedicated-network:accesses:read
       parameters:
         - name: networkId
           in: query
@@ -59,6 +62,9 @@ paths:
         - Accesses
       summary: Create a device access to a dedicated network with given configuration
       operationId: createNetworkAccess
+      security:
+        - oAuth2:
+            - dedicated-network:access:create
       requestBody:
         content:
           application/json:
@@ -96,6 +102,9 @@ paths:
         - Accesses
       summary: Get a device access to the dedicated network and its configuration
       operationId: readNetworkAccess
+      security:
+        - oAuth2:
+            - dedicated-network:access:read
       parameters:
         - name: accessId
           in: path
@@ -128,6 +137,9 @@ paths:
         - Accesses
       summary: Delete a device access to the dedicated network
       operationId: deleteNetworkAccess
+      security:
+        - oAuth2:
+            - dedicated-network:access:delete
       parameters:
         - name: accessId
           in: path
@@ -152,6 +164,17 @@ paths:
           $ref: "#/components/responses/Generic503"
 
 components:
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.example.com/oauth/token
+          scopes:
+            dedicated-network:accesses:read: Get a list of device accesses for networks
+            dedicated-network:access:create: Create a device access to a network with given configuration
+            dedicated-network:access:read: Get a device access for the network and its configuration
+            dedicated-network:access:delete: Delete a device access to a network
 
   parameters:
     x-correlator:

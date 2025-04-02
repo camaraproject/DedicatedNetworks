@@ -21,6 +21,9 @@ paths:
         - Profiles
       summary: Read dedicated network profiles
       operationId: readNetworkProfiles
+      security:
+        - oAuth2:
+            - dedicated-network:profiles:read
       parameters:
         - $ref: "#/components/parameters/x-correlator"
       responses:
@@ -50,6 +53,9 @@ paths:
         - Profiles
       summary: Read a dedicated network profile
       operationId: readNetworkProfile
+      security:
+        - oAuth2:
+            - dedicated-network:profile:read
       parameters:
         - name: profileId
           in: path
@@ -78,6 +84,15 @@ paths:
           $ref: "#/components/responses/Generic503"
 
 components:
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.example.com/oauth/token
+          scopes:
+            dedicated-network:profiles:read: Read network profiles
+            dedicated-network:profile:read: Read a network profile
 
   parameters:
     x-correlator:

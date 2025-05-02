@@ -48,7 +48,7 @@ info:
     <td>Network Provider</td>
     <td>The entity that provides the physical network resources</td>
     </tr>
-    
+
     </table>
 
     ## Dedicated Network APIs
@@ -85,7 +85,7 @@ info:
     </table>
 
     A high-level sequence of steps involved when using Dedicated Network APIs is depicted in the diagram below and further described in their respective sections.
-    
+
     **Figure**: High-level sequence of steps<br>
     <!-- ![figure HighLevelSequenceOfSteps.svg](https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/blob/main/documentation/API_documentation/resources/HighLevelSequenceOfSteps.svg)-->
     <img alt="figure HighLevelSequenceOfSteps.svg" src="https://raw.githubusercontent.com/tlohmar/DedicatedNetworks/refs/heads/description/documentation/API_documentation/resources/HighLevelSequenceOfSteps.svg" width="200"/>
@@ -152,7 +152,7 @@ info:
     On successful acceptance of the request, an HTTP resource is created. The response always returns a REQUESTED State. Reserved resources are only usable when the network is in ACTIVATED state.
 
     A normal lifecycle is depicted below:
-    
+
     **Figure**: Normal lifecycle<br>
     <img alt="figure NormalLifecycle.svg" src="https://raw.githubusercontent.com/tlohmar/DedicatedNetworks/refs/heads/description/documentation/API_documentation/resources/NormalLifecycle.svg" width="200"/>
 

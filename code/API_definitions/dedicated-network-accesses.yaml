@@ -3,6 +3,26 @@ info:
   title: Dedicated Network - Network Accesses API
   description: |
     This API allows for requesting network access for devices. A device is identified by the CAMARA _device object_, containing either an MSIDSN or a Network Access Identifier.
+
+    # Accesses API
+
+    A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. Only devices for which a Device Access resource has been created can use the connectivity resources allocated for that network. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.
+
+    A Device Access is created by performing a POST operation on the /accesses endpoint.
+
+    The API Consumer provides the following information
+
+    - the networkId to access is given
+
+    - the device (CAMARA device object) to identify the device. Either a MSISDN or a Network Access Identifier can be used.
+
+    - Optionally, a default QoS Profile can be set for the device
+
+    - Optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device can access
+
+    The API returns an accessId which is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
+
+
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html

@@ -134,3 +134,36 @@ sequenceDiagram
         Network-->>D: Connection established / denied
     end
 ```
+
+## States of the network
+
+The dedicated network supports multiple states, i.e. REQUESTED, RESERVED, ACTIVATED and TERMINATED. The networks resource is created with a POST on the /networks API. The status of the HTTP resource is independent of the status of the representing dedicated network.
+
+On successful acceptance of the request, an HTTP resource is created. The response always returns a REQUESTED State. Reserved resources are only usable when the network is in ACTIVATED state.
+
+**Figure**: lifecycle of a network
+
+```mermaid
+stateDiagram-v2
+    [*] --> REQUESTED: POST /networks
+    REQUESTED --> RESERVED: Use is confirmed (Service Time not reached)
+    RESERVED --> ACTIVATED: Service Time reached
+    ACTIVATED --> TERMINATED: Service Time expires
+    REQUESTED --> ACTIVATED: Use is confirmed (Service Time already reached)
+    RESERVED --> TERMINATED: Failed to reserve resources
+```
+
+Explainations
+- A network in REQUESTED state is not (yet) committed by the Network Provider.
+
+- A network in RESERVED state is committed to be available for use during the Service Time by the Network Provider.
+
+- The targeted resources of the network are free to be used by other users or for other purposes, while the network is in RESERVED state.
+
+- Reserved resources are only usable when the network is in ACTIVATED state.
+
+- The network may enter the ACTIVATED state directly after the REQUESTED state if the service start time has been reached when the API Provider successfully completed the resource reservation.
+
+- The network may enter the TERMINATED state directly after the REQUESTED state if the API Provider could not complete the resource reservation.
+
+- A network in TERMINATED state cannot be modified anymore and should be deleted. If not deleted by the API Consumer, the representing HTTP resource (URL) may be removed by the API Provider.

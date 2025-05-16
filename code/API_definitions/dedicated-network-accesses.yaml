@@ -20,16 +20,15 @@ info:
 
     - Optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device can access
 
-    The API returns an accessId. 
-    
+    The API returns an accessId.
+
      which is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
 
     # Querying one or more device accesses
 
     All available device accesses of the API consumer can be queried by performing a `GET` operation on the `/accesses` endpoint. The query can be filted for accesses to a specific network (networkId) or for certain devices.
 
-    A specific device access of the API consumer can be queried by performing a `GET` operation on the `/accesses/{accessId}` endpoint, where the accessId has been obtained during the _create_ procedure. 
-    
+    A specific device access of the API consumer can be queried by performing a `GET` operation on the `/accesses/{accessId}` endpoint, where the accessId has been obtained during the _create_ procedure.
     # Deleting a device accesses
 
     A specific device access of the API consumer can be deleted by performing a `DELETE` operation on the `/accesses/{accessId}` endpoint. Deletion of the access can be interpreted as removal of the access permissions.

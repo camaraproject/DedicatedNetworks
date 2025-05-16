@@ -1,6 +1,6 @@
 # High level description of Dedicated Networks concept and APIs
 ## Introduction
-_Dedicated Networks_ enable dedicated use of public network connectivity resources by reserving some of these resources for use by devices and applications. To these devices and applications, the reserved resources appear as their own virtual or logical network.
+_Dedicated Networks_ enable dedicated use of public network connectivity resources by reserving some of these resources for use by devices and applications. To these devices and applications, the reserved resources appear as their own virtual or logical network. Please check [here](https://github.com/camaraproject/DedicatedNetworks/blob/main/documentation/SupportingDocuments/UsageScenarios.md) for several usage scenarios for Dedicated Networks.
 
 Fixed and Mobile Networks already offer the capability of separating devices into different networks. These concepts are sometimes called logical networks or virtual private networks. Multiple of these networks can coexist on the same physical network and can separate target traffic from other traffic for assured performance, enhanced security and other scenarios where consistent experience is required.
 

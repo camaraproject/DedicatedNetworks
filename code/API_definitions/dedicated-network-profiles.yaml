@@ -2,11 +2,11 @@ openapi: 3.0.3
 info:
   title: Dedicated Network - Network Profiles API
   description: |
-    This API allows for discovering available network profiles, which are offered by the network provider to be used in conjunction of the Dedicated Network API. Network profiles describe the capabilities and performance targets of a dedicated network.
+    This API allows for discovering available network profiles, which are offered by the network provider to be used in conjunction of the Dedicated Network API. Network profiles describe the capabilities and performance targets of a dedicated network. For more information about the Dedicated Networks APIs, see [link]().
 
-    A Dedicated Network Profile represents a predefined set of network capabilities and performance characteristics that can be applied when creating a Dedicated Network. It enables API Consumers to understand the capabilities they can expect when using the reserved network connectivity resources. A Network Profile is a validated, supported configuration that has been pre-approved between the API Provider and API Consumer.
+    A Network Profile represents a predefined set of network capabilities and performance characteristics that can be applied when creating a Network. It enables API Consumers to understand the capabilities they can expect when using the reserved network connectivity resources. A Network Profile is a validated, supported configuration that has been pre-approved between the API Provider and API Consumer.
 
-    A Network Profile contains information about the maximum number of devices allowed, the aggregated throughput to be provided, and a set of allowed QoS Profiles that devices can use when having access to the Dedicated Network. A detailed description of the individual parameters may be included within the terms and conditions.
+    A Network Profile contains information about the maximum number of devices allowed, the aggregated throughput to be provided, and a set of allowed QoS Profiles that devices can use when having access to the Dedicated Network. A detailed description of the individual parameters may be included within the _terms and conditions_ (outside of scope for the API).
 
     The key characteristics of the API include:
 

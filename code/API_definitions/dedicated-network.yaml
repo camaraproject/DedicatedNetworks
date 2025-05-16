@@ -3,139 +3,10 @@ info:
   title: Dedicated Network - Networks API
   description: |
     This API allows for requesting a Dedicated Network, which provides a set of capabilities and connectivity performance targets. The Dedicated Network may be requested for a particular geographical location and at a particular time window. Depending on the requested start time for the dedicated network, the network may first enter a _reserved_ state.
-    # High Level Description
-    ## Introduction
-    _Dedicated Networks_ enable dedicated use of public network connectivity resources by reserving some of these resources for use by devices and applications. To these devices and applications, the reserved resources appear as their own virtual or logical network.
 
-    Fixed and Mobile Networks already offer the capability of separating devices into different networks. These concepts are sometimes called logical networks or virtual private networks. Multiple of these networks can coexist on the same physical network and can separate target traffic from other traffic for assured performance, enhanced security and other scenarios where consistent experience is required.
+    # Creating a network
 
-    There are different options to technically realize a Dedicated Network. For example:
-
-    - Using 5G Network Slices (see 3GPP 23.501, clause 5.15)
-
-    - Using 5G Non-Public Networks (NPN), specifically the Public Network Integrated NPN (PNI-NPN), see 3GPP 23.501, clause 5.30)
-
-    - Using a separate 4G APN (see 3GPP 23.401) or 5G DNNs (see 3GPP 23.501). Note, a DNN is equivalent to an APN, per 3GPP 23.003.
-
-    Dedicated Networks abstract the complexity across **Network Provider** realizations to enable coherent use of diverse network capabilities.
-
-    A Dedicated Network is often only needed for a specific time duration (e.g. one hour) and at specific locations (e.g. the area of a festival). These are referred to as Service Time and Service Area.
-
-    The CAMARA Dedicated Network APIs allow **API Consumers** to programmatically manage Dedicated Networks, without the need for in-depth knowledge of telecommunications systems.
-
-    API Consumers have control over which devices are allowed to access and use the reserved network connectivity resources. In addition, network connectivity characteristics, for example, routing and performance may be individually tailored for each device.
-
-    Detailed characteristics, behaviors and costs pertaining to Dedicated Networks are typically described by the **API Provider** in the terms and conditions. Such terms and conditions may also contain obligations and restrictions.
-
-    An API Provider realizes Dedicated Networks based on the physical network resources managed by a Network Provider. An API Provider can be the Network Provider.
-
-    Key roles
-    <table>
-    <tr>
-    <td>Role Name</td>
-    <td>Description</td>
-    </tr>
-
-    <tr>
-    <td>API Consumer</td>
-    <td>The entity that consumes the Dedicated Network APIs</td>
-    </tr>
-    <tr>
-    <td>API Provider</td>
-    <td>The entity that provides the Dedicated Network APIs</td>
-    </tr>
-    <tr>
-    <td>Network Provider</td>
-    <td>The entity that provides the physical network resources</td>
-    </tr>
-
-    </table>
-
-    ## Dedicated Network APIs
-
-    The CAMARA Dedicated Network APIs allow for programmatic management of Dedicated Networks, without the need for in-depth knowledge of telecommunications systems.
-
-    The APIs are summarized in the table below followed by a brief description. Detailed descriptions are provided within each specification.
-
-    <table>
-    <tr>
-    <td>API</td>
-    <td>Purpose of the API</td>
-    <td>Key Abstractions and concepts</td>
-    </tr>
-
-    <tr>
-    <td>Dedicated Network API</td>
-    <td>Reservation and lifecycle management of network connectivity resources for dedicated use.</td>
-    <td>A Dedicated Network is a logical resource and is used to embody the reservation of network connectivity resources in the physical network. Initiating a new reservation request using this API results in a new Dedicated Network resource being created. The Dedicated Network undergoes various lifecycle States including REQUESTED, RESERVED, ACTIVATED and TERMINATED. Reservation of resources occurs based on the selected Network Profile, duration when the reservation is needed (Service Time) and geographical areas where the service is needed (Service Area).</td>
-    </tr>
-
-    <tr>
-    <td>Dedicated Network Profiles API</td>
-    <td>Discovery of predefined set of network capabilities and performance characteristics</td>
-    <td>A Network Profile represents a predefined set of network capabilities and performance characteristics that can be applied when creating dedicated networks. Each profile represents a validated, supported configuration that has been pre-approved in the terms and conditions between the API Provider and API Consumer.</td>
-    </tr>
-
-    <tr>
-    <td>Dedicated Network Accesses API</td>
-    <td>Managing access to the Dedicated Network, i.e., controlling which devices may benefit from the reserved resources and capabilities</td>
-    <td>A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.</td>
-    </tr>
-
-    </table>
-
-    A high-level sequence of steps involved when using Dedicated Network APIs is depicted in the diagram below and further described in their respective sections.
-
-    **Figure**: High-level sequence of steps<br>
-    <!-- ![figure HighLevelSequenceOfSteps.svg](https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/blob/main/documentation/API_documentation/resources/HighLevelSequenceOfSteps.svg)-->
-    <img alt="figure HighLevelSequenceOfSteps.svg" src="https://raw.githubusercontent.com/tlohmar/DedicatedNetworks/refs/heads/description/documentation/API_documentation/resources/HighLevelSequenceOfSteps.svg" width="200"/>
-
-    ## Pre-requisites
-
-    Before Dedicated Network APIs can be invoked, relevant agreements need to be in place between the API Consumer and the API Provider. Conceptually, the agreement contains all the different terms and conditions, which typically include price, service descriptions and conditions. It also includes obligations and restrictions possibly for both, the API Provider and the API Consumer, etc.
-
-    An API Provider may provide a catalog where API Consumers can get an overview of the various options available. For example, there may be a catalog of available APIs, and a catalog of available parameter sets for each of the APIs.
-
-    The API Provider may also offer a procedure for requesting additional customization, for example, additional Service Areas or Network Profiles. Such a procedure can leverage conventional methods such as emails or phone conversations.
-
-    API Consumers selects from available Network Profiles and Service Areas offered by the API Provider which then become part of the agreed terms and conditions.
-
-    This preparation phase is **outside the scope** of the Dedicated Network APIs.
-
-    As result of the agreement on the terms and conditions, the following aspects are determined
-
-    - URLs and credentials for the API Consumer to use
-
-    - A set of capabilities and performance targets (Network Profiles) that an API Consumer is eligible to use
-
-    - A set of geographic areas (Service Areas) that an API Consumer is eligible to use
-
-    - The API Consumer is aware about the terms and conditions (incl price), when selecting different parameter or parameter combinations according to the conditions.
-
-    Note that, at completion of the pre-requisites, no network connectivity resources are reserved, i.e., no Dedicated Network is created.
-
-    ## Detailed high-level flow
-    The diagram below attempts to depict the complete flow including API endpoint, response codes, and key parameters.
-
-    **Figure**: High Level Flow with additional details
-
-    <img alt="figure HighLevelFlowWithAdditionalDetails.svg" src="https://raw.githubusercontent.com/tlohmar/DedicatedNetworks/refs/heads/description/documentation/API_documentation/resources/HighLevelFlowWithAdditionalDetails.svg" width="1200"/>
-
-    # Dedicated Network API
-
-    The Dedicated Network API enables programmatic creation and lifecycle management of dedicated network connectivity resources on a public network.
-
-    A Dedicated Network is a logical resource and is used to embody the reservation of network connectivity resources in the physical network. The act of reservation is equivalent to creating a new Dedicated Network resource via the REST APIs.
-
-    A Dedicated Network undergoes various States including REQUESTED, RESERVED, ACTIVATED and TERMINATED.
-
-    Reservation of resources occurs based on the selected Network Profile, duration when the reservation is needed (Service Time) and geographical areas when the service is needed (Service Area).
-
-    The Dedicated Network API provides a /networks endpoint that allows API Consumers to create a Dedicated Network, delete the Delete Network, list the existing Dedicated Networks and view details of a specific Dedicate Network.
-
-    ## Creating a Dedicated Network
-
-    A Dedicated Network is created by performing a POST operation on the /networks endpoint.
+    A network is created by performing a `POST` operation on the `/networks` endpoint. 
 
     The API Consumer needs to provide the following input parameters to create a network:
 
@@ -149,38 +20,19 @@ info:
 
     The API returns a networkId. The networkId is a unique identifier of the network, which remains unchanged during its lifetime. The networkId is required when creating Device Accesses.
 
-    On successful acceptance of the request, an HTTP resource is created. The response always returns a REQUESTED State. Reserved resources are only usable when the network is in ACTIVATED state.
+    Initially, the created network is in `REQUESTED` state. The network is only usable when the network is in `ACTIVATED` state. Find a detailed description of the network states [here](). 
 
-    A normal lifecycle is depicted below:
 
-    **Figure**: Normal lifecycle<br>
-    <img alt="figure NormalLifecycle.svg" src="https://raw.githubusercontent.com/tlohmar/DedicatedNetworks/refs/heads/description/documentation/API_documentation/resources/NormalLifecycle.svg" width="200"/>
+    # Querying one or more Networks
 
-    A more detailed explanation of the states is provided below:<br>
-    **Figure**: Dedicate Network States<br>
-    <img alt="figure DedicateNetworkStates.svg" src="https://raw.githubusercontent.com/tlohmar/DedicatedNetworks/refs/heads/description/documentation/API_documentation/resources/DedicateNetworkStates.svg" width="400"/>
+    All available network of the API consumer can be queried by performing a `GET` operation on the `/networks` endpoint. 
+    
+    A specific network of the API consumer can be queried by performing a `GET` operation on the `/networks/{networkId}` endpoint, where the networkId has been obtained during the _create_ procedure. 
 
-    A network in REQUESTED state is not (yet) committed by the Network Provider.
+    # Deleting a Network
 
-    A network in RESERVED state is committed to be available for use during the Service Time by the Network Provider.
+    A specific network of the API consumer can be deleted by performing a `DELETE` operation on the `/networks/{networkId}` endpoint. Deletion of a network can be interpreted as a cancelation of the resource reservation. 
 
-    The targeted resources of the network are free to be used by other users or for other purposes, while the network is in RESERVED state.
-
-    Reserved resources are only usable when the network is in ACTIVATED state.
-
-    The network may enter the ACTIVATED state directly after the REQUESTED state if the service start time has been reached when the API Provider successfully completed the resource reservation.
-
-    The network may enter the TERMINATED state directly after the REQUESTED state if the API Provider could not complete the resource reservation.
-
-    A network in TERMINATED state cannot be modified anymore and should be deleted. If not deleted by the API Consumer, the representing HTTP resource (URL) may be removed by the API Provider.
-
-    ## Querying a Dedicated Network
-
-    To be expanded
-
-    ## Deleting A Dedicated Network
-
-    To be expanded
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html

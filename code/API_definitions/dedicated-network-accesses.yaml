@@ -1,27 +1,38 @@
 openapi: 3.0.3
 info:
-  title: Dedicated Network - Network Accesses API
+  title: Dedicated Network - Accesses API
   description: |
     This API allows for requesting network access for devices. A device is identified by the CAMARA _device object_, containing either an MSIDSN or a Network Access Identifier.
 
-    # Accesses API
-
     A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. Only devices for which a Device Access resource has been created can use the connectivity resources allocated for that network. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.
 
-    A Device Access is created by performing a POST operation on the /accesses endpoint.
+    # Creating a device access
+
+    A Device Access is created by performing a `POST` operation on the `/accesses` endpoint.
 
     The API Consumer provides the following information
 
     - the networkId to access is given
 
-    - the device (CAMARA device object) to identify the device. Either a MSISDN or a Network Access Identifier can be used.
+    - the `device` object (CAMARA device object) to identify the device. Either a MSISDN or a Network Access Identifier can be used.
 
     - Optionally, a default QoS Profile can be set for the device
 
     - Optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device can access
 
-    The API returns an accessId which is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
+    The API returns an accessId. 
+    
+     which is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
 
+    # Querying one or more device accesses
+
+    All available device accesses of the API consumer can be queried by performing a `GET` operation on the `/accesses` endpoint. The query can be filted for accesses to a specific network (networkId) or for certain devices.
+
+    A specific device access of the API consumer can be queried by performing a `GET` operation on the `/accesses/{accessId}` endpoint, where the accessId has been obtained during the _create_ procedure. 
+    
+    # Deleting a device accesses
+
+    A specific device access of the API consumer can be deleted by performing a `DELETE` operation on the `/accesses/{accessId}` endpoint. Deletion of the access can be interpreted as removal of the access permissions.
 
   license:
     name: Apache 2.0

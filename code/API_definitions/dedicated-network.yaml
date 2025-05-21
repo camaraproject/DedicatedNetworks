@@ -12,6 +12,35 @@ info:
 
     In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
 
+    # Creating a network
+
+    A network is created by performing a `POST` operation on the `/networks` endpoint.
+
+    The API Consumer needs to provide the following input parameters to create a network:
+
+    - the chosen Network Profile (profileId)
+
+    - the Service Area
+
+    - the service start and end times (Service Time).
+
+    - Optionally, callback related information through sink and sinkCredential parameters to receive notifications about the lifecycle events of the network.
+
+    The API returns a networkId. The networkId is a unique identifier of the network, which remains unchanged during its lifetime. The networkId is required when creating Device Accesses.
+
+    Initially, the created network is in `REQUESTED` state. The network is only usable when the network is in `ACTIVATED` state. Find a detailed description of the network states [here]().
+
+
+    # Querying one or more Networks
+
+    All available network of the API consumer can be queried by performing a `GET` operation on the `/networks` endpoint.
+
+    A specific network of the API consumer can be queried by performing a `GET` operation on the `/networks/{networkId}` endpoint, where the networkId has been obtained during the _create_ procedure.
+
+    # Deleting a Network
+
+    A specific network of the API consumer can be deleted by performing a `DELETE` operation on the `/networks/{networkId}` endpoint. Deletion of a network can be interpreted as a cancelation of the resource reservation.
+
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html

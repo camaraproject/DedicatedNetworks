@@ -2,5 +2,5 @@
 |---------------|------------------------| ----------------------|
 | Ericsson | Thorsten Lohmar  | @tlohmar |
 | Nokia | Peter Kovacs | @PeterKovacs2 |
-| Telefonica | Alejandro Palmier | @alejandropalmier |
+| Telefonica | Carlos Romero | @carlosromerog |
 | Vodafone | Steve Vickers | @SteveV-Vodafone |

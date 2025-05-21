@@ -4,6 +4,14 @@ info:
   description: |
     This API allows for requesting a Dedicated Network, which provides a set of capabilities and connectivity performance targets. The Dedicated Network may be requested for a particular geographical location and at a particular time window. Depending on the requested start time for the dedicated network, the network may first enter a _reserved_ state.
 
+    # Authorization and authentication
+
+    The "Camara Security and Interoperability Profile" provides details of how an API consumer requests an access token. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the profile.
+
+    The specific authorization flows to be used will be agreed upon during the onboarding process, happening between the API consumer and the API provider, taking into account the declared purpose for accessing the API, whilst also being subject to the prevailing legal framework dictated by local legislation.
+
+    In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
+
     # Creating a network
 
     A network is created by performing a `POST` operation on the `/networks` endpoint.
@@ -54,6 +62,11 @@ paths:
         - Networks
       summary: Get a list of dedicated networks
       operationId: listNetworks
+      security:
+        - openId:
+            - dedicated-network:networks:read
+        - oAuth2:
+            - dedicated-network:networks:read
       parameters:
         - $ref: "#/components/parameters/x-correlator"
       responses:
@@ -82,6 +95,11 @@ paths:
         - Networks
       summary: Request to create a dedicated network
       operationId: createNetwork
+      security:
+        - openId:
+            - dedicated-network:networks:create
+        - oAuth2:
+            - dedicated-network:networks:create
       requestBody:
         required: true
         content:
@@ -167,6 +185,11 @@ paths:
         - Networks
       summary: Get the current information about a dedicated network
       operationId: readNetwork
+      security:
+        - openId:
+            - dedicated-network:networks:read
+        - oAuth2:
+            - dedicated-network:networks:read
       parameters:
         - name: networkId
           in: path
@@ -188,8 +211,13 @@ paths:
     delete:
       tags:
         - Networks
-      summary: Destroy a dedicated network
+      summary: Delete a dedicated network
       operationId: deleteNetwork
+      security:
+        - openId:
+            - dedicated-network:networks:delete
+        - oAuth2:
+            - dedicated-network:networks:delete
       parameters:
         - name: networkId
           in: path
@@ -215,6 +243,18 @@ paths:
 
 components:
   securitySchemes:
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
+    oAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.example.com/oauth/token
+          scopes:
+            dedicated-network:networks:read: Read one or more networks
+            dedicated-network:networks:create: Create a network
+            dedicated-network:networks:delete: Delete a network
     notificationsBearerAuth:
       description: Bearer authentication for notifications
       type: http
@@ -316,7 +356,7 @@ components:
           description: The type of the event.
           type: string
           enum:
-            - "org.camaraproject.dedicated-networks.v0.network-status-changed"
+            - "org.camaraproject.dedicated-network.v0.network-status-changed"
         specversion:
           description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
           type: string
@@ -338,7 +378,7 @@ components:
       discriminator:
         propertyName: 'type'
         mapping:
-          org.camaraproject.dedicated-networks.v0.network-status-changed: "#/components/schemas/EventNetworkStatusChanged"
+          org.camaraproject.dedicated-network.v0.network-status-changed: "#/components/schemas/EventNetworkStatusChanged"
 
     EventNetworkStatusChanged:
       description: Event to notify a network status change
@@ -652,9 +692,9 @@ components:
       description: Cloud event example for network status change to ACTIVATED
       value:
         id: 625b2d4b-4da7-4f07-9169-e60ffdf7667c
-        source: 'https://api.example.com/dedicated-networks/v0/networks/b69e5404-3871-448d-8f9f-11dc5d29a4c8'
+        source: 'https://api.example.com/dedicated-network/v0/networks/b69e5404-3871-448d-8f9f-11dc5d29a4c8'
         specversion: '1.0'
-        type: "org.camaraproject.dedicated-networks.v0.network-status-changed"
+        type: "org.camaraproject.dedicated-network.v0.network-status-changed"
         time: '2024-11-29T13:04:00Z'
         data:
           networkId: 'b69e5404-3871-448d-8f9f-11dc5d29a4c8'

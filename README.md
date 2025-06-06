@@ -15,12 +15,12 @@ Repository to describe, develop, document, and test the service APIs for Dedicat
 
 * Service APIs for DedicatedNetworks (see [APIBacklog.md](https://github.com/camaraproject/APIBacklog/blob/main/documentation/APIbacklog.md))
 * The API provides the customer with the ability to:
-  * request/modify/delete a (logical) dedicated network for API consumers.
-  * A dedicated network offers
+  * request/modify/delete a (logical) Dedicated Network for API consumers.
+  * A Dedicated Network offers
     * specific connectivity performance (e.g. speed/ latency)
     * during a specific time duration (e.g. one hour) and
     * at specific locations (e.g. the area of a festival)
-  * A dedicated network may be ensured by an SLA.
+  * A Dedicated Network may be ensured by an SLA.
   * API consumers are able to manage access to this dedicated network for specific devices.
 * Describe, develop, document, and test the APIs
 * Started: October 2024
@@ -30,26 +30,29 @@ Repository to describe, develop, document, and test the service APIs for Dedicat
 **Version Control Notice:** This project undergoes active development with frequent updates to the main branch. No backward compatibility is guaranteed for any code in development branches, including main, until an official release is published. Code changes, including potential reversions, may occur between commits. We recommend using the latest official release version.
 
 
-* **The latest public release is [r1.1](https://github.com/camaraproject/DedicatedNetworks/releases/tag/r1.1), with the following API versions:**
 
-  * **dedicated-network v0.1.0-rc.1 (release candidate)**
+**The latest public release is [r1.1](https://github.com/camaraproject/DedicatedNetworks/releases/tag/r1.1), with the API versions listed below**
+
+To facilitate understanding of these APIs, please consult the [General Description](https://github.com/camaraproject/DedicatedNetworks/blob/r1.1/documentation/API_documentation/DedicatedNetworks_GeneralDescription.md) for essential concepts and workflows prior to examining the technical specifications.
+
+* **dedicated-network v0.1.0-rc.1 (release candidate)**
   [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r1.1/code/API_definitions/dedicated-network.yaml)
   [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network.yaml&nocors)
   [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network.yaml)
 
-  * **dedicated-network-profiles v0.1.0-rc.1 (release candidate)**
+* **dedicated-network-profiles v0.1.0-rc.1 (release candidate)**
   [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r1.1/code/API_definitions/dedicated-network-profiles.yaml)
   [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-profiles.yaml&nocors)
   [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-profiles.yaml)
 
-  * **dedicated-network-accesses v0.1.0-rc.1 (release candidate)**
+* **dedicated-network-accesses v0.1.0-rc.1 (release candidate)**
   [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r1.1/code/API_definitions/dedicated-network-accesses.yaml)
   [[View it on ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-accesses.yaml&nocors)
   [[View it on Swagger Editor]](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-accesses.yaml)
 
-* Previous releases and pre-releases are available here: https://github.com/camaraproject/DedicatedNetworks/releases
+Previous releases and pre-releases are available here: https://github.com/camaraproject/DedicatedNetworks/releases
 
-* For changes see the [CHANGELOG.md](https://github.com/camaraproject/DedicatedNetworks/blob/main/CHANGELOG.md)
+For changes see the [CHANGELOG.md](https://github.com/camaraproject/DedicatedNetworks/blob/main/CHANGELOG.md)
 
 ## Contributing
 * Meetings are held virtually

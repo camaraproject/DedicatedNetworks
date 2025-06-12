@@ -19,7 +19,7 @@ The API definition(s) are based on
 
 - dedicated-network v0.1.0-rc.1 API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network.yaml&nocors)
-  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network.yaml)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r1.1/code/API_definitions/dedicated-network.yaml)
 
 
@@ -29,7 +29,7 @@ The API definition(s) are based on
 
 - dedicated-network-accesses v0.1.0-rc.1 API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-accesses.yaml&nocors)
-  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-accesses.yaml)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-accesses.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r1.1/code/API_definitions/dedicated-network-accesses.yaml)
 
 
@@ -39,7 +39,7 @@ The API definition(s) are based on
 
 - dedicated-network-profiles v0.1.0-rc.1 API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-profiles.yaml&nocors)
-  - [View it on Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-profiles.yaml)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r1.1/code/API_definitions/dedicated-network-profiles.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r1.1/code/API_definitions/dedicated-network-profiles.yaml)
 
 

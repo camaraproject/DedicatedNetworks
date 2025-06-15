@@ -39,7 +39,15 @@ info:
 
     # Deleting a Network
 
-    A specific network of the API consumer can be deleted by performing a `DELETE` operation on the `/networks/{networkId}` endpoint. Deletion of a network can be interpreted as a cancelation of the resource reservation.
+    A specific network of the API consumer can be deleted by performing a `DELETE` operation on the `/networks/{networkId}` endpoint. Deletion of a network can be interpreted as a cancellation of the resource reservation.
+
+    # Additional CAMARA error responses
+
+    The list of error codes in this API specification is not exhaustive. Therefore the API specification may not document some non-mandatory error statuses as indicated in `CAMARA API Design Guide`.
+
+    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified in the `API Readiness Checklist` document associated to this API version.
+
+    As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible error response if it is explicitly documented in the API.
 
   license:
     name: Apache 2.0
@@ -268,11 +276,13 @@ components:
       description: Correlation id for the different services
       schema:
         type: string
+        pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
   headers:
     x-correlator:
       description: Correlation id for the different services
       schema:
         type: string
+        pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
 
   schemas:
     NetworkId:
@@ -590,12 +600,6 @@ components:
                 status: 401
                 code: UNAUTHENTICATED
                 message: Request not authenticated due to missing, invalid, or expired credentials.
-            GENERIC_401_AUTHENTICATION_REQUIRED:
-              description: New authentication is needed, authentication is no longer valid
-              value:
-                status: 401
-                code: AUTHENTICATION_REQUIRED
-                message: New authentication is required.
 
     Generic403:
       description: Forbidden

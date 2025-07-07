@@ -61,6 +61,8 @@ A high-level sequence of steps involved when using Dedicated Network APIs is dep
     C --> D
 ```
 
+An Access resource for a device can be created once the Network resource is created. An Access resource cannot be created anymore, once the Network is in TERMINATED [state](#states-of-the-network).
+
 ## Pre-requisites
 
 Before Dedicated Network APIs can be invoked, relevant agreements need to be in place between the API Consumer and the API Provider. Conceptually, the agreement contains all the different terms and conditions, which typically include price, service descriptions and conditions. It also includes obligations and restrictions possibly for both, the API Provider and the API Consumer, etc.

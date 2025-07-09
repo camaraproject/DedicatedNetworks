@@ -75,8 +75,6 @@ paths:
       security:
         - openId:
             - dedicated-network-accesses:accesses:read
-        - oAuth2:
-            - dedicated-network-accesses:accesses:read
       parameters:
         - name: networkId
           in: query
@@ -116,8 +114,6 @@ paths:
       operationId: createNetworkAccess
       security:
         - openId:
-            - dedicated-network-accesses:accesses:create
-        - oAuth2:
             - dedicated-network-accesses:accesses:create
       requestBody:
         content:
@@ -159,8 +155,6 @@ paths:
       security:
         - openId:
             - dedicated-network-accesses:accesses:read
-        - oAuth2:
-            - dedicated-network-accesses:accesses:read
       parameters:
         - name: accessId
           in: path
@@ -196,8 +190,6 @@ paths:
       security:
         - openId:
             - dedicated-network-accesses:accesses:delete
-        - oAuth2:
-            - dedicated-network-accesses:accesses:delete
       parameters:
         - name: accessId
           in: path
@@ -226,15 +218,6 @@ components:
     openId:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
-    oAuth2:
-      type: oauth2
-      flows:
-        clientCredentials:
-          tokenUrl: https://api.example.com/oauth/token
-          scopes:
-            dedicated-network-accesses:accesses:read: Read one or more accesses
-            dedicated-network-accesses:accesses:create: Create an access
-            dedicated-network-accesses:accesses:delete: Delete an access
   parameters:
     x-correlator:
       name: x-correlator

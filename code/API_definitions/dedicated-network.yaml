@@ -218,8 +218,6 @@ paths:
       security:
         - openId:
             - dedicated-network:networks:delete
-        - oAuth2:
-            - dedicated-network:networks:delete
       parameters:
         - name: networkId
           in: path

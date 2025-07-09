@@ -73,8 +73,6 @@ paths:
       security:
         - openId:
             - dedicated-network:networks:read
-        - oAuth2:
-            - dedicated-network:networks:read
       parameters:
         - $ref: "#/components/parameters/x-correlator"
       responses:
@@ -105,8 +103,6 @@ paths:
       operationId: createNetwork
       security:
         - openId:
-            - dedicated-network:networks:create
-        - oAuth2:
             - dedicated-network:networks:create
       requestBody:
         required: true
@@ -196,8 +192,6 @@ paths:
       security:
         - openId:
             - dedicated-network:networks:read
-        - oAuth2:
-            - dedicated-network:networks:read
       parameters:
         - name: networkId
           in: path
@@ -254,15 +248,6 @@ components:
     openId:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
-    oAuth2:
-      type: oauth2
-      flows:
-        clientCredentials:
-          tokenUrl: https://api.example.com/oauth/token
-          scopes:
-            dedicated-network:networks:read: Read one or more networks
-            dedicated-network:networks:create: Create a network
-            dedicated-network:networks:delete: Delete a network
     notificationsBearerAuth:
       description: Bearer authentication for notifications
       type: http

@@ -58,8 +58,6 @@ paths:
       security:
         - openId:
             - dedicated-network-profiles:profiles:read
-        - oAuth2:
-            - dedicated-network-profiles:profiles:read
       parameters:
         - $ref: "#/components/parameters/x-correlator"
       responses:
@@ -91,8 +89,6 @@ paths:
       operationId: readNetworkProfile
       security:
         - openId:
-            - dedicated-network-profiles:profiles:read
-        - oAuth2:
             - dedicated-network-profiles:profiles:read
       parameters:
         - name: profileId
@@ -126,13 +122,6 @@ components:
     openId:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
-    oAuth2:
-      type: oauth2
-      flows:
-        clientCredentials:
-          tokenUrl: https://api.example.com/oauth/token
-          scopes:
-            dedicated-network-profiles:profiles:read: Read network profiles
 
   parameters:
     x-correlator:

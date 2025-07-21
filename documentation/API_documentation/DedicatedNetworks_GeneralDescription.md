@@ -6,11 +6,11 @@ Fixed and Mobile Networks already offer the capability of separating devices int
 
 There are different options to technically realize a Dedicated Network. For example:
 
-- Using 5G Network Slices (see 3GPP 23.501, clause 5.15)
+- Using 5G Network Slices (see 3GPP 23.501 Rel-15, clause 5.15)
 
-- Using 5G Non-Public Networks (NPN), specifically the Public Network Integrated NPN (PNI-NPN), see 3GPP 23.501, clause 5.30)
+- Using 5G Non-Public Networks (NPN), specifically the Public Network Integrated NPN (PNI-NPN), see 3GPP 23.501 Rel-16, clause 5.30)
 
-- Using a separate 4G APN (see 3GPP 23.401) or 5G DNNs (see 3GPP 23.501). Note, a DNN is equivalent to an APN, per 3GPP 23.003.
+- Using a separate 4G APN (see 3GPP 23.401 Rel-8) or 5G DNNs (see 3GPP 23.501 Rel-15). Note, a DNN is equivalent to an APN, per 3GPP 23.003 Rel-15.
 
 Dedicated Networks abstract the complexity across **Network Provider** realizations to enable coherent use of diverse network capabilities.
 

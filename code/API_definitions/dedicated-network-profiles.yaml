@@ -154,11 +154,10 @@ components:
           description: Qos Profiles, which are supported by the dedicated network.
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/QosProfileName'
           minItems: 1
         defaultQosProfile:
-          description: default Qos Profiles of a device access.
-          type: string
+          $ref: '#/components/schemas/QosProfileName'
       required:
         - id
         - maxNumberOfDevices
@@ -190,6 +189,22 @@ components:
         - Mbps
         - Gbps
         - Tbps
+
+    QosProfileName:
+      description: |
+        A unique name for identifying a specific QoS profile.
+        This may follow different formats depending on the service providers implementation.
+        Some options addresses:
+          - A UUID style string
+          - Support for predefined profiles QOS_S, QOS_M, QOS_L, and QOS_E
+          - A searchable descriptive name
+        The set of QoS Profiles that an operator is offering can be retrieved by means of the QoS Profile API.
+      type: string
+      example: QCI_1_voice
+      minLength: 3
+      maxLength: 256
+      format: string
+      pattern: "^[a-zA-Z0-9_.-]+$"
 
     ErrorInfo:
       type: object

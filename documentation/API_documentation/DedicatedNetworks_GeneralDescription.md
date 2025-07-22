@@ -24,6 +24,9 @@ Detailed characteristics, behaviors and costs pertaining to Dedicated Networks a
 
 An API Provider realizes Dedicated Networks based on the physical network resources managed by a Network Provider. An API Provider can be the Network Provider.
 
+The present set of [Usage Scenarios](../SupportingDocuments/UsageScenarios.md) focuses on B2B use-cases, where the owner of the devices / device subscriptions is also acting as API invoker for the Networks and the Accesses APIs. This constellation allows using using the MSISDN as device identifier with a two-legged access tokens, since no additional consent needs to be obtained.
+
+
 **Key roles**
 
 | **Role Name** | **Description** |

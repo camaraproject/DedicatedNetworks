@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Dedicated Network - Accesses API
+  title: Dedicated Network - Accesses
   description: |
     This API allows for requesting network access for devices. A device is identified by the CAMARA _device object_, containing either an MSIDSN or a Network Access Identifier.
 
@@ -14,19 +14,32 @@ info:
 
     In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
 
+    # Identifying the device from the access token
+
+    This API requires the API consumer to identify a device as the subject of the API as follows:
+    - When the API is invoked using a two-legged access token, the subject will be identified from the optional `device`, which therefore MUST be provided.
+    - When a three-legged access token is used however, this optional identifier MUST NOT be provided, as the subject will be uniquely identified from the access token.
+
+    This approach simplifies API usage for API consumers using a three-legged access token to invoke the API by relying on the information that is associated with the access token and was identified during the authentication process.
+
+    ## Error handling:
+
+    - If the subject cannot be identified from the access token and the optional `device` object is not included in the request, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
+    - If the subject can be identified from the access token and the optional `device` object is also included in the request, then the server will return an error with the `422 UNNECESSARY_IDENTIFIER` error code. This will be the case even if the same `device` is identified by these two methods, as the server is unable to make this comparison.
+
     # Creating a device access
 
     A Device Access is created by performing a `POST` operation on the `/accesses` endpoint.
 
     The API Consumer provides the following information
 
-    - the networkId to access is given
+    - the networkId to which access is being given
 
-    - the `device` object (CAMARA device object) to identify the device. Either a MSISDN or a Network Access Identifier can be used.
+    - identifier of the device - either in `device` object or in the token (see "Identifying the device from the access token" above)
 
-    - Optionally, a default QoS Profile can be set for the device
+    - optionally, a default QoS Profile can be set for the device
 
-    - Optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device can access
+    - optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device can access
 
     The API returns an accessId.
 
@@ -54,7 +67,10 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
-  x-camara-commonalities: 0.5
+  x-camara-commonalities: 0.6
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/DedicatedNetworks
 servers:
   - url: "{apiRoot}/dedicated-network-accesses/vwip"
     variables:
@@ -100,10 +116,6 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
-        "500":
-          $ref: "#/components/responses/Generic500"
-        "503":
-          $ref: "#/components/responses/Generic503"
     post:
       tags:
         - Accesses
@@ -141,10 +153,8 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
-        "500":
-          $ref: "#/components/responses/Generic500"
-        "503":
-          $ref: "#/components/responses/Generic503"
+        "422":
+          $ref: "#/components/responses/Generic422"
 
   /accesses/{accessId}:
     get:
@@ -177,10 +187,6 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
-        "500":
-          $ref: "#/components/responses/Generic500"
-        "503":
-          $ref: "#/components/responses/Generic503"
 
     delete:
       tags:
@@ -208,10 +214,6 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
-        "500":
-          $ref: "#/components/responses/Generic500"
-        "503":
-          $ref: "#/components/responses/Generic503"
 
 components:
   securitySchemes:
@@ -224,8 +226,7 @@ components:
       in: header
       description: Correlation id for the different services
       schema:
-        type: string
-        pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+        $ref: "#/components/schemas/XCorrelator"
     x-device:
       name: x-device
       in: header
@@ -247,10 +248,14 @@ components:
     x-correlator:
       description: Correlation id for the different services
       schema:
-        type: string
-        pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+        $ref: "#/components/schemas/XCorrelator"
 
   schemas:
+    XCorrelator:
+      type: string
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
+
     AccessId:
       description: Network access id in UUID format
       type: string
@@ -300,7 +305,7 @@ components:
             * `phoneNumber`
             * `networkAccessIdentifier`
             NOTE1: the network operator might support only a subset of these options. The API invoker can provide multiple identifiers to be compatible across different network operators. In this case the identifiers MUST belong to the same device.
-            NOTE2: for the Commonalities release v0.4, we are enforcing that the networkAccessIdentifier is only part of the schema for future-proofing, and CAMARA does not currently allow its use. After the CAMARA meta-release work is concluded and the relevant issues are resolved, its use will need to be explicitly documented in the guidelines.
+            NOTE2: As for this Commonalities release, we are enforcing that the networkAccessIdentifier is only part of the schema for future-proofing, and CAMARA does not currently allow its use. After the CAMARA meta-release work is concluded and the relevant issues are resolved, its use will need to be explicitly documented in the guidelines.
       type: object
       properties:
         phoneNumber:
@@ -321,30 +326,42 @@ components:
       example: "123456789@domain.com"
 
     ErrorInfo:
-      description: Common schema for errors
       type: object
-      properties:
-        status:
-          type: integer
-          description: HTTP status code returned along with this error response
-        code:
-          type: string
-          description: Code given to this error
-        message:
-          type: string
-          description: Detailed error description
       required:
+        - message
         - status
         - code
-        - message
+      properties:
+        message:
+          type: string
+          description: A human readable description of what the event represent
+        status:
+          type: integer
+          description: HTTP response status code
+        code:
+          type: string
+          description: Friendly Code to describe the error
 
   responses:
     Generic400:
       description: Bad Request
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorInfo"
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+                      - OUT_OF_RANGE
           examples:
             GENERIC_400_INVALID_ARGUMENT:
               description: Invalid Argument. Generic Syntax Exception
@@ -367,14 +384,23 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorInfo"
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
           examples:
             GENERIC_401_UNAUTHENTICATED:
-              description: Request cannot be authenticated
+              description: Request cannot be authenticated and a new authentication is required
               value:
                 status: 401
                 code: UNAUTHENTICATED
-                message: Request not authenticated due to missing, invalid, or expired credentials.
+                message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
 
     Generic403:
       description: Forbidden
@@ -384,7 +410,17 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorInfo"
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+                      - INVALID_TOKEN_CONTEXT
           examples:
             GENERIC_403_PERMISSION_DENIED:
               description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
@@ -407,7 +443,17 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorInfo"
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+                      - IDENTIFIER_NOT_FOUND
           examples:
             GENERIC_404_NOT_FOUND:
               description: Resource is not found
@@ -415,6 +461,12 @@ components:
                 status: 404
                 code: NOT_FOUND
                 message: The specified resource is not found.
+            GENERIC_404_IDENTIFIER_NOT_FOUND:
+              description: Some identifier cannot be matched to a device
+              value:
+                status: 404
+                code: IDENTIFIER_NOT_FOUND
+                message: Device identifier not found.
 
     Generic410:
       description: Gone
@@ -424,7 +476,16 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorInfo"
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 410
+                  code:
+                    enum:
+                      - GONE
           examples:
             GENERIC_410_GONE:
               description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
@@ -433,33 +494,49 @@ components:
                 code: GONE
                 message: Access to the target resource is no longer available.
 
-    Generic500:
-      description: Internal server error
-      headers:
-        x-correlator:
-          $ref: '#/components/headers/x-correlator'
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorInfo"
-          example:
-            status: 500
-            code: INTERNAL
-            message: "Internal server error: ..."
-
-    Generic503:
-      description: Service Unavailable
+    Generic422:
+      description: Unprocessable Content
       headers:
         x-correlator:
           $ref: "#/components/headers/x-correlator"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorInfo"
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 422
+                  code:
+                    enum:
+                      - SERVICE_NOT_APPLICABLE
+                      - MISSING_IDENTIFIER
+                      - UNSUPPORTED_IDENTIFIER
+                      - UNNECESSARY_IDENTIFIER
           examples:
-            GENERIC_503_UNAVAILABLE:
-              description: Service is not available. Temporary situation usually related to maintenance process in the server side
+            GENERIC_422_SERVICE_NOT_APPLICABLE:
+              description: Service not applicable for the provided identifier
               value:
-                status: 503
-                code: UNAVAILABLE
-                message: Service Unavailable.
+                status: 422
+                code: SERVICE_NOT_APPLICABLE
+                message: The service is not available for the provided identifier.
+            GENERIC_422_MISSING_IDENTIFIER:
+              description: An identifier is not included in the request and the device or phone number identification cannot be derived from the 3-legged access token
+              value:
+                status: 422
+                code: MISSING_IDENTIFIER
+                message: The device cannot be identified.
+            GENERIC_422_UNSUPPORTED_IDENTIFIER:
+              description: None of the provided identifiers is supported by the implementation
+              value:
+                status: 422
+                code: UNSUPPORTED_IDENTIFIER
+                message: The identifier provided is not supported.
+            GENERIC_422_UNNECESSARY_IDENTIFIER:
+              description: An explicit identifier is provided when a device or phone number has already been identified from the access token
+              value:
+                status: 422
+                code: UNNECESSARY_IDENTIFIER
+                message: The device is already identified by the access token.

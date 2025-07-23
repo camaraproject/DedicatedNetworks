@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
+Feature: CAMARA Dedicated Network API, wip - Network Accesses API Operations
     # Input to be provided by the implementation to the tester
     #
     # Implementation indications:

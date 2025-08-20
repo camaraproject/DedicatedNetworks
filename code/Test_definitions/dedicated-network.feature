@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, wip - Networks API Operations
+Feature: CAMARA Dedicated Network API, v0.1 - Networks API Operations
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -20,7 +20,7 @@ Feature: CAMARA Dedicated Network API, wip - Networks API Operations
 
   @dedicated_network_listNetworks_01_success
   Scenario: List all dedicated networks
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.1/networks"
     When the request "listNetworks" is sent
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
@@ -31,7 +31,7 @@ Feature: CAMARA Dedicated Network API, wip - Networks API Operations
 
   @dedicated_network_createNetwork_01_success_basic
   Scenario: Create a dedicated network (basic success)
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.1/networks"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/CreateNetwork"
     And the request body property "$.profileId" is set to a valid network profile ID
@@ -49,7 +49,7 @@ Feature: CAMARA Dedicated Network API, wip - Networks API Operations
 
   @dedicated_network_createNetwork_02_success_echo
   Scenario: Create a dedicated network (response echoes request fields)
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.1/networks"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/CreateNetwork"
     And the request body property "$.profileId" is set to a valid network profile ID
@@ -70,7 +70,7 @@ Feature: CAMARA Dedicated Network API, wip - Networks API Operations
   @dedicated_network_readNetwork_01_success
   Scenario: Get details of a specific network
     Given an existing dedicated network
-    And the resource "/dedicated-network/vwip/networks/{networkId}"
+    And the resource "/dedicated-network/v0.1/networks/{networkId}"
     And the path parameter "networkId" is set to the ID of the existing network
     When the request "readNetwork" is sent
     Then the response status code is 200
@@ -84,7 +84,7 @@ Feature: CAMARA Dedicated Network API, wip - Networks API Operations
   @dedicated_network_deleteNetwork_01_success
   Scenario: Delete a dedicated network
     Given an existing dedicated network
-    And the resource "/dedicated-network/vwip/networks/{networkId}"
+    And the resource "/dedicated-network/v0.1/networks/{networkId}"
     And the path parameter "networkId" is set to the ID of the existing network
     When the request "deleteNetwork" is sent
     Then the response status code is 204

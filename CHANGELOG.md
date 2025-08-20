@@ -3,7 +3,7 @@
 # r1.2
 ## Release Notes
 
-This release contains the definition and documentation of
+This initial public release contains the definition and documentation of
 * dedicated-network v0.1.0
 * dedicated-network-accesses v0.1.0
 * dedicated-network-profiles v0.1.0

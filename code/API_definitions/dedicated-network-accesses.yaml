@@ -5,7 +5,7 @@ info:
 
     This API allows for requesting network access for devices. A device is identified by the CAMARA _device object_, containing either an MSIDSN or a Network Access Identifier. For more information about the Dedicated Networks APIs, see the _GeneralDescription_ document in the Dedicated Networks [repository](https://github.com/camaraproject/DedicatedNetworks/).
 
-    A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. Only devices for which a Device Access resource has been created can use the connectivity resources allocated for that network. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.
+    A Device Access represents the permission for a specific device or for a group of specific devices to use a Dedicated Network's reserved connectivity resources. Only devices for which a Device Access resource has been created can use the connectivity resources allocated for that network. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.
 
     A device is identified by the CAMARA `device` object, where at least one identifier for the device (user equipment) out of four options: IPv4 address, IPv6 address, Phone number, or Network Access Identifier assigned by the mobile network operator for the device.
 
@@ -24,8 +24,8 @@ info:
     # Identifying the device from the access token
 
     This API requires the API consumer to identify a device as the subject of the API as follows:
-    - When the API is invoked using a two-legged access token, the subject will be identified from the optional `device`, which therefore MUST be provided.
-    - When a three-legged access token is used however, this optional identifier MUST NOT be provided, as the subject will be uniquely identified from the access token.
+    - When the API is invoked using a two-legged access token, the subject will be identified from the `device`, which therefore MUST be provided either individually or in a device group.
+    - When a three-legged access token is used however, this optional identifier MUST NOT be provided nor a device group can be used, as the subject will be uniquely identified from the access token.
 
     This approach simplifies API usage for API consumers using a three-legged access token to invoke the API by relying on the information that is associated with the access token and was identified during the authentication process.
 
@@ -42,15 +42,13 @@ info:
 
     - the networkId to which access is being given
 
-    - identifier of the device - either in `device` object or in the token (see "Identifying the device from the access token" above)
+    - either the identifier of the device - either in `device` object or in the token (see "Identifying the device from the access token" above) - or the device group identifier (see "Creating a device group")
 
-    - optionally, a default QoS Profile can be set for the device (see Network Profiles section in the dedicated-network-profiles API in the [Dedicated Networks repository](https://github.com/camaraproject/DedicatedNetworks/)).
+    - optionally, a default QoS Profile can be set for the device(s) (see Network Profiles section in the dedicated-network-profiles API in the [Dedicated Networks repository](https://github.com/camaraproject/DedicatedNetworks/)).
 
-    - optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device can access
+    - optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device(s) can access
 
-    The API returns an accessId.
-
-     which is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
+    The API returns an accessId which is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
 
     # Querying one or more device accesses
 
@@ -61,6 +59,44 @@ info:
     # Deleting a device accesses
 
     A specific device access of the API consumer can be deleted by performing a `DELETE` operation on the `/accesses/{accessId}` endpoint. Deletion of the access can be interpreted as removal of the access permissions.
+
+    # Creating a device group
+
+    A Device Group is created by performing a `POST` operation on the `/device-groups` endpoint.
+
+    The API Consumer provides the following information
+
+    - list of devices included in the device group (which may be empty)
+
+    - optionally, a name for the device group
+
+    - optionally, a description of the device group
+
+    The API returns a deviceGroupId which is needed to query, modify, and delete the Device Group.
+
+    # Reading a device group
+
+    A specific device group of the API consumer can be read by performing a `GET` operation on the `/device-groups/{deviceGroupId}` endpoint, where the deviceGroupId has been obtained during the _create_ procedure.
+    
+    # Modifying a device group
+
+    A Device Group can be modified by performing a `PATCH` operation on the `/device-groups/{deviceGroupId}` endpoint. The operation complies with the standard JSON PATCH operation specified in IETF RFC 6902.
+
+    The API Consumer may modify the following information
+
+    - the list of devices included in the device group (which may be empty). Modification of the list can be interpreted as modification of the access permissions.
+
+    - the name for the device group
+
+    - the description of the device group
+
+    # Deleting a device group
+
+    A specific device group of the API consumer can be deleted by performing a `DELETE` operation on the `/device-groups/{deviceGroupId}` endpoint. Deletion of the device group will fail if the device group is used in any device access.
+
+    ## Error handling
+
+    - If the device group is used (referred to) by any access, then the server will return an error with the `409 RESOURCE_IN_USE` error code.
 
     # Additional CAMARA error responses
 
@@ -104,11 +140,16 @@ paths:
           description: Dedicated network id
           schema:
             $ref: 'dedicated-network.yaml#/components/schemas/NetworkId'
+        - name: deviceGroupId
+          in: query
+          description: Device group id
+          schema:
+            $ref: '#/components/schemas/DeviceGroupId'        
         - $ref: "#/components/parameters/x-device"
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '200':
-          description: List of existing device accesses to dedicated networks, optionally filtered for a given device and/or for a dedicated network (the list can be empty)
+          description: List of existing device accesses to dedicated networks, optionally filtered for a given device or a device group and/or for a dedicated network (the list can be empty)
           content:
             application/json:
               schema:
@@ -222,6 +263,174 @@ paths:
         "404":
           $ref: "#/components/responses/Generic404"
 
+  /device-groups:
+    post:
+      tags:
+        - Device Groups
+      summary: Create a device group with given list of devices
+      operationId: createDeviceGroup
+      security:
+        - openId:
+          - dedicated-network-accesses:device-groups:create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeviceGroup'
+      responses:
+        '201':
+          description: Successful creation of device group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceGroupInfo'
+          headers:
+            Location:
+              description: 'URL including the resource identifier of the newly created device group.'
+              required: true
+              schema:
+                type: string
+        '400':
+          $ref: "#/components/responses/Generic400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+
+  /device-groups/{deviceGroupId}:
+    get:
+      tags:
+        - Device Groups
+      summary: Get a device group and its configuration
+      operationId: readDeviceGroup
+      security:
+        - openId:
+          - dedicated-network-accesses:device-groups:read
+      parameters:
+        - name: deviceGroupId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/DeviceGroupId"
+        - $ref: "#/components/parameters/x-correlator"
+      responses:
+        '200':
+          description: A device group with configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceGroupInfo'
+        '400':
+          $ref: "#/components/responses/Generic400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+
+    patch:
+      tags:
+        - Device Groups
+      summary: Update a device group and its configuration
+      description: An update operation for a device group and its configuration. NOTE that the 'id' property cannot be updated.
+      operationId: updateDeviceGroup
+      security:
+        - openId:
+          - dedicated-network-accesses:device-groups:update
+      parameters:
+        - name: deviceGroupId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/DeviceGroupId"
+        - $ref: "#/components/parameters/x-correlator"
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/GenericPatchRequest'
+            examples: 
+              UPDATE_DEVICE_GROUP_NAME_AND_DESCRIPTION_EXAMPLE:
+                summary: Update of device group name and descripton
+                description: JSON Patch operations to replace device group name and descripton
+                value:
+                  - op: replace
+                    path: /name
+                    value: Site1
+                  - op: reaplce
+                    path: /description
+                    value: All IoT devices located at Site1
+              ADD_DEVICE_AT_BEGINNING:
+                summary: Add device to the beginning of device list
+                description: JSON Patch operations to insert device object at the beginning of the list of devices 
+                value:
+                  - op: add
+                    path: /devices/0
+                    value:
+                      phoneNumber: "+46123456789"
+              REMOVE_DEVICE_FROM_BEGINNING:
+                summary: Remove matching device from the beginning of device list
+                description: JSON Patch operations to remove device object from beginning of the list of devices as long as it matches the given device object
+                value:
+                  - op: remove
+                    path: /devices/0
+                  - op: test
+                    path: /devices/0
+                    value:
+                      phoneNumber: "+46123456789"
+
+      responses:
+        '200':
+          description: A device group with configuration after successful update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceGroupInfo'
+        '204':
+          description: Successful update of a device access group
+        '400':
+          $ref: "#/components/responses/Generic400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+
+    delete:
+      tags:
+        - Device Groups
+      summary: Delete a device group
+      operationId: deleteDeviceGroup
+      security:
+        - openId:
+          - dedicated-network-accesses:device-groups:delete
+        - oAuth2:
+          - dedicated-network-accesses:device-groups:delete
+      parameters:
+        - name: deviceGroupId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/DeviceGroupId"
+        - $ref: "#/components/parameters/x-correlator"
+      responses:
+        '204':
+          description: Successful deletion of a device access group
+        '400':
+          $ref: "#/components/responses/Generic400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+        "409":
+          $ref: "#/components/responses/Generic409"
+
 components:
   securitySchemes:
     openId:
@@ -268,6 +477,11 @@ components:
       type: string
       format: uuid
 
+    DeviceGroupId:
+      description: Device group id in UUID format
+      type: string
+      format: uuid
+
     BaseNetworkAccessInfo:
       description: Common attributes of a device access to a dedicated network
       type: object
@@ -276,6 +490,8 @@ components:
           $ref: "dedicated-network.yaml#/components/schemas/NetworkId"
         device:
           $ref: "#/components/schemas/Device"
+        deviceGroupId:
+          $ref: "#/components/schemas/DeviceGroupId"
         qosProfiles:
           description: (Optional) List of supported QOS profiles usable for the device. When absent, all QosProfiles of the Network are supported. Only a subset of the QOS profiles of the network is allowed
           type: array
@@ -326,6 +542,39 @@ components:
         ipv6Address:
           $ref: "#/components/schemas/DeviceIpv6Address"
       minProperties: 1
+
+    BaseDeviceGroupInfo:
+      description: Common attributes of a device group
+      type: object
+      properties:
+        devices:
+          description: list of devices included in the device group, which may be empty.
+          type: array
+          items:
+            $ref: '#/components/schemas/Device'
+        name:
+          type: string
+        description:
+          type: string    
+      required:
+        - devices
+
+    DeviceGroupInfo:
+      description: Inforamtion about a device group
+      allOf:
+        - $ref: "#/components/schemas/BaseDeviceGroupInfo"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/DeviceGroupId"
+          required:
+            - id
+
+    CreateDeviceGroup:
+      description: Attributes required to create a device group.
+      # NOTE this API design prepares for adding request specific attributes later
+      allOf:
+        - $ref: "#/components/schemas/BaseDeviceGroupInfo"
 
     PhoneNumber:
       description: A public identifier addressing a telephone subscription. In mobile networks it corresponds to the MSISDN (Mobile Station International Subscriber Directory Number). In order to be globally unique it has to be formatted in international format, according to E.164 standard, prefixed with '+'.
@@ -397,6 +646,37 @@ components:
         code:
           type: string
           description: Friendly Code to describe the error
+
+    GenericPatchRequest:
+      type: array
+      items:
+        $ref: "#/components/schemas/GenericPatchOperation"
+
+    GenericPatchOperation: 
+      description: A JSONPatch document as defined by RFC 6902 
+      required:
+      - "op"
+      - "path"
+      properties: 
+        op: 
+          type: string 
+          description: The operation to be performed 
+          enum:
+          - "add"
+          - "remove"
+          - "replace"
+          - "move"
+          - "copy"
+          - "test"
+        path: 
+          type: string 
+          description: A JSON-Pointer as defined by RFC 6901
+        value: 
+          type: object 
+          description: The value to be used within the operations.
+        from: 
+          type: string 
+          description: A string containing a JSON Pointer value.
 
   responses:
     Generic400:
@@ -523,6 +803,39 @@ components:
                 status: 404
                 code: IDENTIFIER_NOT_FOUND
                 message: Device identifier not found.
+
+    Generic409:
+      description: Conflict
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 409
+                  code:
+                    enum:
+                      - CONFLICT
+                      - RESOURCE_IN_USE
+          examples:
+            GENERIC_409_CONFLICT:
+              description: Request is in conflict with another request or another resource
+              value:
+                status: 409
+                code: CONFLICT
+                message: Access to the target resource is in conflict with another request or another resource.
+            GENERIC_409_RESOURCE_IN_USE:
+              description: Resource is in use
+              value:
+                status: 409
+                code: RESOURCE_IN_USE
+                message: Access to the target resource is not permitted because the resource is in use.
 
     Generic410:
       description: Gone

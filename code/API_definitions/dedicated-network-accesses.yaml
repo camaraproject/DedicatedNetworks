@@ -77,7 +77,7 @@ info:
     # Reading a device group
 
     A specific device group of the API consumer can be read by performing a `GET` operation on the `/device-groups/{deviceGroupId}` endpoint, where the deviceGroupId has been obtained during the _create_ procedure.
-    
+
     # Modifying a device group
 
     A Device Group can be modified by performing a `PATCH` operation on the `/device-groups/{deviceGroupId}` endpoint. The operation complies with the standard JSON PATCH operation specified in IETF RFC 6902.
@@ -144,7 +144,7 @@ paths:
           in: query
           description: Device group id
           schema:
-            $ref: '#/components/schemas/DeviceGroupId'        
+            $ref: '#/components/schemas/DeviceGroupId'
         - $ref: "#/components/parameters/x-device"
         - $ref: "#/components/parameters/x-correlator"
       responses:
@@ -271,7 +271,7 @@ paths:
       operationId: createDeviceGroup
       security:
         - openId:
-          - dedicated-network-accesses:device-groups:create
+            - dedicated-network-accesses:device-groups:create
       requestBody:
         content:
           application/json:
@@ -307,7 +307,7 @@ paths:
       operationId: readDeviceGroup
       security:
         - openId:
-          - dedicated-network-accesses:device-groups:read
+            - dedicated-network-accesses:device-groups:read
       parameters:
         - name: deviceGroupId
           in: path
@@ -339,7 +339,7 @@ paths:
       operationId: updateDeviceGroup
       security:
         - openId:
-          - dedicated-network-accesses:device-groups:update
+            - dedicated-network-accesses:device-groups:update
       parameters:
         - name: deviceGroupId
           in: path
@@ -352,7 +352,7 @@ paths:
           application/json-patch+json:
             schema:
               $ref: '#/components/schemas/GenericPatchRequest'
-            examples: 
+            examples:
               UPDATE_DEVICE_GROUP_NAME_AND_DESCRIPTION_EXAMPLE:
                 summary: Update of device group name and descripton
                 description: JSON Patch operations to replace device group name and descripton
@@ -360,12 +360,12 @@ paths:
                   - op: replace
                     path: /name
                     value: Site1
-                  - op: reaplce
+                  - op: replace
                     path: /description
                     value: All IoT devices located at Site1
               ADD_DEVICE_AT_BEGINNING:
                 summary: Add device to the beginning of device list
-                description: JSON Patch operations to insert device object at the beginning of the list of devices 
+                description: JSON Patch operations to insert device object at the beginning of the list of devices
                 value:
                   - op: add
                     path: /devices/0
@@ -407,9 +407,7 @@ paths:
       operationId: deleteDeviceGroup
       security:
         - openId:
-          - dedicated-network-accesses:device-groups:delete
-        - oAuth2:
-          - dedicated-network-accesses:device-groups:delete
+            - dedicated-network-accesses:device-groups:delete
       parameters:
         - name: deviceGroupId
           in: path
@@ -555,7 +553,7 @@ components:
         name:
           type: string
         description:
-          type: string    
+          type: string
       required:
         - devices
 
@@ -652,15 +650,15 @@ components:
       items:
         $ref: "#/components/schemas/GenericPatchOperation"
 
-    GenericPatchOperation: 
-      description: A JSONPatch document as defined by RFC 6902 
+    GenericPatchOperation:
+      description: A JSONPatch document as defined by RFC 6902
       required:
       - "op"
       - "path"
-      properties: 
-        op: 
-          type: string 
-          description: The operation to be performed 
+      properties:
+        op:
+          type: string
+          description: The operation to be performed
           enum:
           - "add"
           - "remove"
@@ -668,15 +666,24 @@ components:
           - "move"
           - "copy"
           - "test"
-        path: 
-          type: string 
+        path:
+          type: string
           description: A JSON-Pointer as defined by RFC 6901
-        value: 
-          type: object 
-          description: The value to be used within the operations.
-        from: 
-          type: string 
+        value:
+          $ref: "#/components/schemas/GenericPatchOperationValue"
+        from:
+          type: string
           description: A string containing a JSON Pointer value.
+
+    GenericPatchOperationValue:
+      description: The value to be used within the operations.
+      anyOf:
+        - type: string
+        - type: number
+        - type: object
+        - type: array
+        - type: boolean
+        - type: "null"
 
   responses:
     Generic400:

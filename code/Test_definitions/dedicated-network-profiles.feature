@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, wip - Network Profiles API Operations
+Feature: CAMARA Dedicated Network API, v0.1 - Network Profiles API Operations
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -18,7 +18,7 @@ Feature: CAMARA Dedicated Network API, wip - Network Profiles API Operations
 
   @dedicated_network_profiles_readNetworkProfiles_01_success
   Scenario: List all available network profiles
-    Given the resource "/dedicated-network-profiles/vwip/profiles"
+    Given the resource "/dedicated-network-profiles/v0.1/profiles"
     When the request "readNetworkProfiles" is sent
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
@@ -31,7 +31,7 @@ Feature: CAMARA Dedicated Network API, wip - Network Profiles API Operations
   @dedicated_network_profiles_readNetworkProfile_01_success
   Scenario: Get details of a specific network profile
     Given an existing network profile
-    And the resource "/dedicated-network-profiles/vwip/profiles/{profileId}"
+    And the resource "/dedicated-network-profiles/v0.1/profiles/{profileId}"
     And the path parameter "profileId" is set to the ID of the existing profile
     When the request "readNetworkProfile" is sent
     Then the response status code is 200

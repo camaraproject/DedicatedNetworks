@@ -98,6 +98,7 @@ The diagram below attempts to depict the complete flow including API endpoint, r
 
 **Figure**: High Level Flow with additional details
 ```mermaid
+
 sequenceDiagram
     participant App as API Consumer (Application)
     participant P as Profiles API
@@ -106,15 +107,16 @@ sequenceDiagram
     participant Network as Physical Network
     participant D as Device(s)
     Note over App,D: Pre-requisites completed
-    rect black
+    
+    rect rgba(51, 49, 49, 0.6)
         note right of App: 1: Reading Profiles
         App->>P: GET /profiles
-        P->>App: 200 OK Profiles [profileId, ...]
+        P->>App: 200 OK (Profiles [profileId, ...])
     end
-    rect black
+    rect rgba(51, 49, 49, 0.6)
         note right of App: 2: Creating a Dedicated Network
         App->>N: POST /networks (profileId, serviceArea, serviceTime, ...)
-        N->>App: 201 ACCEPTED (networkId, status=REQUESTED)
+        N->>App: 201 Created (networkId, status=REQUESTED, ...)
          N <<-->> Network: Provisioning / configuration as needed<br> Managed by API Provider and Network Provider<br>  Outside scope of the Dedicated Network APIs
         alt Callback enabled
             N-->>App: Optional callback: (networkId, status=RESERVED)
@@ -124,16 +126,16 @@ sequenceDiagram
             N-->>App: 200 OK (networkId, status=ACTIVATED)
         end
     end
-    rect black
+    rect rgba(51, 49, 49, 0.6)
         note right of App: 3: Managing Device Access
         loop Create Access resource for a given device to the given network
             App->>A: POST /accesses (networkId, device)
-            A->>App: 200 OK Access created (accessId)
+            A->>App: 201 Created (accessId)
         end
         A <<-->> Network: Provisioning / configuration as needed<br> Managed by API Provider and Network Provider<br>  Outside scope of the Dedicated Network APIs
         loop Delete a previously created Access resource
             App->>A: DELETE /accesses (accessId)
-            A->>App: 200 OK Access deleted
+            A->>App: 204 No Content
         end
     end
     Note over App,D: 4: Dedicated Network in ACTIVATED state

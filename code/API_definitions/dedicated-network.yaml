@@ -170,8 +170,6 @@ paths:
           $ref: "#/components/responses/Generic401"
         "403":
           $ref: "#/components/responses/Generic403"
-        "404":
-          $ref: "#/components/responses/Generic404"
 
   /networks/{networkId}:
     get:
@@ -262,12 +260,15 @@ components:
       type: string
       format: uuid
 
+    NetworkProfileId:
+      type: string
+
     BaseNetworkInfo:
       description: Common attributes of a dedicated network
       type: object
       properties:
         profileId:
-          $ref: 'dedicated-network-profiles.yaml#/components/schemas/NetworkProfileId'
+          $ref: '#/components/schemas/NetworkProfileId'
         serviceTime:
           $ref: '#/components/schemas/ServiceTime'
         serviceArea:
@@ -523,19 +524,19 @@ components:
     ErrorInfo:
       type: object
       required:
-        - message
         - status
         - code
+        - message
       properties:
-        message:
-          type: string
-          description: A human readable description of what the event represent
         status:
           type: integer
           description: HTTP response status code
         code:
           type: string
-          description: Friendly Code to describe the error
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          description: A human-readable description of what the event represents
 
   responses:
     Generic400:

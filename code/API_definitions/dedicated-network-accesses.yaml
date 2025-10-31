@@ -491,10 +491,8 @@ components:
       properties:
         networkId:
           $ref: "#/components/schemas/NetworkId"
-        device:
-          $ref: "#/components/schemas/Device"
-        deviceGroupId:
-          $ref: "#/components/schemas/DeviceGroupId"
+        devices:
+          $ref: "#/components/schemas/AccessDevices"
         qosProfiles:
           description: (Optional) List of supported QOS profiles usable for the device. When absent, all QosProfiles of the Network are supported. Only a subset of the QOS profiles of the network is allowed
           type: array
@@ -506,6 +504,7 @@ components:
           type: string
       required:
         - networkId
+        - devices
 
     CreateNetworkAccess:
       description: Attributes required to create a dedicated network access for a device.
@@ -572,6 +571,12 @@ components:
               $ref: "#/components/schemas/DeviceGroupId"
           required:
             - id
+
+    AccessDevices:
+      description: A device or a device group with access a dedicated network
+      oneOf:
+        - $ref: "#/components/schemas/Device"
+        - $ref: "#/components/schemas/DeviceGroupId"
 
     CreateDeviceGroup:
       description: Attributes required to create a device group.

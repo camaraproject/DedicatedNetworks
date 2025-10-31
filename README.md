@@ -58,7 +58,7 @@ For changes see the [CHANGELOG.md](https://github.com/camaraproject/DedicatedNet
 
 ## Contributing
 * Meetings are held virtually
-    * Schedule: bi-weekly, Mondays, 10 AM CEST (08:00 UTC). For date/time of the next meeting, see previous meeting minutes
+    * Schedule: bi-weekly, Mondays, 10 AM CET (09:00 UTC). For date/time of the next meeting, see previous meeting minutes
     * [Registration / Join](https://zoom-lfx.platform.linuxfoundation.org/meeting/94505909302?password=67b9a175-154f-4fe1-986d-0b825227a95b)
     * Minutes: Access [meeting minutes](https://lf-camaraproject.atlassian.net/l/cp/S3hQ1AFG)
 * Mailing List

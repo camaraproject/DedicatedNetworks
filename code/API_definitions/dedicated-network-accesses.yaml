@@ -658,19 +658,19 @@ components:
     GenericPatchOperation:
       description: A JSONPatch document as defined by RFC 6902
       required:
-      - "op"
-      - "path"
+        - "op"
+        - "path"
       properties:
         op:
           type: string
           description: The operation to be performed
           enum:
-          - "add"
-          - "remove"
-          - "replace"
-          - "move"
-          - "copy"
-          - "test"
+            - "add"
+            - "remove"
+            - "replace"
+            - "move"
+            - "copy"
+            - "test"
         path:
           type: string
           description: A JSON-Pointer as defined by RFC 6901

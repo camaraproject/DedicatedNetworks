@@ -261,7 +261,9 @@ components:
       format: uuid
 
     NetworkProfileId:
+      description: Network profile id in UUID format
       type: string
+      format: uuid
 
     BaseNetworkInfo:
       description: Common attributes of a dedicated network

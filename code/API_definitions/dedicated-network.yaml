@@ -20,7 +20,7 @@ info:
 
     - the chosen Network Profile (profileId)
 
-    - the Service Area
+    - the Service Area (serviceAreaId)
 
     - the service start and end times (Service Time).
 
@@ -265,6 +265,10 @@ components:
       type: string
       format: uuid
 
+    ServiceAreaId:
+      type: string
+      format: uuid
+
     BaseNetworkInfo:
       description: Common attributes of a dedicated network
       type: object
@@ -273,8 +277,8 @@ components:
           $ref: '#/components/schemas/NetworkProfileId'
         serviceTime:
           $ref: '#/components/schemas/ServiceTime'
-        serviceArea:
-          $ref: '#/components/schemas/Area'
+        serviceAreaId:
+          $ref: '#/components/schemas/ServiceAreaId'
         sink:
           description: The address to which events shall be delivered using the selected protocol.
           type: string
@@ -285,7 +289,7 @@ components:
       required:
         - profileId
         - serviceTime
-        - serviceArea
+        - serviceAreaId
 
     NetworkInfo:
       description: Current dedicated network information
@@ -398,38 +402,6 @@ components:
       required:
         - start
         - end
-
-    Area:
-      description: Base schema for all areas
-      type: object
-      properties:
-        areaType:
-          $ref: "#/components/schemas/AreaType"
-      required:
-        - areaType
-      discriminator:
-        propertyName: areaType
-        mapping:
-          AREANAME: "#/components/schemas/AreaName"
-
-    AreaType:
-      type: string
-      description: |
-        Type of this area.
-        AREANAME - The area is defined by an area name
-      enum:
-        - AREANAME
-
-    AreaName:
-      description: Name of a predefined area
-      allOf:
-        - $ref: "#/components/schemas/Area"
-        - type: object
-          required:
-            - areaName
-          properties:
-            areaName:
-              type: string
 
     SinkCredential:
       type: object

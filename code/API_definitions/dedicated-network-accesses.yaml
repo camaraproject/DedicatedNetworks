@@ -687,13 +687,13 @@ components:
 
     GenericPatchOperationValue:
       description: The value to be used within the operations.
+      nullable: true
       anyOf:
         - type: string
         - type: number
         - type: object
         - type: array
         - type: boolean
-        - type: "null"
 
   responses:
     Generic400:

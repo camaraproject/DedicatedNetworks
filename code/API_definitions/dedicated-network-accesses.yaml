@@ -690,11 +690,11 @@ components:
       anyOf:
         - type: string
         - type: number
-        - type: object
+        - type: object # this branch serves also as the "null" value
+          nullable: true
         - type: array
           items: {}
         - type: boolean
-        - nullable: true
 
   responses:
     Generic400:

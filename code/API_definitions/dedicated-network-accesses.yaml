@@ -327,7 +327,7 @@ components:
         The current status of the device access. The status can be one of the following:
         * `REQUESTED` - The Device Access is requested, but not granted. Possible transitions to GRANTED and DENIED states
         * `GRANTED` - The Device Access is granted by the CSP, and the device can access the Dedicated Network when the network is in the ACTIVATED state. Possible transition to DENIED state
-        * `DENIED` - The Device Access is denied by the CSP, and the device can not access the Dedicated Network. The denial can be caused by a veriaty of conditions, such as lack of resources or system failure. 
+        * `DENIED` - The Device Access is denied by the CSP, and the device can not access the Dedicated Network. The denial can be caused by a veriaty of conditions, such as lack of resources or system failure.
 
       type: string
       enum:
@@ -924,5 +924,5 @@ components:
           accessId: b69e5404-3871-448d-8f9f-11dc5d29a4c8
           status: GRANTED
           statusInfo:
-            code:  REQUEST_APPROVED
+            code: REQUEST_APPROVED
             message: The device access request is approved.

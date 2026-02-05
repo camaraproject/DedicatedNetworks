@@ -47,7 +47,7 @@ The APIs are summarized in the table below followed by a brief description. Deta
 | Dedicated Network Profiles API | Discovery of predefined set of network capabilities and performance characteristics | A Network Profile represents a predefined set of network capabilities and performance characteristics that can be applied when creating dedicated networks. Each profile represents a validated, supported configuration that has been pre-approved in the _terms and conditions_ between the API Provider and API Consumer. |
 | Dedicated Network Accesses API | Managing access to the Dedicated Network, i.e., controlling which devices may benefit from the reserved resources and capabilities | A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.<br>The access for devices to the network can only be managed when the Network is created and not in the TERMINATED [state](#states-of-the-network). |
 
-The Accesses and the Network Profile re-use the concept of named QoS Profiles from [QualityOnDemand](https://github.com/camaraproject/QualityOnDemand) for describing connectivity performance characteristics. An API provider may offer the `qos-profiles` API for resolving a QoS Profile name into characteristics of a specific QoS profile. 
+The Accesses and the Network Profile re-use the concept of named QoS Profiles from [QualityOnDemand](https://github.com/camaraproject/QualityOnDemand) for describing connectivity performance characteristics. An API provider may offer the `qos-profiles` API for resolving a QoS Profile name into characteristics of a specific QoS profile.
 
 When multiple QoS profiles are defined within a Network Profile, the API Consumer may either statically assign a different QoS profile (from the set of QoS profiles) for each device access or may dynamically create QoS Sessions using the QualityOnDemand `quality-on-demand` API.
 The API Consumer may also restict the list of possible QoS Profiles within a Device Access.
@@ -107,7 +107,7 @@ sequenceDiagram
     participant Network as Physical Network
     participant D as Device(s)
     Note over App,D: Pre-requisites completed
-    
+
     rect rgba(51, 49, 49, 0.6)
         note right of App: 1: Reading Profiles
         App->>P: GET /profiles
@@ -130,7 +130,13 @@ sequenceDiagram
         note right of App: 3: Managing Device Access
         loop Create Access resource for a given device to the given network
             App->>A: POST /accesses (networkId, device)
-            A->>App: 201 Created (accessId)
+            A->>App: 201 Created (accessId, status=REQUESTED)
+        end
+        alt Callback enabled
+            N-->>App: Optional callback: (accessId, status=GRANTED)
+        else Polling
+            App->>N: GET /accesses/{accessId}
+            N-->>App: 200 OK (accessId, status=GRANTED)
         end
         A <<-->> Network: Provisioning / configuration as needed<br> Managed by API Provider and Network Provider<br>  Outside scope of the Dedicated Network APIs
         loop Delete a previously created Access resource
@@ -139,7 +145,7 @@ sequenceDiagram
         end
     end
     Note over App,D: 4: Dedicated Network in ACTIVATED state
-    loop One or more devices
+    loop One or more devices in GRANTED state
         D-->>Network: Connect to network
         Network-->>D: Connection established / denied
     end

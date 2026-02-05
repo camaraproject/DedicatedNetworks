@@ -191,3 +191,32 @@ Explainations
 - The network may enter the TERMINATED state directly after the REQUESTED state if the API Provider could not complete the resource reservation.
 
 - A network in TERMINATED state cannot be modified anymore and should be deleted. If not deleted by the API Consumer, the representing HTTP resource (URL) may be removed by the API Provider.
+
+## States of device access to the network
+
+The device access to the dedicated network supports multiple states, i.e. REQUESTED, GRANTED, and DENIED. The networks access resource is created with a POST on the /accesses API. It contains `deviceAccess` object which contains the state information of the device access.
+
+On successful acceptance of the request, an HTTP resource is created. The response always returns a REQUESTED State. Reserved resources are only usable when the network is in ACTIVATED state.
+
+**Figure**: lifecycle of a device access to network
+
+```mermaid
+stateDiagram-v2
+    [*] --> REQUESTED: POST /accesses
+    REQUESTED --> GRANTED: Device Access is granted
+    REQUESTED --> DENIED: Device Access is rejected or it failed
+    GRANTED --> DENIED: Device Access is revoked (after having been granted) or it failed.
+```
+
+Explainations
+- A device access is usable only when it is in GRANTED state while the dedicated network is in ACTIVATED state.
+
+- A device access will transition from REQUESTED to GRANTED state (with reason code: REQUEST_APPROVED) when the access to the network is approved.
+
+- A device access will transition from REQUESTED to DENIED state (with reason code: REQUEST_FAILED) if failure occured while approving the request.
+
+- A device access will transition from REQUESTED to DENIED state (with reason code: REQUEST_REJECTED) if the request is rejected.
+
+- A device access will transition from GRANTED to DENIED state (with reason code: ACCESS_FAILED) if failure occured after the access has been granted.
+
+- A device access will transition from GRANTED to DENIED state (with reason code: ACCESS_REVOKED) when the grant to access the network is revoked.

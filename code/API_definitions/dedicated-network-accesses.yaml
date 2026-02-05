@@ -55,6 +55,10 @@ info:
     Initially, the device access is in `REQUESTED` state. The device access is only usable when it is in `GRANTED` state.
 
 
+     ## Error handling:
+
+     - If the dedicated network identified by the networkId is in an incompatible state when creating a device access, e.g. it is in the TERMINATED state, then the server will return an error with the `409 INCOMPATIBLE_STATE` error code.
+
     # Querying one or more device accesses
 
     All available device accesses of the API consumer can be queried by performing a `GET` operation on the `/accesses` endpoint. The query can be filted for accesses to a specific network (networkId) or for certain devices.
@@ -203,6 +207,8 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
+        "409":
+          $ref: "#/components/responses/Generic409"
         "422":
           $ref: "#/components/responses/Generic422"
 
@@ -782,6 +788,53 @@ components:
                 status: 404
                 code: IDENTIFIER_NOT_FOUND
                 message: Device identifier not found.
+
+    Generic409:
+      description: Conflict
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 409
+                  code:
+                    enum:
+                      - ABORTED
+                      - ALREADY_EXISTS
+                      - CONFLICT
+                      - INCOMPATIBLE_STATE
+          examples:
+            GENERIC_409_ABORTED:
+              description: Concurreny of processes of the same nature/scope
+              value:
+                status: 409
+                code: ABORTED
+                message: Concurrency conflict.
+            GENERIC_409_ALREADY_EXISTS:
+              description: Trying to create an existing resource
+              value:
+                status: 409
+                code: ALREADY_EXISTS
+                message: The resource that a client tried to create already exists.
+            GENERIC_409_CONFLICT:
+              description: Duplication of an existing resource
+              value:
+                status: 409
+                code: CONFLICT
+                message: A specified resource duplicate entry found.
+            GENERIC_409_INCOMPATIBLE_STATE:
+              description: A resource referenced in the request is in an incompatible state for the requested operation
+              value:
+                status: 409
+                code: INCOMPATIBLE_STATE
+                message: A referenced resource is in an incompatible state.
 
     Generic410:
       description: Gone

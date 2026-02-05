@@ -48,9 +48,12 @@ info:
 
     - optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device can access
 
-    The API returns an accessId.
+    - Optionally, callback related information through sink and sinkCredential parameters to receive notifications about the lifecycle events of the device access.
 
-     which is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
+    The API returns an accessId. The accessId is a unique identifier of the device access, which remains unchanged during its lifetime. The accessId is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
+
+    Initially, the device access is in `REQUESTED` state. The device access is only usable when it is in `GRANTED` state.
+
 
      ## Error handling:
 
@@ -143,6 +146,46 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateNetworkAccess'
+      callbacks:
+        notifications:
+          "{$request.body#/sink}":
+            post:
+              tags:
+                - Device access status callback
+              summary: "Device access status notifications callback"
+              description: |
+                Important: this endpoint is to be implemented by the API consumer.
+                It will be called upon change of the network access request status.
+                Currently only DEVICE_ACCESS_STATUS_CHANGED event is defined.
+              operationId: postNotification
+              parameters:
+                - $ref: "#/components/parameters/x-correlator"
+              requestBody:
+                required: true
+                content:
+                  application/cloudevents+json:
+                    schema:
+                      $ref: "#/components/schemas/CloudEvent"
+                    examples:
+                      DEVICE_ACCESS_STATUS_CHANGED_EXAMPLE:
+                        $ref: "#/components/examples/DEVICE_ACCESS_STATUS_CHANGED_EXAMPLE"
+              responses:
+                "204":
+                  description: Successful notification
+                  headers:
+                    x-correlator:
+                      $ref: '#/components/headers/x-correlator'
+                "400":
+                  $ref: "#/components/responses/Generic400"
+                "401":
+                  $ref: "#/components/responses/Generic401"
+                "403":
+                  $ref: "#/components/responses/Generic403"
+                "410":
+                  $ref: "#/components/responses/Generic410"
+              security:
+                - {}
+                - notificationsBearerAuth: []
       responses:
         '201':
           description: Successful creation of network access for a device
@@ -279,6 +322,49 @@ components:
       type: string
       format: uuid
 
+    DeviceAccessStatus:
+      description: |
+        The current status of the device access. The status can be one of the following:
+        * `REQUESTED` - The Device Access is requested, but not granted. Possible transitions to GRANTED and DENIED states
+        * `GRANTED` - The Device Access is granted by the CSP, and the device can access the Dedicated Network when the network is in the ACTIVATED state. Possible transition to DENIED state
+        * `DENIED` - The Device Access is denied by the CSP, and the device can not access the Dedicated Network. The denial can be caused by a veriaty of conditions, such as lack of resources or system failure.
+
+      type: string
+      enum:
+        - REQUESTED
+        - GRANTED
+        - DENIED
+
+    ReasonInfo:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: A human-readable code to describe the reason
+        message:
+          type: string
+          description: A human-readable description of what the reason represents
+
+    DeviceAccessStatusInfo:
+      description: Additional information about the reason for the current device access status
+      type: object
+      properties:
+        reason:
+          allOf:
+            - $ref: "#/components/schemas/ReasonInfo"
+            - type: object
+              properties:
+                code:
+                  enum:
+                    - REQUEST_APPROVED
+                    - REQUEST_REJECTED
+                    - REQUEST_FAILED
+                    - ACCESS_REVOKED
+                    - ACCESS_FAILED
+
     BaseNetworkAccessInfo:
       description: Common attributes of a device access to a dedicated network
       type: object
@@ -296,6 +382,13 @@ components:
         defaultQosProfile:
           description: (Optional) The default QOS profile of a device access. When absent, the defaultQosProfile of the Network is used
           type: string
+        sink:
+          description: The address to which events shall be delivered using the selected protocol.
+          type: string
+          format: uri
+          pattern: ^https:\/\/.+$
+        sinkCredential:
+          $ref: '#/components/schemas/SinkCredential'
       required:
         - networkId
 
@@ -306,15 +399,84 @@ components:
         - $ref: "#/components/schemas/BaseNetworkAccessInfo"
 
     NetworkAccessInfo:
-      description: Inforamtion about a dedicated network access for a device
+      description: Information about a dedicated network access for a device
       allOf:
         - $ref: "#/components/schemas/BaseNetworkAccessInfo"
         - type: object
           properties:
             id:
               $ref: "#/components/schemas/AccessId"
+            status:
+              $ref: "#/components/schemas/DeviceAccessStatus"
+            statusInfo:
+              $ref: "#/components/schemas/DeviceAccessStatusInfo"
           required:
             - id
+            - status
+
+    CloudEvent:
+      description: Event compliant with the CloudEvents specification
+      required:
+        - id
+        - source
+        - specversion
+        - type
+        - time
+      properties:
+        id:
+          description: Identifier of this event, that must be unique in the source context.
+          type: string
+        source:
+          description: Identifies the context in which an event happened in the specific Provider Implementation.
+          type: string
+          format: uri-reference
+        type:
+          description: The type of the event.
+          type: string
+          enum:
+            - "org.camaraproject.dedicated-network.v0.device-access-status-changed"
+        specversion:
+          description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
+          type: string
+          enum:
+            - '1.0'
+        datacontenttype:
+          description: 'media-type that describes the event payload encoding, must be "application/json" for CAMARA APIs'
+          type: string
+          enum:
+            - 'application/json'
+        data:
+          description: Event notification details payload, which depends on the event type
+          type: object
+        time:
+          description: |
+            Timestamp of when the occurrence happened. It must follow RFC 3339
+          type: string
+          format: date-time
+      discriminator:
+        propertyName: 'type'
+        mapping:
+          org.camaraproject.dedicated-network-accesses.v0.device-access-status-changed: "#/components/schemas/EventDeviceAccessStatusChanged"
+
+    EventDeviceAccessStatusChanged:
+      description: Event to notify a device access status change
+      type: object
+      properties:
+        data:
+          type: object
+          description: Status change details
+          required:
+            - accessId
+            - deviceAccess
+          properties:
+            accesskId:
+              $ref: "#/components/schemas/AccessId"
+            status:
+              $ref: "#/components/schemas/DeviceAccessStatus"
+            statusInfo:
+              $ref: "#/components/schemas/DeviceAccessStatusInfo"
+      required:
+        - data
 
     Device:
       description: |
@@ -391,6 +553,98 @@ components:
       type: string
       format: ipv6
       example: 2001:db8:85a3:8d3:1319:8a2e:370:7344
+
+    SinkCredential:
+      type: object
+      properties:
+        credentialType:
+          type: string
+          enum:
+            - PLAIN
+            - ACCESSTOKEN
+            - REFRESHTOKEN
+      discriminator:
+        propertyName: credentialType
+        mapping:
+          PLAIN: '#/components/schemas/PlainCredential'
+          ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
+          REFRESHTOKEN: '#/components/schemas/RefreshTokenCredential'
+      required:
+        - credentialType
+
+    PlainCredential:
+      type: object
+      description: A plain credential as a combination of an identifier and a secret.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          required:
+            - identifier
+            - secret
+          properties:
+            identifier:
+              description: The identifier might be an account or username.
+              type: string
+            secret:
+              description: The secret might be a password or passphrase.
+              type: string
+
+    AccessTokenCredential:
+      type: object
+      description: An access token credential.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
+              type: string
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)). For the current version of the API the type MUST be set to `Bearer`.
+              type: string
+              enum:
+                - bearer
+          required:
+            - accessToken
+            - accessTokenExpiresUtc
+            - accessTokenType
+
+    RefreshTokenCredential:
+      type: object
+      description: An access token credential with a refresh token.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
+              type: string
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
+              type: string
+              enum:
+                - bearer
+            refreshToken:
+              description: REQUIRED. An refresh token credential used to acquire access tokens.
+              type: string
+            refreshTokenEndpoint:
+              type: string
+              format: uri
+              description: REQUIRED. A URL at which the refresh token can be traded for an access token.
+      required:
+        - accessToken
+        - accessTokenExpiresUtc
+        - accessTokenType
+        - refreshToken
+        - refreshTokenEndpoint
 
     ErrorInfo:
       type: object
@@ -654,3 +908,21 @@ components:
                 status: 422
                 code: UNNECESSARY_IDENTIFIER
                 message: The device is already identified by the access token.
+
+  examples:
+
+    DEVICE_ACCESS_STATUS_CHANGED_EXAMPLE:
+      summary: Device access status changed
+      description: Cloud event example for network status change to GRANTED
+      value:
+        id: 625b2d4b-4da7-4f07-9169-e60ffdf7667c
+        source: 'https://api.example.com/dedicated-network-accesses/v0/accesses/b69e5404-3871-448d-8f9f-11dc5d29a4c8'
+        specversion: '1.0'
+        type: "org.camaraproject.dedicated-network.v0.device-access-status-changed"
+        time: '2024-11-29T13:04:00Z'
+        data:
+          accessId: b69e5404-3871-448d-8f9f-11dc5d29a4c8
+          status: GRANTED
+          statusInfo:
+            code: REQUEST_APPROVED
+            message: The device access request is approved.

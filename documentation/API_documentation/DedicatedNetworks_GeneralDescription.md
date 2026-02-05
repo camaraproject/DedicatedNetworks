@@ -47,7 +47,7 @@ The APIs are summarized in the table below followed by a brief description. Deta
 | Dedicated Network Profiles API | Discovery of predefined set of network capabilities and performance characteristics | A Network Profile represents a predefined set of network capabilities and performance characteristics that can be applied when creating dedicated networks. Each profile represents a validated, supported configuration that has been pre-approved in the _terms and conditions_ between the API Provider and API Consumer. |
 | Dedicated Network Accesses API | Managing access to the Dedicated Network, i.e., controlling which devices may benefit from the reserved resources and capabilities | A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.<br>The access for devices to the network can only be managed when the Network is created and not in the TERMINATED [state](#states-of-the-network). |
 
-The Accesses and the Network Profile re-use the concept of named QoS Profiles from [QualityOnDemand](https://github.com/camaraproject/QualityOnDemand) for describing connectivity performance characteristics. An API provider may offer the `qos-profiles` API for resolving a QoS Profile name into characteristics of a specific QoS profile. 
+The Accesses and the Network Profile re-use the concept of named QoS Profiles from [QualityOnDemand](https://github.com/camaraproject/QualityOnDemand) for describing connectivity performance characteristics. An API provider may offer the `qos-profiles` API for resolving a QoS Profile name into characteristics of a specific QoS profile.
 
 When multiple QoS profiles are defined within a Network Profile, the API Consumer may either statically assign a different QoS profile (from the set of QoS profiles) for each device access or may dynamically create QoS Sessions using the QualityOnDemand `quality-on-demand` API.
 The API Consumer may also restict the list of possible QoS Profiles within a Device Access.
@@ -107,7 +107,7 @@ sequenceDiagram
     participant Network as Physical Network
     participant D as Device(s)
     Note over App,D: Pre-requisites completed
-    
+
     rect rgba(51, 49, 49, 0.6)
         note right of App: 1: Reading Profiles
         App->>P: GET /profiles
@@ -130,7 +130,13 @@ sequenceDiagram
         note right of App: 3: Managing Device Access
         loop Create Access resource for a given device to the given network
             App->>A: POST /accesses (networkId, device)
-            A->>App: 201 Created (accessId)
+            A->>App: 201 Created (accessId, status=REQUESTED)
+        end
+        alt Callback enabled
+            N-->>App: Optional callback: (accessId, status=GRANTED)
+        else Polling
+            App->>N: GET /accesses/{accessId}
+            N-->>App: 200 OK (accessId, status=GRANTED)
         end
         A <<-->> Network: Provisioning / configuration as needed<br> Managed by API Provider and Network Provider<br>  Outside scope of the Dedicated Network APIs
         loop Delete a previously created Access resource
@@ -139,7 +145,7 @@ sequenceDiagram
         end
     end
     Note over App,D: 4: Dedicated Network in ACTIVATED state
-    loop One or more devices
+    loop One or more devices in GRANTED state
         D-->>Network: Connect to network
         Network-->>D: Connection established / denied
     end
@@ -191,3 +197,32 @@ Explainations
 - The network may enter the TERMINATED state directly after the REQUESTED state if the API Provider could not complete the resource reservation.
 
 - A network in TERMINATED state cannot be modified anymore and should be deleted. If not deleted by the API Consumer, the representing HTTP resource (URL) may be removed by the API Provider.
+
+## States of device access to the network
+
+The device access to the dedicated network supports multiple states, i.e. REQUESTED, GRANTED, and DENIED. The networks access resource is created with a POST on the /accesses API. It contains `deviceAccess` object which contains the state information of the device access.
+
+On successful acceptance of the request, an HTTP resource is created. The response always returns a REQUESTED State. Reserved resources are only usable when the network is in ACTIVATED state.
+
+**Figure**: lifecycle of a device access to network
+
+```mermaid
+stateDiagram-v2
+    [*] --> REQUESTED: POST /accesses
+    REQUESTED --> GRANTED: Device Access is granted
+    REQUESTED --> DENIED: Device Access is rejected or it failed
+    GRANTED --> DENIED: Device Access is revoked (after having been granted) or it failed.
+```
+
+Explainations
+- A device access is usable only when it is in GRANTED state while the dedicated network is in ACTIVATED state.
+
+- A device access will transition from REQUESTED to GRANTED state (with reason code: REQUEST_APPROVED) when the access to the network is approved.
+
+- A device access will transition from REQUESTED to DENIED state (with reason code: REQUEST_FAILED) if failure occured while approving the request.
+
+- A device access will transition from REQUESTED to DENIED state (with reason code: REQUEST_REJECTED) if the request is rejected.
+
+- A device access will transition from GRANTED to DENIED state (with reason code: ACCESS_FAILED) if failure occured after the access has been granted.
+
+- A device access will transition from GRANTED to DENIED state (with reason code: ACCESS_REVOKED) when the grant to access the network is revoked.

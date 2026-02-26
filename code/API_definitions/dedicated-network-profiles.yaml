@@ -78,6 +78,11 @@ paths:
         - openId:
             - dedicated-network-profiles:profiles:read
       parameters:
+        - name: name
+          in: query
+          description: name of a network profile
+          schema:
+            type: string
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '200':
@@ -153,13 +158,18 @@ components:
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     NetworkProfileId:
+      description: Network profile id in UUID format
       type: string
+      format: uuid
 
     NetworkProfile:
       type: object
       properties:
         id:
           $ref: '#/components/schemas/NetworkProfileId'
+        name:
+          description: A human-readable name to describe the network profile
+          type: string
         maxNumberOfDevices:
           type: integer
         aggregatedUlThroughput:
@@ -225,19 +235,20 @@ components:
     ErrorInfo:
       type: object
       required:
-        - message
         - status
         - code
+        - message
       properties:
-        message:
-          type: string
-          description: A human readable description of what the event represent
         status:
           type: integer
           description: HTTP response status code
         code:
           type: string
-          description: Friendly Code to describe the error
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          description: A human-readable description of what the event represents
+
   responses:
     Generic400:
       description: Bad Request

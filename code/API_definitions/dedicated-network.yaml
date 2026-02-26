@@ -18,9 +18,9 @@ info:
 
     The API Consumer needs to provide the following input parameters to create a network:
 
-    - the chosen Network Profile (profileId)
+    - the chosen Network Profile (networkProfileId) or QoS profile (qosProfileName). The choice is between a Network Profile (which contains properties like maximum number of devices, aggregated throughput, a list of supported QOS profiles, and a default QoS profile) and a QoS Profile which is equivalent to a simplified Network Profile for a single device, with just a default QoS profile, and with the aggregated throughput corresponding to the throughput defined by the QoS Profile.
 
-    - the Service Area
+    - the Service Area (serviceAreaId)
 
     - the service start and end times (Service Time).
 
@@ -170,8 +170,6 @@ paths:
           $ref: "#/components/responses/Generic401"
         "403":
           $ref: "#/components/responses/Generic403"
-        "404":
-          $ref: "#/components/responses/Generic404"
 
   /networks/{networkId}:
     get:
@@ -262,16 +260,43 @@ components:
       type: string
       format: uuid
 
+    NetworkProfileId:
+      description: Network profile id in UUID format
+      type: string
+      format: uuid
+
+    QosProfileName:
+      description: |
+        A unique name for identifying a specific QoS profile.
+        This may follow different formats depending on the service providers implementation.
+        Some options addresses:
+          - A UUID style string
+          - Support for predefined profiles QOS_S, QOS_M, QOS_L, and QOS_E
+          - A searchable descriptive name
+        The set of QoS Profiles that an operator is offering can be retrieved by means of the QoS Profile API.
+      type: string
+      example: QCI_1_voice
+      minLength: 3
+      maxLength: 256
+      format: string
+      pattern: "^[a-zA-Z0-9_.-]+$"
+
+    ServiceAreaId:
+      type: string
+      format: uuid
+
     BaseNetworkInfo:
       description: Common attributes of a dedicated network
       type: object
       properties:
-        profileId:
-          $ref: 'dedicated-network-profiles.yaml#/components/schemas/NetworkProfileId'
+        networkProfileId:
+          $ref: '#/components/schemas/NetworkProfileId'
+        qosProfileName:
+          $ref: '#/components/schemas/QosProfileName'
         serviceTime:
           $ref: '#/components/schemas/ServiceTime'
-        serviceArea:
-          $ref: '#/components/schemas/Area'
+        serviceAreaId:
+          $ref: '#/components/schemas/ServiceAreaId'
         sink:
           description: The address to which events shall be delivered using the selected protocol.
           type: string
@@ -280,9 +305,13 @@ components:
         sinkCredential:
           $ref: '#/components/schemas/SinkCredential'
       required:
-        - profileId
         - serviceTime
-        - serviceArea
+        - serviceAreaId
+      oneOf:
+        - required:
+            - networkProfileId
+        - required:
+            - qosProfileName
 
     NetworkInfo:
       description: Current dedicated network information
@@ -396,38 +425,6 @@ components:
         - start
         - end
 
-    Area:
-      description: Base schema for all areas
-      type: object
-      properties:
-        areaType:
-          $ref: "#/components/schemas/AreaType"
-      required:
-        - areaType
-      discriminator:
-        propertyName: areaType
-        mapping:
-          AREANAME: "#/components/schemas/AreaName"
-
-    AreaType:
-      type: string
-      description: |
-        Type of this area.
-        AREANAME - The area is defined by an area name
-      enum:
-        - AREANAME
-
-    AreaName:
-      description: Name of a predefined area
-      allOf:
-        - $ref: "#/components/schemas/Area"
-        - type: object
-          required:
-            - areaName
-          properties:
-            areaName:
-              type: string
-
     SinkCredential:
       type: object
       properties:
@@ -523,19 +520,19 @@ components:
     ErrorInfo:
       type: object
       required:
-        - message
         - status
         - code
+        - message
       properties:
-        message:
-          type: string
-          description: A human readable description of what the event represent
         status:
           type: integer
           description: HTTP response status code
         code:
           type: string
-          description: Friendly Code to describe the error
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          description: A human-readable description of what the event represents
 
   responses:
     Generic400:

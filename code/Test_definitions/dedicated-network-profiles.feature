@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, wip - Network Profiles API Operations
+Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -12,7 +12,7 @@ Feature: CAMARA Dedicated Network API, wip - Network Profiles API Operations
   Background: Common profiles setup
     Given an environment at "apiRoot"
     And the header "Authorization" is set to a valid access token
-    And the header "x-correlator" is set to a string value
+    And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
 
   # Success scenarios for GET /profiles
 

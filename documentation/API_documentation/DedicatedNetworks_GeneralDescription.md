@@ -45,9 +45,10 @@ The APIs are summarized in the table below followed by a brief description. Deta
 | ---- | ------- | ----|
 | Dedicated Network API | Reservation and lifecycle management of network connectivity resources for dedicated use. | A Dedicated Network is a logical resource and is used to embody the reservation of network connectivity resources in the physical network. Initiating a new reservation request using this API results in a new Dedicated Network resource being created. The Dedicated Network undergoes various lifecycle States including REQUESTED, RESERVED, ACTIVATED and TERMINATED. Reservation of resources occurs based on the selected Network Profile, duration when the reservation is needed (Service Time) and geographical areas where the service is needed (Service Area). |
 | Dedicated Network Profiles API | Discovery of predefined set of network capabilities and performance characteristics | A Network Profile represents a predefined set of network capabilities and performance characteristics that can be applied when creating dedicated networks. Each profile represents a validated, supported configuration that has been pre-approved in the _terms and conditions_ between the API Provider and API Consumer. |
+| Dedicated Network Areas API | Discovery of network service areas with support for network profiles and QoS profiles | A Network Service Area represents a  geographical area with coverage consistent with one or more network profiles and/or one or more QoS profiles. It enables API Consumers to select the geographical area where they can expect to consume the reserved network connectivity resources. A Network Service Area may have been pre-agreed between the API Provider and API Consumer in the _terms and conditions_ between the API Provider and API Consumer. |
 | Dedicated Network Accesses API | Managing access to the Dedicated Network, i.e., controlling which devices may benefit from the reserved resources and capabilities | A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.<br>The access for devices to the network can only be managed when the Network is created and not in the TERMINATED [state](#states-of-the-network). |
 
-The Accesses and the Network Profile re-use the concept of named QoS Profiles from [QualityOnDemand](https://github.com/camaraproject/QualityOnDemand) for describing connectivity performance characteristics. An API provider may offer the `qos-profiles` API for resolving a QoS Profile name into characteristics of a specific QoS profile. 
+The Accesses and the Network Profile re-use the concept of named QoS Profiles from [QualityOnDemand](https://github.com/camaraproject/QualityOnDemand) for describing connectivity performance characteristics. An API provider may offer the `qos-profiles` API for resolving a QoS Profile name into characteristics of a specific QoS profile.
 
 When multiple QoS profiles are defined within a Network Profile, the API Consumer may either statically assign a different QoS profile (from the set of QoS profiles) for each device access or may dynamically create QoS Sessions using the QualityOnDemand `quality-on-demand` API.
 The API Consumer may also restict the list of possible QoS Profiles within a Device Access.
@@ -59,11 +60,13 @@ A high-level sequence of steps involved when using Dedicated Network APIs is dep
 ```mermaid
     graph TD
     0[Complete Pre-requisites]
-    A[Choose Dedicated Network Profile]
+    1[Choose Dedicated Network Service Area]
+    A[Choose Dedicated Network Profile or QoS Profile]
     B[Create a Dedicated Network]
     C[Create Device Accesses]
     D[Allowed devices can use reserved network connectivity resources]
-    0 --> A
+    0 --> 1
+    1 --> A
     A --> B
     B --> C
     C --> D
@@ -77,7 +80,7 @@ An API Provider may provide a catalog where API Consumers can get an overview of
 
 The API Provider may also offer a procedure for requesting additional customization, for example, additional Service Areas or Network Profiles. Such a procedure can leverage conventional methods such as emails or phone conversations.
 
-API Consumers selects from available Network Profiles and Service Areas offered by the API Provider which then become part of the agreed terms and conditions.
+API Consumers selects from available Network Profiles, QoS profiles, and Service Areas offered by the API Provider which then become part of the agreed terms and conditions.
 
 This preparation phase is **outside the scope** of the Dedicated Network APIs.
 
@@ -85,7 +88,7 @@ As result of the agreement on the terms and conditions, the following aspects ar
 
 - URLs and credentials for the API Consumer to use
 
-- A set of capabilities and performance targets (Network Profiles) that an API Consumer is eligible to use
+- A set of capabilities and performance targets (Network Profiles and QoS Profiles) that an API Consumer is eligible to use
 
 - A set of geographic areas (Service Areas) that an API Consumer is eligible to use
 
@@ -98,23 +101,33 @@ The diagram below attempts to depict the complete flow including API endpoint, r
 
 **Figure**: High Level Flow with additional details
 ```mermaid
+
 sequenceDiagram
     participant App as API Consumer (Application)
     participant P as Profiles API
+    participant A as Areas API
     participant N as Networks API
     participant A as Accesses API
     participant Network as Physical Network
     participant D as Device(s)
     Note over App,D: Pre-requisites completed
-    rect black
+
+    rect rgba(51, 49, 49, 0.6)
         note right of App: 1: Reading Profiles
         App->>P: GET /profiles
-        P->>App: 200 OK Profiles [profileId, ...]
+        P->>App: 200 OK (Profiles [profileId, ...])
     end
-    rect black
-        note right of App: 2: Creating a Dedicated Network
-        App->>N: POST /networks (profileId, serviceArea, serviceTime, ...)
-        N->>App: 201 ACCEPTED (networkId, status=REQUESTED)
+
+    rect rgba(51, 49, 49, 0.6)
+        note right of App: 2: Discovering Areas
+        App->>P: POST /retrieve-service-areas
+        P->>App: 200 OK (Service areas [areaId, ...])
+    end
+
+    rect rgba(51, 49, 49, 0.6)
+        note right of App: 3: Creating a Dedicated Network
+        App->>N: POST /networks (profileId or qosProfileName, areaId, serviceTime, ...)
+        N->>App: 201 Created (networkId, status=REQUESTED, ...)
          N <<-->> Network: Provisioning / configuration as needed<br> Managed by API Provider and Network Provider<br>  Outside scope of the Dedicated Network APIs
         alt Callback enabled
             N-->>App: Optional callback: (networkId, status=RESERVED)
@@ -124,19 +137,19 @@ sequenceDiagram
             N-->>App: 200 OK (networkId, status=ACTIVATED)
         end
     end
-    rect black
-        note right of App: 3: Managing Device Access
+    rect rgba(51, 49, 49, 0.6)
+        note right of App: 4: Managing Device Access
         loop Create Access resource for a given device to the given network
             App->>A: POST /accesses (networkId, device)
-            A->>App: 200 OK Access created (accessId)
+            A->>App: 201 Created (accessId)
         end
         A <<-->> Network: Provisioning / configuration as needed<br> Managed by API Provider and Network Provider<br>  Outside scope of the Dedicated Network APIs
         loop Delete a previously created Access resource
             App->>A: DELETE /accesses (accessId)
-            A->>App: 200 OK Access deleted
+            A->>App: 204 No Content
         end
     end
-    Note over App,D: 4: Dedicated Network in ACTIVATED state
+    Note over App,D: 5: Dedicated Network in ACTIVATED state
     loop One or more devices
         D-->>Network: Connect to network
         Network-->>D: Connection established / denied
@@ -144,9 +157,11 @@ sequenceDiagram
 ```
 
 Description of main steps
-1. Reading Profiles: The API Consumer is reading the eligible Network Profiles. Each Network Profile contains properties, like aggregated throughput or QOS profiles.
+1. Reading Profiles: The API Consumer is reading the eligible Network Profiles. Each Network Profile contains properties, like aggregated throughput or QoS profiles. Reading of the eligible QoS Profiles may also occur in this step (not shown in the diagram).
     * The terms and conditions (see [Pre-requisites](#pre-requisites)) may define the conditions, constrains, etc for using the profile.
-1. Creating a Dedicated Network: The API Consumer creates a network, providing the profile, service time and service area as input parameters
+1. Discovering Areas: The API Consumer is retrieving the eligible Network Service Areas. Each Network Service Area contains properties, like the areas's geographical coordinates and supported network profiles and QoS profiles.
+    * The terms and conditions (see [Pre-requisites](#pre-requisites)) may define the conditions, constrains, etc for using the service area.
+1. Creating a Dedicated Network: The API Consumer creates a network, providing the network profile or QoS profile, service time and service area as input parameters
     * The network is initially in REQUESTED state. See [network lifecycle](#states-of-the-network) for more information.
     * The API Consumer can register a sink for receiving network state changes.
 1.  Managing Device Access: The API Consumer may allow one or more devices to get access to the capabilities and pcapacity of the network
@@ -154,7 +169,7 @@ Description of main steps
         * Creating an Access resource corresponds to giving access for a device to the network.
         * Deleting an Access resource corresponds to revoking access for a device to the network.
 1.  When Dedicated Network is in ACTIVATED state: Devices with access will be able to connect to the network.
-    * When a default QoS profile is defined within the Network Profile (or changed via the Access resources), the all traffic of the device will be treated with this QoS profile as default
+    * When a single QoS profile is used or a default QoS profile is defined within the Network Profile (or changed via the Access resources), all the traffic of the device will be treated with this QoS profile as default
     * When multiple QoS profiles are defined within the Network Profile (or changed via the Access resources), the API Consumer may use the QOD API for managing QoS Sessions with the QoS Profiles listed in the Network Profile.
 
 ## States of the network

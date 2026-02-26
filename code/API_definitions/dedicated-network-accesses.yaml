@@ -33,6 +33,7 @@ info:
 
     - If the subject cannot be identified from the access token and the optional `device` object is not included in the request, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
     - If the subject can be identified from the access token and the optional `device` object is also included in the request, then the server will return an error with the `422 UNNECESSARY_IDENTIFIER` error code. This will be the case even if the same `device` is identified by these two methods, as the server is unable to make this comparison.
+    - If the number of devices with access to the network is equal to or exceeds the 'maxNumberOfDevices', the API provider will provide a `429 QUOTA_EXCEEDED` error code.
 
     # Creating a device access
 
@@ -168,7 +169,8 @@ paths:
           $ref: "#/components/responses/Generic409"
         "422":
           $ref: "#/components/responses/Generic422"
-
+        "429":
+          $ref: "#/components/responses/Generic429"
   /accesses/{accessId}:
     get:
       tags:
@@ -654,3 +656,35 @@ components:
                 status: 422
                 code: UNNECESSARY_IDENTIFIER
                 message: The device is already identified by the access token.
+    Generic429:
+      description: Too Many Requests
+      headers:
+        x-correlator:
+          $ref: "#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 429
+                  code:
+                    enum:
+                      - QUOTA_EXCEEDED
+                      - TOO_MANY_REQUESTS
+          examples:
+            GENERIC_429_QUOTA_EXCEEDED:
+              description: Request is rejected due to exceeding a business quota limit
+              value:
+                status: 429
+                code: QUOTA_EXCEEDED
+                message: Out of resource quota.
+            GENERIC_429_TOO_MANY_REQUESTS:
+              description: Access to the API has been temporarily blocked due to rate or spike arrest limits being reached
+              value:
+                status: 429
+                code: TOO_MANY_REQUESTS
+                message: Rate limit reached.

@@ -87,6 +87,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NetworkInfo'
+                maxItems: 200
         "400":
           $ref: "#/components/responses/Generic400"
         "401":
@@ -164,6 +165,7 @@ paths:
               schema:
                 type: string
                 format: uri
+                maxLength: 2048
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -253,17 +255,20 @@ components:
     XCorrelator:
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     NetworkId:
       description: Network id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     NetworkProfileId:
       description: Network profile id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     QosProfileName:
       description: |
@@ -284,6 +289,7 @@ components:
     ServiceAreaId:
       type: string
       format: uuid
+      maxLength: 36
 
     BaseNetworkInfo:
       description: Common attributes of a dedicated network
@@ -301,6 +307,7 @@ components:
           description: The address to which events shall be delivered using the selected protocol.
           type: string
           format: uri
+          maxLength: 2048
           pattern: ^https:\/\/.+$
         sinkCredential:
           $ref: '#/components/schemas/SinkCredential'
@@ -360,10 +367,9 @@ components:
         id:
           description: Identifier of this event, that must be unique in the source context.
           type: string
+          maxLength: 256
         source:
-          description: Identifies the context in which an event happened in the specific Provider Implementation.
-          type: string
-          format: uri-reference
+          $ref: "#/components/schemas/Source"
         type:
           description: The type of the event.
           type: string
@@ -383,14 +389,40 @@ components:
           description: Event notification details payload, which depends on the event type
           type: object
         time:
+          $ref: "#/components/schemas/DateTime"
           description: |
-            Timestamp of when the occurrence happened. It must follow RFC 3339
+            Timestamp of when the occurrence happened. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
           type: string
           format: date-time
+          maxLength: 64
       discriminator:
         propertyName: 'type'
         mapping:
           org.camaraproject.dedicated-network.v0.network-status-changed: "#/components/schemas/EventNetworkStatusChanged"
+
+    Source:
+      type: string
+      format: uri-reference
+      minLength: 1
+      maxLength: 2048
+      description: |
+        Identifies the context in which an event happened - be a non-empty `URI-reference` like:
+        - URI with a DNS authority:
+          * https://github.com/cloudevents
+          * mailto:cncf-wg-serverless@lists.cncf.io
+        - Universally-unique URN with a UUID:
+          * urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
+        - Application-specific identifier:
+          * /cloudevents/spec/pull/123
+          * 1-555-123-4567
+      example: "https://notificationSendServer12.example.com"
+
+    DateTime:
+      type: string
+      format: date-time
+      maxLength: 64
+      description: Timestamp of when the occurrence happened. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+      example: "2018-04-05T17:31:00Z"
 
     EventNetworkStatusChanged:
       description: Event to notify a network status change
@@ -456,9 +488,11 @@ components:
             identifier:
               description: The identifier might be an account or username.
               type: string
+              maxLength: 256
             secret:
               description: The secret might be a password or passphrase.
               type: string
+              maxLength: 512
 
     AccessTokenCredential:
       type: object
@@ -470,10 +504,12 @@ components:
             accessToken:
               description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
               type: string
+              maxLength: 4096
             accessTokenExpiresUtc:
               type: string
               format: date-time
-              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
+              maxLength: 64
+              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
             accessTokenType:
               description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)). For the current version of the API the type MUST be set to `Bearer`.
               type: string
@@ -494,10 +530,12 @@ components:
             accessToken:
               description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
               type: string
+              maxLength: 4096
             accessTokenExpiresUtc:
               type: string
               format: date-time
-              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
+              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+              maxLength: 64
             accessTokenType:
               description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
               type: string
@@ -506,9 +544,11 @@ components:
             refreshToken:
               description: REQUIRED. An refresh token credential used to acquire access tokens.
               type: string
+              maxLength: 4096
             refreshTokenEndpoint:
               type: string
               format: uri
+              maxLength: 2048
               description: REQUIRED. A URL at which the refresh token can be traded for an access token.
       required:
         - accessToken
@@ -526,12 +566,17 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
 
   responses:

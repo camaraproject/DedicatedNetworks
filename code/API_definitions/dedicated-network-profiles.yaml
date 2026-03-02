@@ -77,6 +77,7 @@ paths:
           description: name of a network profile
           schema:
             type: string
+            maxLength: 200
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '200':
@@ -87,6 +88,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NetworkProfile'
+                maxItems: 200
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -149,12 +151,14 @@ components:
     XCorrelator:
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     NetworkProfileId:
       description: Network profile id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     NetworkProfile:
       type: object
@@ -164,6 +168,7 @@ components:
         name:
           description: A human-readable name to describe the network profile
           type: string
+          maxLength: 200
         maxNumberOfDevices:
           type: integer
         aggregatedUlThroughput:
@@ -235,12 +240,17 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
 
   responses:

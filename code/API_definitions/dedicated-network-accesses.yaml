@@ -119,6 +119,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NetworkAccessInfo'
+                maxItems: 200
         "400":
           $ref: "#/components/responses/Generic400"
         "401":
@@ -156,6 +157,7 @@ paths:
               required: true
               schema:
                 type: string
+                maxLength: 2048
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -255,6 +257,7 @@ components:
               as per section 3.3.5 of the RFC
       schema:
         type: string
+        maxLength: 200
       example: 'phonenumber="+123456789"'
 
   headers:
@@ -267,17 +270,20 @@ components:
     XCorrelator:
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     AccessId:
       description: Network access id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     NetworkId:
       description: Network id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     BaseNetworkAccessInfo:
       description: Common attributes of a device access to a dedicated network
@@ -292,10 +298,13 @@ components:
           type: array
           items:
             type: string
+            maxLength: 256
           minItems: 1
+          maxItems: 10
         defaultQosProfile:
           description: (Optional) The default QOS profile of a device access. When absent, the defaultQosProfile of the Network is used
           type: string
+          maxLength: 256
       required:
         - networkId
 
@@ -377,6 +386,7 @@ components:
       description: A single IPv4 address with no subnet mask
       type: string
       format: ipv4
+      maxLength: 15
       example: "84.125.93.10"
 
     Port:
@@ -390,6 +400,7 @@ components:
         The device should be identified by the observed IPv6 address, or by any single IPv6 address from within the subnet allocated to the device (e.g. adding ::0 to the /64 prefix).
       type: string
       format: ipv6
+      maxLength: 45
       example: 2001:db8:85a3:8d3:1319:8a2e:370:7344
 
     ErrorInfo:
@@ -401,12 +412,17 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
 
   responses:

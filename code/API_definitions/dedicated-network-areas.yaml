@@ -93,6 +93,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ServiceArea'
+                maxItems: 200
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -150,10 +151,12 @@ components:
     XCorrelator:
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     NetworkProfileId:
       type: string
+      maxLength: 36
 
     QosProfileName:
       description: |
@@ -174,6 +177,7 @@ components:
     ServiceAreaId:
       type: string
       format: uuid
+      maxLength: 36
 
     RetrieveServiceAreasRequest:
       description: Request object to retrieve service areas that match all the given properties
@@ -187,6 +191,7 @@ components:
           $ref: "#/components/schemas/Area"
         byName:
           type: string
+          maxLength: 200
         byNetworkProfileId:
           $ref: "#/components/schemas/NetworkProfileId"
         byQosProfileName:
@@ -199,8 +204,10 @@ components:
           $ref: '#/components/schemas/ServiceAreaId'
         name:
           type: string
+          maxLength: 200
         description:
           type: string
+          maxLength: 200
         area:
           $ref: '#/components/schemas/Area'
         networkProfiles:
@@ -209,12 +216,14 @@ components:
           items:
             $ref: "#/components/schemas/NetworkProfileId"
           minItems: 1
+          maxItems: 20
         qosProfiles:
           description: Qos Profiles which are supported in this area.
           type: array
           items:
             $ref: '#/components/schemas/QosProfileName'
           minItems: 1
+          maxItems: 20
       required:
         - id
         - area
@@ -323,12 +332,17 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
 
   responses:

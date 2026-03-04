@@ -390,11 +390,6 @@ components:
           type: object
         time:
           $ref: "#/components/schemas/DateTime"
-          description: |
-            Timestamp of when the occurrence happened. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
-          type: string
-          format: date-time
-          maxLength: 64
       discriminator:
         propertyName: 'type'
         mapping:

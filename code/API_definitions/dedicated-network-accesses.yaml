@@ -260,7 +260,7 @@ components:
       schema:
         type: string
         maxLength: 8192
-        # Practical limit of HTTP headers 
+        # Practical limit of HTTP headers
       example: 'phonenumber="+123456789"'
 
   headers:

@@ -166,6 +166,7 @@ paths:
                 type: string
                 format: uri
                 maxLength: 2048
+                # Is this too short? The standard should not limit deployments.
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -308,6 +309,7 @@ components:
           type: string
           format: uri
           maxLength: 2048
+          # Is this too short? the standrd should not limit deployments
           pattern: ^https:\/\/.+$
         sinkCredential:
           $ref: '#/components/schemas/SinkCredential'

@@ -78,6 +78,7 @@ paths:
           schema:
             type: string
             maxLength: 200
+            # Is this too short? (The standard should not limit deployments)
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '200':
@@ -89,6 +90,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/NetworkProfile'
                 maxItems: 200
+                # We may need to add pagination support, https://github.com/camaraproject/Commonalities/blob/main/documentation/CAMARA-API-Design-Guide.md#41-pagination
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -169,6 +171,7 @@ components:
           description: A human-readable name to describe the network profile
           type: string
           maxLength: 200
+          # Is this too short? The standard should not limit deployments.
         maxNumberOfDevices:
           type: integer
         aggregatedUlThroughput:

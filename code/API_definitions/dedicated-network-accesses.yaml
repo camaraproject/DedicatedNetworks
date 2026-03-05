@@ -120,6 +120,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/NetworkAccessInfo'
                 maxItems: 200
+                # We may need to add pagination support, https://github.com/camaraproject/Commonalities/blob/main/documentation/CAMARA-API-Design-Guide.md#41-pagination
         "400":
           $ref: "#/components/responses/Generic400"
         "401":
@@ -158,6 +159,7 @@ paths:
               schema:
                 type: string
                 maxLength: 2048
+                # Is this long enough?
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -257,7 +259,8 @@ components:
               as per section 3.3.5 of the RFC
       schema:
         type: string
-        maxLength: 200
+        maxLength: 8192
+        # Practical limit of HTTP headers 
       example: 'phonenumber="+123456789"'
 
   headers:
@@ -300,7 +303,7 @@ components:
             type: string
             maxLength: 256
           minItems: 1
-          maxItems: 10
+          maxItems: 128
         defaultQosProfile:
           description: (Optional) The default QOS profile of a device access. When absent, the defaultQosProfile of the Network is used
           type: string

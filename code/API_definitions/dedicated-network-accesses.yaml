@@ -78,7 +78,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
-  x-camara-commonalities: 0.6
+  x-camara-commonalities: "0.7"
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/DedicatedNetworks
@@ -119,6 +119,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NetworkAccessInfo'
+                maxItems: 200
+                # We may need to add pagination support, https://github.com/camaraproject/Commonalities/blob/main/documentation/CAMARA-API-Design-Guide.md#41-pagination
         "400":
           $ref: "#/components/responses/Generic400"
         "401":
@@ -156,6 +158,8 @@ paths:
               required: true
               schema:
                 type: string
+                maxLength: 2048
+                # Is this long enough?
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -255,6 +259,8 @@ components:
               as per section 3.3.5 of the RFC
       schema:
         type: string
+        maxLength: 8192
+        # Practical limit of HTTP headers
       example: 'phonenumber="+123456789"'
 
   headers:
@@ -267,17 +273,20 @@ components:
     XCorrelator:
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     AccessId:
       description: Network access id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     NetworkId:
       description: Network id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     BaseNetworkAccessInfo:
       description: Common attributes of a device access to a dedicated network
@@ -292,10 +301,13 @@ components:
           type: array
           items:
             type: string
+            maxLength: 256
           minItems: 1
+          maxItems: 128
         defaultQosProfile:
           description: (Optional) The default QOS profile of a device access. When absent, the defaultQosProfile of the Network is used
           type: string
+          maxLength: 256
       required:
         - networkId
 
@@ -333,7 +345,7 @@ components:
         networkAccessIdentifier:
           $ref: "#/components/schemas/NetworkAccessIdentifier"
         ipv4Address:
-          $ref: "#/components/schemas/DeviceIpv4Addr"
+          $ref: "#/components/schemas/DeviceIpv4Address"
         ipv6Address:
           $ref: "#/components/schemas/DeviceIpv6Address"
       minProperties: 1
@@ -349,7 +361,7 @@ components:
       type: string
       example: "123456789@domain.com"
 
-    DeviceIpv4Addr:
+    DeviceIpv4Address:
       type: object
       description: |
         The device should be identified by either the public (observed) IP address and port as seen by the application server, or the private (local) and any public (observed) IP addresses in use by the device (this information can be obtained by various means, for example from some DNS servers).
@@ -361,9 +373,9 @@ components:
         In all cases, publicAddress must be specified, along with at least one of either privateAddress or publicPort, dependent upon which is known. In general, mobile devices cannot be identified by their public IPv4 address alone.
       properties:
         publicAddress:
-          $ref: "#/components/schemas/SingleIpv4Addr"
+          $ref: "#/components/schemas/SingleIpv4Address"
         privateAddress:
-          $ref: "#/components/schemas/SingleIpv4Addr"
+          $ref: "#/components/schemas/SingleIpv4Address"
         publicPort:
           $ref: "#/components/schemas/Port"
       anyOf:
@@ -373,10 +385,11 @@ components:
         publicAddress: "84.125.93.10"
         publicPort: 59765
 
-    SingleIpv4Addr:
+    SingleIpv4Address:
       description: A single IPv4 address with no subnet mask
       type: string
       format: ipv4
+      maxLength: 15
       example: "84.125.93.10"
 
     Port:
@@ -390,6 +403,7 @@ components:
         The device should be identified by the observed IPv6 address, or by any single IPv6 address from within the subnet allocated to the device (e.g. adding ::0 to the /64 prefix).
       type: string
       format: ipv6
+      maxLength: 45
       example: 2001:db8:85a3:8d3:1319:8a2e:370:7344
 
     ErrorInfo:
@@ -401,12 +415,17 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
 
   responses:

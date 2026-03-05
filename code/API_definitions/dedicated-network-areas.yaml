@@ -63,7 +63,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
-  x-camara-commonalities: 0.6
+  x-camara-commonalities: "0.7"
 servers:
   - url: "{apiRoot}/dedicated-network-areas/vwip"
     variables:
@@ -93,6 +93,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ServiceArea'
+                maxItems: 200
+                # We may need to add pagination support, https://github.com/camaraproject/Commonalities/blob/main/documentation/CAMARA-API-Design-Guide.md#41-pagination
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -150,10 +152,12 @@ components:
     XCorrelator:
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     NetworkProfileId:
       type: string
+      maxLength: 36
 
     QosProfileName:
       description: |
@@ -174,6 +178,7 @@ components:
     ServiceAreaId:
       type: string
       format: uuid
+      maxLength: 36
 
     RetrieveServiceAreasRequest:
       description: Request object to retrieve service areas that match all the given properties
@@ -187,6 +192,8 @@ components:
           $ref: "#/components/schemas/Area"
         byName:
           type: string
+          maxLength: 200
+          # Is this too short?
         byNetworkProfileId:
           $ref: "#/components/schemas/NetworkProfileId"
         byQosProfileName:
@@ -199,8 +206,12 @@ components:
           $ref: '#/components/schemas/ServiceAreaId'
         name:
           type: string
+          maxLength: 200
+          # Is this too short?
         description:
           type: string
+          maxLength: 200
+          # Is this too short
         area:
           $ref: '#/components/schemas/Area'
         networkProfiles:
@@ -209,12 +220,16 @@ components:
           items:
             $ref: "#/components/schemas/NetworkProfileId"
           minItems: 1
+          maxItems: 256
+          # The standard should not limit deployments here. Deployments may enforce a shorter array length
         qosProfiles:
           description: Qos Profiles which are supported in this area.
           type: array
           items:
             $ref: '#/components/schemas/QosProfileName'
           minItems: 1
+          maxItems: 256
+          # The standard should not limit deployments here. Deployments may enforce a shorter array length
       required:
         - id
         - area
@@ -323,12 +338,17 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
 
   responses:

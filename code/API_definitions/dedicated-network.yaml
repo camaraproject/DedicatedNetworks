@@ -24,6 +24,8 @@ info:
 
     - the service start and end times (Service Time).
 
+    - Optionally, a name for the network.
+
     - Optionally, callback related information through sink and sinkCredential parameters to receive notifications about the lifecycle events of the network.
 
     The API returns a networkId. The networkId is a unique identifier of the network, which remains unchanged during its lifetime. The networkId is required when creating Device Accesses.
@@ -33,7 +35,7 @@ info:
 
     # Querying one or more Networks
 
-    All available network of the API consumer can be queried by performing a `GET` operation on the `/networks` endpoint.
+    All available network of the API consumer can be queried by performing a `GET` operation on the `/networks` endpoint. The query can be filtered for netwworks matching a certain name.
 
     A specific network of the API consumer can be queried by performing a `GET` operation on the `/networks/{networkId}` endpoint, where the networkId has been obtained during the _create_ procedure.
 
@@ -77,6 +79,11 @@ paths:
         - openId:
             - dedicated-network:networks:read
       parameters:
+        - name: name
+          in: query
+          description: name of a network
+          schema:
+            type: string
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '200':
@@ -289,6 +296,9 @@ components:
       description: Common attributes of a dedicated network
       type: object
       properties:
+        name:
+          description: A human-readable name to describe the network
+          type: string
         networkProfileId:
           $ref: '#/components/schemas/NetworkProfileId'
         qosProfileName:

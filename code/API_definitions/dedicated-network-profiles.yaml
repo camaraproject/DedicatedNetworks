@@ -175,9 +175,10 @@ components:
         maxNumberOfDevices:
           type: integer
           example: 5
-          format: int32
+          format: int64
           minimum: 1
-          maximum: 128
+          maximum: 1000000000000
+          # this is assuming support for an IoT use-case with nationwide support.
           # We may need to restrict this because of new Commonalities 0.7-rc1
         aggregatedUlThroughput:
           $ref: "#/components/schemas/BitRate"

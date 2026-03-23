@@ -35,7 +35,7 @@ info:
 
     # Querying one or more Networks
 
-    All available network of the API consumer can be queried by performing a `GET` operation on the `/networks` endpoint. The query can be filtered for netwworks matching a certain name.
+    All available network of the API consumer can be queried by performing a `GET` operation on the `/networks` endpoint. The query can be filtered for networks matching a certain name.
 
     A specific network of the API consumer can be queried by performing a `GET` operation on the `/networks/{networkId}` endpoint, where the networkId has been obtained during the _create_ procedure.
 

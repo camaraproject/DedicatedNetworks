@@ -133,6 +133,8 @@ paths:
       tags:
         - Accesses
       summary: Get a list of accesses to dedicated networks, optionally filtered for a given device and/or for a given dedicated network
+      description: |
+        Get a list of accesses to dedicated networks, optionally filtered for a given device and/or for a given dedicated network
       operationId: listAccesses
       security:
         - openId:
@@ -167,6 +169,7 @@ paths:
         - Accesses
       summary: Create an access to a dedicated network with given configuration, optionally including devices
       description: |
+        Create an access to a dedicated network with given configuration, optionally including devices
         **NOTE:**
           - This API recommends usage of a two-legged access token, but if the invoker uses a three-legged token, the corresponding `device` identifier MUST be provided and must match the identifier in the access token.
       operationId: createAccess
@@ -261,12 +264,15 @@ paths:
       tags:
         - Accesses
       summary: Read access information
+      description: |
+        Read access information
       operationId: readAccess
       security:
         - openId:
             - dedicated-network-accesses:accesses:read
       parameters:
         - name: accessId
+          description: access identifier
           in: path
           required: true
           schema:
@@ -292,12 +298,15 @@ paths:
       tags:
         - Accesses
       summary: Delete an access
+      description: |
+        Delete an access
       operationId: deleteAccess
       security:
         - openId:
             - dedicated-network-accesses:accesses:delete
       parameters:
         - name: accessId
+          description: access identifier
           in: path
           required: true
           schema:
@@ -318,6 +327,7 @@ paths:
   /accesses/{accessId}/devices:
     parameters:
       - name: accessId
+        description: access identifier
         in: path
         required: true
         schema:
@@ -327,6 +337,8 @@ paths:
       tags:
         - Devices
       summary: Read a paged list of devices with information included in the access, optionally filtered by device status
+      description: |
+        Read a paged list of devices with information included in the access, optionally filtered by device status
       operationId: listDevices
       security:
         - openId:
@@ -334,6 +346,8 @@ paths:
       parameters:
         - name: perPage
           in: query
+          description: |
+            Number of access devices to return per page
           schema:
             type: integer
             default: 10
@@ -348,8 +362,9 @@ paths:
             $ref: "#/components/schemas/SerializedDevice"
         - name: deviceStatus
           in: query
+          description: only access devices with this status are to be returned
           schema:
-            $ref:  "#/components/schemas/DeviceStatus"
+            $ref: "#/components/schemas/DeviceStatus"
       responses:
         '200':
           description: Complete list of devices returned (no further pages) (can be empty).
@@ -383,6 +398,7 @@ paths:
   /accesses/{accessId}/devices/add:
     parameters:
       - name: accessId
+        description: access identifier
         in: path
         required: true
         schema:
@@ -392,6 +408,8 @@ paths:
       tags:
         - Devices
       summary: Add devices to the access
+      description: |
+        Add devices to the access
       operationId: addDevicesToAccess
       security:
         - openId:
@@ -430,6 +448,7 @@ paths:
   /accesses/{accessId}/devices/remove:
     parameters:
       - name: accessId
+        description: access identifier
         in: path
         required: true
         schema:
@@ -439,6 +458,7 @@ paths:
       tags:
         - Devices
       summary: Remove devices from the access
+      description: Remove devices from the access
       operationId: removeDevicesFromAccess
       security:
         - openId:
@@ -473,6 +493,7 @@ paths:
 components:
   securitySchemes:
     openId:
+      description: OpenID Connect authentication via discovery metadata
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
   parameters:
@@ -505,6 +526,7 @@ components:
 
   schemas:
     XCorrelator:
+      description: Correlation id for the different services
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
@@ -533,6 +555,8 @@ components:
         - DENIED
 
     ReasonInfo:
+      description: |
+        Information about the reason for a change
       type: object
       required:
         - code
@@ -550,6 +574,8 @@ components:
       type: object
       properties:
         reason:
+          description: |
+            Information about the reason for a device status change in the context of the access
           allOf:
             - $ref: "#/components/schemas/ReasonInfo"
             - type: object
@@ -563,12 +589,13 @@ components:
                     - ACCESS_FAILED
 
     AccessDevices:
+      description: A list of access devices
       type: array
       items:
         $ref: "#/components/schemas/AccessDevice"
 
     AccessDevice:
-      description:  Information about a single device included in an access
+      description: Information about a single device included in an access
       type: object
       properties:
         device:
@@ -619,11 +646,13 @@ components:
                 - maxItems: 100
 
     CreateAccessSuccess:
-      description:  Response body used when access was created successfully for all devices (if any)
-      $ref: '#/components/schemas/AccessInfo'
+      description: |
+        Response body used when access was created successfully for all devices (if any)
+      allOf:
+        - $ref: '#/components/schemas/AccessInfo'
 
     CreateAccessPartialSuccess:
-      description:  |
+      description: |
         Response body used when access was created successfully but for some devices only.
         Successful devices are returned in `recentAccessDevices` while failed devices are listed in `results`.
         **NOTE:** Only failed devices are listed in `results`.
@@ -632,14 +661,17 @@ components:
         - $ref: '#/components/schemas/ResultsForDevices'
 
     AccessStats:
-      description:  Statistical information for a dedicated network access
+      description: Statistical information for a dedicated network access
       type: object
       properties:
         totalDevices:
+          description: the total number of devices included in the access (regardless of status)
           type: integer
         totalGranted:
+          description: the total number of devices included in the access with status GRANTED
           type: integer
         totalDenied:
+          description: the total number of devices included in the access with status DENIED
           type: integer
       required:
         - totalDevices
@@ -678,7 +710,7 @@ components:
         - maxItems: 100
 
     AddDevicesSuccess:
-      description:  |
+      description: |
         Response body used when all devices could be added to an access successfully.
         It contains a list of `deviceInfo`s, one per device.
       allOf:
@@ -687,24 +719,27 @@ components:
         - maxItems: 100
 
     AddDevicesPartialSuccess:
-      description:  |
+      description: |
         Response body used when not all devices could be added successfully.
         It contains a list of results, one result per device, detailing the result of the attempt to add the device to the access.
         **NOTE:** Both successful and failed devices are listed in `results`. A successful result for a device contains a `deviceInfo`.
-      $ref: "#/components/schemas/ResultsForDevices"
+      allOf:
+        - $ref: "#/components/schemas/ResultsForDevices"
 
     RemoveDevicesRequest:
       description: Request body used to remove devices from an access
       allOf:
         - $ref: "#/components/schemas/Devices"
         - minItems: 1
+        - maxItems: 100
 
     RemoveDevicesPartialSuccess:
-      description:  |
+      description: |
         Response body used when not all devices could be removed successfully.
         It contains a list of results, one result per failed device, detailing the result of the failed attempt to remove the device from the access.
         **NOTE:** Only failed devices are listed in `results`.
-      $ref: "#/components/schemas/ResultsForDevices"
+      allOf:
+        - $ref: "#/components/schemas/ResultsForDevices"
 
     ErrorResults:
       description: |
@@ -715,10 +750,11 @@ components:
         - $ref: "#/components/schemas/ResultsForDevices"
 
     ResultsForDevices:
-      description:  An object describing results of an operation targetting mutlpiple devices
+      description: An object describing results of an operation targetting mutlpiple devices
       type: object
       properties:
         results:
+          description: A list of operation results, one result per device
           type: array
           items:
             $ref: '#/components/schemas/ResultForDevice'
@@ -726,6 +762,7 @@ components:
           maxItems: 100
 
     ResultForDevice:
+      description: Information about the result of an operation for a device
       type: object
       required:
         - device
@@ -910,9 +947,11 @@ components:
       example: 2001:db8:85a3:8d3:1319:8a2e:370:7344
 
     SinkCredential:
+      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target
       type: object
       properties:
         credentialType:
+          description: The type of the credential
           type: string
           enum:
             - PLAIN
@@ -1002,6 +1041,7 @@ components:
         - refreshTokenEndpoint
 
     ErrorInfo:
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
       type: object
       required:
         - status
@@ -1296,10 +1336,10 @@ components:
                     code: IDENTIFIER_NOT_FOUND
                     message: Device identifier not found.
                   - device:
-                      phoneNumber: "+49123450*"
-                    status: 400
-                    code: INVALID_ARGUMENT
-                    message: Client specified an invalid device identifier.
+                      phoneNumber: "+491234500001"
+                    status: 409
+                    code: CONFLICT
+                    message: Client specified a duplicate device identifier.
   examples:
 
     DEVICE_STATUS_CHANGED_EXAMPLE:

@@ -3,9 +3,9 @@ info:
   title: Dedicated Network - Accesses
   description: |
 
-    This API allows for requesting network access for devices. A device is identified by the CAMARA _device object_, containing either an MSIDSN or a Network Access Identifier. For more information about the Dedicated Networks APIs, see the _GeneralDescription_ document in the Dedicated Networks [repository](https://github.com/camaraproject/DedicatedNetworks/).
+    This API allows for requesting access to a dedicated network for devices. A device is identified by the CAMARA _device object_, containing either an MSIDSN or a Network Access Identifier. For more information about the Dedicated Networks APIs, see the _GeneralDescription_ document in the Dedicated Networks [repository](https://github.com/camaraproject/DedicatedNetworks/).
 
-    A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. Only devices for which a Device Access resource has been created can use the connectivity resources allocated for that network. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.
+    An Access to a dedicated network represents the permission for its devices to use the Dedicated Network's reserved connectivity resources. The usage of the resources can be tailored by the access within the constraints of the applicable Network Profile.
 
     A device is identified by the CAMARA `device` object, where at least one identifier for the device (user equipment) out of four options: IPv4 address, IPv6 address, Phone number, or Network Access Identifier assigned by the mobile network operator for the device.
 
@@ -24,51 +24,80 @@ info:
     # Identifying the device from the access token
 
     This API requires the API consumer to identify a device as the subject of the API as follows:
-    - When the API is invoked using a two-legged access token, the subject will be identified from the optional `device`, which therefore MUST be provided.
-    - When a three-legged access token is used however, this optional identifier MUST NOT be provided, as the subject will be uniquely identified from the access token.
-
-    This approach simplifies API usage for API consumers using a three-legged access token to invoke the API by relying on the information that is associated with the access token and was identified during the authentication process.
+    - Since this API can handle multiple devices in one request it is strongly recommended to use a two-legged access token
+    - When the API is invoked using a two-legged access token, each device will be identified by the respective `device` identifier, which therefore MUST be provided.
+    - If a three-legged access token is used however, the corresponding `device` identifier MUST be provided and must match the identifier in the access token.
 
     ## Error handling:
 
-    - If the subject cannot be identified from the access token and the optional `device` object is not included in the request, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
-    - If the subject can be identified from the access token and the optional `device` object is also included in the request, then the server will return an error with the `422 UNNECESSARY_IDENTIFIER` error code. This will be the case even if the same `device` is identified by these two methods, as the server is unable to make this comparison.
+    - If the subject can be identified from the access token and there is no matching `device` object, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
     - If the number of devices with access to the network is equal to or exceeds the 'maxNumberOfDevices', the API provider will provide a `429 QUOTA_EXCEEDED` error code.
 
-    # Creating a device access
+    # Creating a network access for devices
 
-    A Device Access is created by performing a `POST` operation on the `/accesses` endpoint.
+    An Access for devices is created by performing a `POST` operation on the `/accesses` endpoint.
 
     The API Consumer provides the following information
 
     - the networkId to which access is being given
 
-    - identifier of the device - either in `device` object or in the token (see "Identifying the device from the access token" above)
+    - optionally, a list of identifiers of the devices, using a device object as device identifier
 
-    - optionally, a default QoS Profile can be set for the device (see Network Profiles section in the dedicated-network-profiles API in the [Dedicated Networks repository](https://github.com/camaraproject/DedicatedNetworks/)).
+    - optionally, a default QoS Profile can be set for the access and all of its devices (see Network Profiles section in the dedicated-network-profiles API in the [Dedicated Networks repository](https://github.com/camaraproject/DedicatedNetworks/)).
 
-    - optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the device can access
+    - optionally, a subset of QoS Profiles from this network can be provided to further restrict which QoS Profiles the devices can access
 
-    - Optionally, callback related information through sink and sinkCredential parameters to receive notifications about the lifecycle events of the device access.
+    - Optionally, callback related information through sink and sinkCredential parameters to receive notifications about the lifecycle events of the devices of the access.
 
-    The API returns an accessId. The accessId is a unique identifier of the device access, which remains unchanged during its lifetime. The accessId is needed to query the status of the Device Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
+    The API returns an accessId. The accessId is a unique identifier of the access, which remains unchanged during its lifetime. The accessId is needed to query the status of the Access (GET /accesses/{accessId}) and to delete Access (DELETE accesses/{accessId}).
 
-    Initially, the device access is in `REQUESTED` state. The device access is only usable when it is in `GRANTED` state.
+    If a list of devices is provided in the create request, the API also returns a recentAccessDevices with information for each device that was recognized and could be included in the access. For performance reasons the recentAccessDevices is limited to 100 most recently handled devices.
 
+    Initially, each device included in the access is in `REQUESTED` state. The device can access the network only when it is in `GRANTED` state.
+
+    If callback related information is provided, it will be used to notify of state transitions for all devices included in the access.
 
      ## Error handling:
 
-     - If the dedicated network identified by the networkId is in an incompatible state when creating a device access, e.g. it is in the TERMINATED state, then the server will return an error with the `409 INCOMPATIBLE_STATE` error code.
+     - If the dedicated network identified by the networkId is in an incompatible state when creating a network access, e.g. it is in the TERMINATED state, then the server will return an error with the `409 INCOMPATIBLE_STATE` error code.
 
-    # Querying one or more device accesses
+    # Adding devices to an access
 
-    All available device accesses of the API consumer can be queried by performing a `GET` operation on the `/accesses` endpoint. The query can be filted for accesses to a specific network (networkId) or for certain devices.
+    When an access already exists, additional devices can be added by performing a `POST` operation on the `/accesses/{accessId}/devices` collection endpoint.
 
-    A specific device access of the API consumer can be queried by performing a `GET` operation on the `/accesses/{accessId}` endpoint, where the accessId has been obtained during the _create_ procedure.
+    The API Consumer provides the following information
 
-    # Deleting a device accesses
+    - a list of identifiers of the devices to be added, using a device object as device identifier
 
-    A specific device access of the API consumer can be deleted by performing a `DELETE` operation on the `/accesses/{accessId}` endpoint. Deletion of the access can be interpreted as removal of the access permissions.
+    If all the requested devices could be added, the API returns a list with information for each requested device.
+
+    If not all requested devices could be added, the API returns a result detailing which devices were added and which failed.
+
+    If callback related information was provided for the access, it will be used to also notify of state transitions for all the newly included devices.
+
+    # Removing devices from an access
+
+    When an access already exists, devices can be removed from it by performing a `DELETE` operation on the `/accesses/{accessId}/devices` collection endpoint.
+
+    The API Consumer provides the following information
+
+    - a list of identifiers of the devices to be removed, using a device object as device identifier
+
+    The API returns a confirmation of removal or, if not all devices could be removed, a result detailing which devices were removed and which failed.
+
+    # Querying devices in an access
+
+    All devices included in an access can be queried by performing a `GET` operation on the `/accesses/{accessId}/devices` endpoint. The query can be for a specific device or for devices with a specific status.
+
+    # Querying one or more accesses
+
+    All available accesses of the API consumer can be queried by performing a `GET` operation on the `/accesses` endpoint. The query can be filtered for accesses to a specific network or those including a specific device.
+
+    A specific access of the API consumer can be queried by performing a `GET` operation on the `/accesses/{accessId}` endpoint, where the accessId has been obtained during the _create_ procedure.
+
+    # Deleting an access
+
+    A specific access of the API consumer can be deleted by performing a `DELETE` operation on the `/accesses/{accessId}` endpoint. Deletion of the access can be interpreted as removal of the permission for all the devices included in the access to access the network.
 
     # Additional CAMARA error responses
 
@@ -94,15 +123,17 @@ servers:
         description: API root, defined by the service provider, e.g. `api.example.com` or `api.example.com/somepath`
 tags:
   - name: Accesses
-    description: Manage accesses of devices for a dedicated network
+    description: Manage accesses to a dedicated network for devices
+  - name: Devices
+    description: Manage devices of an access to a dedicated network
 paths:
 
   /accesses:
     get:
       tags:
         - Accesses
-      summary: Get a list of device accesses to dedicated networks, optionally filtered for a given device and/or for a given dedicated network
-      operationId: listNetworkAccesses
+      summary: Get a list of accesses to dedicated networks, optionally filtered for a given device and/or for a given dedicated network
+      operationId: listAccesses
       security:
         - openId:
             - dedicated-network-accesses:accesses:read
@@ -116,13 +147,13 @@ paths:
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '200':
-          description: List of existing device accesses to dedicated networks, optionally filtered for a given device and/or for a dedicated network (the list can be empty)
+          description: List of existing accesses to dedicated networks, optionally filtered for a given device and/or for a dedicated network (the list can be empty)
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/NetworkAccessInfo'
+                  $ref: '#/components/schemas/AccessInfo'
         "400":
           $ref: "#/components/responses/Generic400"
         "401":
@@ -134,11 +165,11 @@ paths:
     post:
       tags:
         - Accesses
-      summary: Create a device access to a dedicated network with given configuration
+      summary: Create an access to a dedicated network with given configuration, optionally including devices
       description: |
         **NOTE:**
-          - When the API allows usage of a two-legged access token and the invoker uses it, the optional `device` object shall be present.
-      operationId: createNetworkAccess
+          - This API recommends usage of a two-legged access token, but if the invoker uses a three-legged token, the corresponding `device` identifier MUST be provided and must match the identifier in the access token.
+      operationId: createAccess
       security:
         - openId:
             - dedicated-network-accesses:accesses:create
@@ -146,7 +177,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateNetworkAccess'
+              $ref: '#/components/schemas/CreateAccessRequest'
       callbacks:
         notifications:
           "{$request.body#/sink}":
@@ -157,7 +188,7 @@ paths:
               description: |
                 Important: this endpoint is to be implemented by the API consumer.
                 It will be called upon change of the network access request status.
-                Currently only DEVICE_ACCESS_STATUS_CHANGED event is defined.
+                Currently only DEVICE_STATUS_CHANGED event is defined.
               operationId: postNotification
               parameters:
                 - $ref: "#/components/parameters/x-correlator"
@@ -168,8 +199,8 @@ paths:
                     schema:
                       $ref: "#/components/schemas/CloudEvent"
                     examples:
-                      DEVICE_ACCESS_STATUS_CHANGED_EXAMPLE:
-                        $ref: "#/components/examples/DEVICE_ACCESS_STATUS_CHANGED_EXAMPLE"
+                      DEVICE_STATUS_CHANGED_EXAMPLE:
+                        $ref: "#/components/examples/DEVICE_STATUS_CHANGED_EXAMPLE"
               responses:
                 "204":
                   description: Successful notification
@@ -189,11 +220,23 @@ paths:
                 - notificationsBearerAuth: []
       responses:
         '201':
-          description: Successful creation of network access for a device
+          description: Successful creation of the access for all devices (if any)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NetworkAccessInfo'
+                $ref: '#/components/schemas/CreateAccessSuccess'
+          headers:
+            Location:
+              description: 'URL including the resource identifier of the newly created network access.'
+              required: true
+              schema:
+                type: string
+        '207':
+          description: Successful creation of the access for some devices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccessPartialSuccess'
           headers:
             Location:
               description: 'URL including the resource identifier of the newly created network access.'
@@ -212,14 +255,13 @@ paths:
           $ref: "#/components/responses/Generic409"
         "422":
           $ref: "#/components/responses/Generic422"
-        "429":
-          $ref: "#/components/responses/Generic429"
+
   /accesses/{accessId}:
     get:
       tags:
         - Accesses
-      summary: Get a device access to the dedicated network and its configuration
-      operationId: readNetworkAccess
+      summary: Read access information
+      operationId: readAccess
       security:
         - openId:
             - dedicated-network-accesses:accesses:read
@@ -232,11 +274,11 @@ paths:
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '200':
-          description: A device access to the dedicated network with configuration
+          description: Access information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NetworkAccessInfo'
+                $ref: '#/components/schemas/AccessInfo'
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -249,8 +291,8 @@ paths:
     delete:
       tags:
         - Accesses
-      summary: Delete a device access to the dedicated network
-      operationId: deleteNetworkAccess
+      summary: Delete an access
+      operationId: deleteAccess
       security:
         - openId:
             - dedicated-network-accesses:accesses:delete
@@ -263,7 +305,7 @@ paths:
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '204':
-          description: Successful deletion of a device access
+          description: Successful deletion of the access
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -272,6 +314,161 @@ paths:
           $ref: "#/components/responses/Generic403"
         "404":
           $ref: "#/components/responses/Generic404"
+
+  /accesses/{accessId}/devices:
+    parameters:
+      - name: accessId
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/AccessId"
+      - $ref: "#/components/parameters/x-correlator"
+    get:
+      tags:
+        - Devices
+      summary: Read a paged list of devices with information included in the access, optionally filtered by device status
+      operationId: listDevices
+      security:
+        - openId:
+            - dedicated-network-accesses:devices:read
+      parameters:
+        - name: perPage
+          in: query
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: seek
+          in: query
+          description: |
+            Marker to fetch the next page. When combined with filters (e.g., deviceStatus),
+            this will return the next set of devices matching those criteria.
+          schema:
+            $ref: "#/components/schemas/SerializedDevice"
+        - name: deviceStatus
+          in: query
+          schema:
+            $ref:  "#/components/schemas/DeviceStatus"
+      responses:
+        '200':
+          description: Complete list of devices returned (no further pages) (can be empty).
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDevices'
+        '206':
+          description: Partial list of devices returned (more results available).
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            Content-Last-Key:
+              $ref: '#/components/headers/Content-Last-Key'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDevices'
+        '400':
+          $ref: "#/components/responses/Generic400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+
+  /accesses/{accessId}/devices/add:
+    parameters:
+      - name: accessId
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/AccessId"
+      - $ref: "#/components/parameters/x-correlator"
+    post:
+      tags:
+        - Devices
+      summary: Add devices to the access
+      operationId: addDevicesToAccess
+      security:
+        - openId:
+            - dedicated-network-accesses:devices:add
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddDevicesRequest"
+      responses:
+        '201':
+          description: Successful addition of all the given devices
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddDevicesSuccess"
+        '207':
+          description: Partially successful addition of devices, success for at least one of the given devices
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddDevicesPartialSuccess"
+        '400':
+          $ref: "#/components/responses/Generic400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+        "409":
+          $ref: "#/components/responses/Generic409"
+        "422":
+          $ref: "#/components/responses/NoProcessableDevices422"
+
+  /accesses/{accessId}/devices/remove:
+    parameters:
+      - name: accessId
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/AccessId"
+      - $ref: "#/components/parameters/x-correlator"
+    post:
+      tags:
+        - Devices
+      summary: Remove devices from the access
+      operationId: removeDevicesFromAccess
+      security:
+        - openId:
+            - dedicated-network-accesses:devices:remove
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemoveDevicesRequest"
+      responses:
+        '204':
+          description: Successful removal of all the given devices
+        '207':
+          description: Partially successful removal of devices, success for at least one of the given devices
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RemoveDevicesPartialSuccess"
+        '400':
+          $ref: "#/components/responses/Generic400"
+        "401":
+          $ref: "#/components/responses/Generic401"
+        "403":
+          $ref: "#/components/responses/Generic403"
+        "404":
+          $ref: "#/components/responses/Generic404"
+        "409":
+          $ref: "#/components/responses/Generic409"
+        "422":
+          $ref: "#/components/responses/NoProcessableDevices422"
 
 components:
   securitySchemes:
@@ -289,24 +486,22 @@ components:
       name: x-device
       in: header
       description: Device object represented in a header
-        Device object (#/components/schemas/Device") represented in a header.
-        It is serialized according to RFC 8941 as a structured field value where
-        the Device object is a dictionary, with the following additonal provisions
-          - property names are changed to lower case to comply with the RFC
-          - serializing property values must comply with the RFC depending on the type, and in particular
-            - if the property value is a string which contains only ASCII characters, the string can be serialized as String,
-              as per section 3.3.3 of the RFC
-            - if the property value is a string and contains non-ASCII characters, the string must be serialized as Byte Sequence using UTF-8 encoding,
-              as per section 3.3.5 of the RFC
       schema:
-        type: string
-      example: 'phonenumber="+123456789"'
+        $ref: "#/components/schemas/SerializedDevice"
 
   headers:
     x-correlator:
       description: Correlation id for the different services
       schema:
         $ref: "#/components/schemas/XCorrelator"
+    X-Total-Count:
+      description: The total number of devices in the entire collection.
+      schema:
+        type: integer
+    Content-Last-Key:
+      description: The identifier of the last device provided in the current response. Use this value in the 'seek' query parameter for the next request.
+      schema:
+        $ref: "#/components/schemas/SerializedDevice"
 
   schemas:
     XCorrelator:
@@ -324,12 +519,12 @@ components:
       type: string
       format: uuid
 
-    DeviceAccessStatus:
+    DeviceStatus:
       description: |
-        The current status of the device access. The status can be one of the following:
-        * `REQUESTED` - The Device Access is requested, but not granted. Possible transitions to GRANTED and DENIED states
-        * `GRANTED` - The Device Access is granted by the CSP, and the device can access the Dedicated Network when the network is in the ACTIVATED state. Possible transition to DENIED state
-        * `DENIED` - The Device Access is denied by the CSP, and the device can not access the Dedicated Network. The denial can be caused by a veriaty of conditions, such as lack of resources or system failure.
+        The current status of the device in the context of the access. The status can be one of the following:
+        * `REQUESTED` - The device was requested to have access to the network. Possible transitions to GRANTED and DENIED states.
+        * `GRANTED` - The device was granted access to the network by the CSP, and therefore the device can use the Dedicated Network when the network is in the ACTIVATED state. Possible transition to DENIED state.
+        * `DENIED` - The device was denied access to the network by the CSP, and therefore the device can not use the Dedicated Network. The denial can be caused by a variety of conditions, such as lack of resources or system failure.
 
       type: string
       enum:
@@ -350,8 +545,8 @@ components:
           type: string
           description: A human-readable description of what the reason represents
 
-    DeviceAccessStatusInfo:
-      description: Additional information about the reason for the current device access status
+    DeviceStatusInfo:
+      description: Additional information about the reason for the current device status
       type: object
       properties:
         reason:
@@ -367,22 +562,39 @@ components:
                     - ACCESS_REVOKED
                     - ACCESS_FAILED
 
-    BaseNetworkAccessInfo:
-      description: Common attributes of a device access to a dedicated network
+    AccessDevices:
+      type: array
+      items:
+        $ref: "#/components/schemas/AccessDevice"
+
+    AccessDevice:
+      description:  Information about a single device included in an access
+      type: object
+      properties:
+        device:
+          $ref: "#/components/schemas/Device"
+        status:
+          $ref: "#/components/schemas/DeviceStatus"
+        statusInfo:
+          $ref: "#/components/schemas/DeviceStatusInfo"
+      required:
+        - device
+        - status
+
+    BaseAccessInfo:
+      description: Common attributes of an access to a dedicated network
       type: object
       properties:
         networkId:
           $ref: "#/components/schemas/NetworkId"
-        device:
-          $ref: "#/components/schemas/Device"
         qosProfiles:
-          description: (Optional) List of supported QOS profiles usable for the device. When absent, all QosProfiles of the Network are supported. Only a subset of the QOS profiles of the network is allowed
+          description: (Optional) List of supported QOS profiles usable for the device(s). When absent, all QosProfiles of the network are supported. Only a subset of the QOS profiles of the network is allowed
           type: array
           items:
             type: string
           minItems: 1
         defaultQosProfile:
-          description: (Optional) The default QOS profile of a device access. When absent, the defaultQosProfile of the Network is used
+          description: (Optional) The default QOS profile for all devices included in the access. When absent, the defaultQosProfile of the network is used
           type: string
         sink:
           description: The address to which events shall be delivered using the selected protocol.
@@ -394,27 +606,146 @@ components:
       required:
         - networkId
 
-    CreateNetworkAccess:
-      description: Attributes required to create a dedicated network access for a device.
-      # NOTE this design prepares for adding request specific attributes later
+    CreateAccessRequest:
+      description: Attributes required to create a dedicated network access for devices
       allOf:
-        - $ref: "#/components/schemas/BaseNetworkAccessInfo"
+        - $ref: "#/components/schemas/BaseAccessInfo"
+        - type: object
+          properties:
+            devices:
+              allOf:
+                - $ref: "#/components/schemas/Devices"
+                - minItems: 1
+                - maxItems: 100
 
-    NetworkAccessInfo:
-      description: Information about a dedicated network access for a device
+    CreateAccessSuccess:
+      description:  Response body used when access was created successfully for all devices (if any)
+      $ref: '#/components/schemas/AccessInfo'
+
+    CreateAccessPartialSuccess:
+      description:  |
+        Response body used when access was created successfully but for some devices only.
+        Successful devices are returned in `recentAccessDevices` while failed devices are listed in `results`.
+        **NOTE:** Only failed devices are listed in `results`.
       allOf:
-        - $ref: "#/components/schemas/BaseNetworkAccessInfo"
+        - $ref: '#/components/schemas/AccessInfo'
+        - $ref: '#/components/schemas/ResultsForDevices'
+
+    AccessStats:
+      description:  Statistical information for a dedicated network access
+      type: object
+      properties:
+        totalDevices:
+          type: integer
+        totalGranted:
+          type: integer
+        totalDenied:
+          type: integer
+      required:
+        - totalDevices
+        - totalGranted
+        - totalDenied
+
+    AccessInfo:
+      description: |
+       Information about a dedicated network access, which includes the following:
+       * id - a unique identifier of the access
+       * stats - access statistics
+       * recentAccessDevices - a list of recently handled devices with information (can be empty)
+        **NOTE:** this recentAccessDevices is limited to a maximum of 100 devices and may therefore not be a complete list
+      allOf:
+        - $ref: "#/components/schemas/BaseAccessInfo"
         - type: object
           properties:
             id:
               $ref: "#/components/schemas/AccessId"
-            status:
-              $ref: "#/components/schemas/DeviceAccessStatus"
-            statusInfo:
-              $ref: "#/components/schemas/DeviceAccessStatusInfo"
+            stats:
+              $ref: "#/components/schemas/AccessStats"
+            recentAccessDevices:
+              allOf:
+                - $ref: "#/components/schemas/AccessDevices"
+                - minItems: 1
+                - maxItems: 100
           required:
             - id
-            - status
+            - stats
+
+    AddDevicesRequest:
+      description: Request body used to add devices to an access
+      allOf:
+        - $ref: "#/components/schemas/Devices"
+        - minItems: 1
+        - maxItems: 100
+
+    AddDevicesSuccess:
+      description:  |
+        Response body used when all devices could be added to an access successfully.
+        It contains a list of `deviceInfo`s, one per device.
+      allOf:
+        - $ref: '#/components/schemas/AccessDevices'
+        - minItems: 1
+        - maxItems: 100
+
+    AddDevicesPartialSuccess:
+      description:  |
+        Response body used when not all devices could be added successfully.
+        It contains a list of results, one result per device, detailing the result of the attempt to add the device to the access.
+        **NOTE:** Both successful and failed devices are listed in `results`. A successful result for a device contains a `deviceInfo`.
+      $ref: "#/components/schemas/ResultsForDevices"
+
+    RemoveDevicesRequest:
+      description: Request body used to remove devices from an access
+      allOf:
+        - $ref: "#/components/schemas/Devices"
+        - minItems: 1
+
+    RemoveDevicesPartialSuccess:
+      description:  |
+        Response body used when not all devices could be removed successfully.
+        It contains a list of results, one result per failed device, detailing the result of the failed attempt to remove the device from the access.
+        **NOTE:** Only failed devices are listed in `results`.
+      $ref: "#/components/schemas/ResultsForDevices"
+
+    ErrorResults:
+      description: |
+        Response body used when none of the devices could be processed successfully.
+        It contains the overall error information and a list of results, one result per device.
+      allOf:
+        - $ref: '#/components/schemas/ErrorInfo'
+        - $ref: "#/components/schemas/ResultsForDevices"
+
+    ResultsForDevices:
+      description:  An object describing results of an operation targetting mutlpiple devices
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultForDevice'
+          minItems: 1
+          maxItems: 100
+
+    ResultForDevice:
+      type: object
+      required:
+        - device
+        - status
+        - message
+      properties:
+        device:
+          $ref: '#/components/schemas/Device'
+        status:
+          type: integer
+          description: The HTTP status code for this specific device operation (e.g., 201, 404, 409)
+          example: 201
+        code:
+          type: string
+          description: A human-readable code to describe the result
+        message:
+          type: string
+          description: A human-readable description of what the result represents
+        deviceInfo:
+          $ref: '#/components/schemas/AccessDevice'
 
     CloudEvent:
       description: Event compliant with the CloudEvents specification
@@ -436,7 +767,7 @@ components:
           description: The type of the event.
           type: string
           enum:
-            - "org.camaraproject.dedicated-network.v0.device-access-status-changed"
+            - "org.camaraproject.dedicated-network.v0.device-status-changed"
         specversion:
           description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
           type: string
@@ -458,27 +789,35 @@ components:
       discriminator:
         propertyName: 'type'
         mapping:
-          org.camaraproject.dedicated-network-accesses.v0.device-access-status-changed: "#/components/schemas/EventDeviceAccessStatusChanged"
+          org.camaraproject.dedicated-network-accesses.v0.device-status-changed: "#/components/schemas/EventDeviceStatusChanged"
 
-    EventDeviceAccessStatusChanged:
-      description: Event to notify a device access status change
+    EventDeviceStatusChanged:
+      description: Event to notify a status change of one or more devices in the context of an access to a dedicated network
       type: object
       properties:
         data:
           type: object
-          description: Status change details
+          description: Status change details for one or more devices in the context of an access to a dedicated network
           required:
             - accessId
-            - deviceAccess
+            - deviceInfos
           properties:
-            accesskId:
+            accessId:
               $ref: "#/components/schemas/AccessId"
-            status:
-              $ref: "#/components/schemas/DeviceAccessStatus"
-            statusInfo:
-              $ref: "#/components/schemas/DeviceAccessStatusInfo"
+            deviceInfos:
+              type: array
+              items:
+                $ref: "#/components/schemas/AccessDevice"
+              minItems: 1
+              maxItems: 100
       required:
         - data
+
+    Devices:
+      description: A list of devices
+      type: array
+      items:
+        $ref: "#/components/schemas/Device"
 
     Device:
       description: |
@@ -501,6 +840,20 @@ components:
         ipv6Address:
           $ref: "#/components/schemas/DeviceIpv6Address"
       minProperties: 1
+
+    SerializedDevice:
+      description: |
+        Device object serialized to a string for use as a device identifier.
+        It is serialized according to RFC 8941 as a structured field value where
+        the Device object is a dictionary, with the following additonal provisions
+          - property names are changed to lower case to comply with the RFC and are ordered alphabetically
+          - serializing property values must comply with the RFC depending on the type, and in particular
+            - if the property value is a string which contains only ASCII characters, the string can be serialized as String,
+              as per section 3.3.3 of the RFC
+            - if the property value is a string and contains non-ASCII characters, the string must be serialized as Byte Sequence using UTF-8 encoding,
+              as per section 3.3.5 of the RFC
+      type: string
+      example: 'phonenumber="+123456789"'
 
     PhoneNumber:
       description: A public identifier addressing a telephone subscription. In mobile networks it corresponds to the MSISDN (Mobile Station International Subscriber Directory Number). In order to be globally unique it has to be formatted in international format, according to E.164 standard, prefixed with '+'.
@@ -814,7 +1167,7 @@ components:
                       - INCOMPATIBLE_STATE
           examples:
             GENERIC_409_ABORTED:
-              description: Concurreny of processes of the same nature/scope
+              description: Concurrency of processes of the same nature/scope
               value:
                 status: 409
                 code: ABORTED
@@ -910,8 +1263,9 @@ components:
                 status: 422
                 code: UNNECESSARY_IDENTIFIER
                 message: The device is already identified by the access token.
-    Generic429:
-      description: Too Many Requests
+
+    NoProcessableDevices422:
+      description: Unprocessable Content due to that none of the requested devices could be processed successfully
       headers:
         x-correlator:
           $ref: "#/components/headers/x-correlator"
@@ -919,44 +1273,50 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/ErrorInfo"
+              - $ref: "#/components/schemas/ErrorResults"
               - type: object
                 properties:
                   status:
                     enum:
-                      - 429
+                      - 422
                   code:
                     enum:
-                      - QUOTA_EXCEEDED
-                      - TOO_MANY_REQUESTS
+                      - DEDICATED_NETWORK_ACCESS.NO_VALID_DEVICE
           examples:
-            GENERIC_429_QUOTA_EXCEEDED:
-              description: Request is rejected due to exceeding a business quota limit
+            DEDICATED_NETWORK_ACCESS_422_NO_VALID_DEVICE:
+              description: The request is syntacticaly correct but none of the devices given in the request could be processed successfully.
               value:
-                status: 429
-                code: QUOTA_EXCEEDED
-                message: Out of resource quota.
-            GENERIC_429_TOO_MANY_REQUESTS:
-              description: Access to the API has been temporarily blocked due to rate or spike arrest limits being reached
-              value:
-                status: 429
-                code: TOO_MANY_REQUESTS
-                message: Rate limit reached.
-
+                status: 422
+                code: DEDICATED_NETWORK_ACCESS.NO_VALID_DEVICE
+                message: None of the devices in the request could be processed successfully.
+                results:
+                  - device:
+                      phoneNumber: "+49123456789"
+                    status: 404
+                    code: IDENTIFIER_NOT_FOUND
+                    message: Device identifier not found.
+                  - device:
+                      phoneNumber: "+49123450*"
+                    status: 400
+                    code: INVALID_ARGUMENT
+                    message: Client specified an invalid device identifier.
   examples:
 
-    DEVICE_ACCESS_STATUS_CHANGED_EXAMPLE:
-      summary: Device access status changed
-      description: Cloud event example for network status change to GRANTED
+    DEVICE_STATUS_CHANGED_EXAMPLE:
+      summary: Device is GRANTED access to a dedicated network
+      description: Cloud event example when a device's status in the context of an access to a dedicated network changes to GRANTED
       value:
         id: 625b2d4b-4da7-4f07-9169-e60ffdf7667c
         source: 'https://api.example.com/dedicated-network-accesses/v0/accesses/b69e5404-3871-448d-8f9f-11dc5d29a4c8'
         specversion: '1.0'
-        type: "org.camaraproject.dedicated-network.v0.device-access-status-changed"
+        type: "org.camaraproject.dedicated-network.v0.device-status-changed"
         time: '2024-11-29T13:04:00Z'
         data:
           accessId: b69e5404-3871-448d-8f9f-11dc5d29a4c8
-          status: GRANTED
-          statusInfo:
-            code: REQUEST_APPROVED
-            message: The device access request is approved.
+          deviceInfos:
+            - device:
+                phoneNumber: "+49123456789"
+              status: GRANTED
+              statusInfo:
+                code: REQUEST_APPROVED
+                message: The request to grant the device access to the network was approved.

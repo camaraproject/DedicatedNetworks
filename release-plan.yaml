@@ -8,19 +8,18 @@
 repository:
   # How this repository participates in CAMARA releases
   # Options: independent (default) | meta-release
-  release_track: meta-release
+  release_track: independent
   # Meta-release participation (update for next cycle when planning)
-  meta_release: Fall25
 
   # Target CAMARA release tag.
   # Initialized to the latest release; update when planning the next release.
   # - New release cycle (increment first number, reset second to 1)
   # - Progression in same cycle (increment second number)
-  target_release_tag: r1.2
+  target_release_tag: r2.1
 
   # Release type being prepared (must be set before release can be triggered)
   # Options: none | pre-release-alpha | pre-release-rc | public-release | maintenance-release
-  target_release_type: none
+  target_release_type: pre-release-alpha
 
 # Dependencies on Commonalities and ICM releases
 # Update per ReleaseManagement requirements for each release cycle
@@ -33,16 +32,16 @@ dependencies:
 # - target_api_status: draft (no file yet) | alpha | rc | public
 apis:
   - api_name: dedicated-network-accesses
-    target_api_version: 0.1.0
-    target_api_status: public
+    target_api_version: 0.2.0
+    target_api_status: alpha
     main_contacts:
       - tlohmar
       - PeterKovacs2
       - carlosromerog
       - eric-murray
   - api_name: dedicated-network-profiles
-    target_api_version: 0.1.0
-    target_api_status: public
+    target_api_version: 0.2.0
+    target_api_status: alpha
     main_contacts:
       - tlohmar
       - PeterKovacs2
@@ -50,7 +49,15 @@ apis:
       - eric-murray
   - api_name: dedicated-network
     target_api_version: 0.1.0
-    target_api_status: public
+    target_api_status: alpha
+    main_contacts:
+      - tlohmar
+      - PeterKovacs2
+      - carlosromerog
+      - eric-murray
+  - api_name: dedicated-network-areas
+    target_api_version: 0.1.0
+    target_api_status: alpha
     main_contacts:
       - tlohmar
       - PeterKovacs2

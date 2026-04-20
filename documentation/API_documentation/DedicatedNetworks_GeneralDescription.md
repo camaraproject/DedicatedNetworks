@@ -18,7 +18,7 @@ A Dedicated Network is often only needed for a specific time duration (e.g. one 
 
 The CAMARA Dedicated Network APIs allow **API Consumers** to programmatically manage Dedicated Networks, without the need for in-depth knowledge of telecommunications systems.
 
-API Consumers have control over which devices are allowed to access and use the reserved network connectivity resources. In addition, network connectivity characteristics, for example, routing and performance may be individually tailored for each device.
+API Consumers have control over which devices are allowed to access and use the reserved network connectivity resources. In addition, network connectivity characteristics, for example, routing and performance may be tailored for a set of devices.
 
 Detailed characteristics, behaviors and costs pertaining to Dedicated Networks are typically described by the **API Provider** in the terms and conditions. Such terms and conditions may also contain obligations and restrictions.
 
@@ -46,12 +46,12 @@ The APIs are summarized in the table below followed by a brief description. Deta
 | Dedicated Network API | Reservation and lifecycle management of network connectivity resources for dedicated use. | A Dedicated Network is a logical resource and is used to embody the reservation of network connectivity resources in the physical network. Initiating a new reservation request using this API results in a new Dedicated Network resource being created. The Dedicated Network undergoes various lifecycle States including REQUESTED, RESERVED, ACTIVATED and TERMINATED. Reservation of resources occurs based on the selected Network Profile, duration when the reservation is needed (Service Time) and geographical areas where the service is needed (Service Area). |
 | Dedicated Network Profiles API | Discovery of predefined set of network capabilities and performance characteristics | A Network Profile represents a predefined set of network capabilities and performance characteristics that can be applied when creating dedicated networks. Each profile represents a validated, supported configuration that has been pre-approved in the _terms and conditions_ between the API Provider and API Consumer. |
 | Dedicated Network Areas API | Discovery of network service areas with support for network profiles and QoS profiles | A Network Service Area represents a  geographical area with coverage consistent with one or more network profiles and/or one or more QoS profiles. It enables API Consumers to select the geographical area where they can expect to consume the reserved network connectivity resources. A Network Service Area may have been pre-agreed between the API Provider and API Consumer in the _terms and conditions_ between the API Provider and API Consumer. |
-| Dedicated Network Accesses API | Managing access to the Dedicated Network, i.e., controlling which devices may benefit from the reserved resources and capabilities | A Device Access represents the permission for a specific device to use a Dedicated Network's reserved connectivity resources. The usage of resources can be tailored to each device within the constraints of the applicable Network Profile.<br>The access for devices to the network can only be managed when the Network is created and not in the TERMINATED [state](#states-of-the-network). |
+| Dedicated Network Accesses API | Managing access to the Dedicated Network, i.e., controlling which devices may benefit from the reserved resources and capabilities | An  Access represents the permission for a set of devices to use a Dedicated Network's reserved connectivity resources. An Access can tailor the resource usage within the constraints of the applicable Network Profile, so that each device inherits the usage.<br>The access can only be managed when the Network is created and not in the TERMINATED [state](#states-of-the-network). |
 
-The Accesses and the Network Profile re-use the concept of named QoS Profiles from [QualityOnDemand](https://github.com/camaraproject/QualityOnDemand) for describing connectivity performance characteristics. An API provider may offer the `qos-profiles` API for resolving a QoS Profile name into characteristics of a specific QoS profile.
+The Access and the Network Profile re-use the concept of named QoS Profiles from [QualityOnDemand](https://github.com/camaraproject/QualityOnDemand) for describing connectivity performance characteristics. An API provider may offer the `qos-profiles` API for resolving a QoS Profile name into characteristics of a specific QoS profile.
 
-When multiple QoS profiles are defined within a Network Profile, the API Consumer may either statically assign a different QoS profile (from the set of QoS profiles) for each device access or may dynamically create QoS Sessions using the QualityOnDemand `quality-on-demand` API.
-The API Consumer may also restict the list of possible QoS Profiles within a Device Access.
+When multiple QoS profiles are defined within a Network Profile, the API Consumer may either statically assign a different QoS profile (from the set of QoS profiles) for each access and consquently for each device access within the access or may dynamically create QoS Sessions using the QualityOnDemand `quality-on-demand` API.
+The API Consumer may also restict the list of possible QoS Profiles within an Access and consquently restrict it for each device within the access.
 
 A high-level sequence of steps involved when using Dedicated Network APIs is depicted in the diagram below and further described in their respective sections.
 
@@ -63,7 +63,7 @@ A high-level sequence of steps involved when using Dedicated Network APIs is dep
     1[Choose Dedicated Network Service Area]
     A[Choose Dedicated Network Profile or QoS Profile]
     B[Create a Dedicated Network]
-    C[Create Device Accesses]
+    C[Create Accesses for Devices]
     D[Allowed devices can use reserved network connectivity resources]
     0 --> 1
     1 --> A
@@ -138,16 +138,16 @@ sequenceDiagram
         end
     end
     rect rgba(51, 49, 49, 0.6)
-        note right of App: 4: Managing Device Access
-        loop Create Access resource for a given device to the given network
-            App->>A: POST /accesses (networkId, device)
-            A->>App: 201 Created (accessId, status=REQUESTED)
+        note right of App: 3: Managing Access for Devices
+        loop Create Access resource to give one or more devices access to the given network
+            App->>A: POST /accesses (networkId, devices)
+            A->>App: 201 Created (accessId, device(s), each device with status=REQUESTED)
         end
         alt Callback enabled
-            N-->>App: Optional callback: (accessId, status=GRANTED)
+            N-->>App: Optional callback(s): (accessId, device(s), each device with status=GRANTED)
         else Polling
-            App->>N: GET /accesses/{accessId}
-            N-->>App: 200 OK (accessId, status=GRANTED)
+            App->>N: GET /accesses/{accessId}/devices
+            N-->>App: 200 OK (device(s), each device with status=GRANTED)
         end
         A <<-->> Network: Provisioning / configuration as needed<br> Managed by API Provider and Network Provider<br>  Outside scope of the Dedicated Network APIs
         loop Delete a previously created Access resource
@@ -170,12 +170,12 @@ Description of main steps
 1. Creating a Dedicated Network: The API Consumer creates a network, providing the network profile or QoS profile, service time and service area as input parameters
     * The network is initially in REQUESTED state. See [network lifecycle](#states-of-the-network) for more information.
     * The API Consumer can register a sink for receiving network state changes.
-1.  Managing Device Access: The API Consumer may allow one or more devices to get access to the capabilities and pcapacity of the network
+1.  Managing Access for Devices: The API Consumer may allow one or more devices to get access to the capabilities and capacity of the network
     * The API Consumer may use the Accesses API, while the network is either in REQUESTED, RESERVED or ACTIVATED state. The API Consumer gets an error code, when using the Accesses API with a Network in TERMINATED state.
-        * Creating an Access resource corresponds to giving access for a device to the network.
-        * Deleting an Access resource corresponds to revoking access for a device to the network.
-1.  When Dedicated Network is in ACTIVATED state: Devices with access will be able to connect to the network.
-    * When a single QoS profile is used or a default QoS profile is defined within the Network Profile (or changed via the Access resources), all the traffic of the device will be treated with this QoS profile as default
+        * Creating an Access resource corresponds to giving access for one or more devices to the network.
+        * Deleting an Access resource corresponds to revoking access for one or more devices to the network.
+1.  When Dedicated Network is in ACTIVATED state: Devices with granted access will be able to connect to the network.
+    * When a single QoS profile is used or a default QoS profile is defined within the Network Profile (or changed via the Access resources), all the traffic of each of the devices will be treated with this QoS profile as default
     * When multiple QoS profiles are defined within the Network Profile (or changed via the Access resources), the API Consumer may use the QOD API for managing QoS Sessions with the QoS Profiles listed in the Network Profile.
 
 ## States of the network
@@ -211,31 +211,38 @@ Explainations
 
 - A network in TERMINATED state cannot be modified anymore and should be deleted. If not deleted by the API Consumer, the representing HTTP resource (URL) may be removed by the API Provider.
 
-## States of device access to the network
+## States of device's access to the network
 
-The device access to the dedicated network supports multiple states, i.e. REQUESTED, GRANTED, and DENIED. The networks access resource is created with a POST on the /accesses API. It contains `deviceAccess` object which contains the state information of the device access.
+The Access resource is created with a POST on the /accesses API including one or more devices.
 
-On successful acceptance of the request, an HTTP resource is created. The response always returns a REQUESTED State. Reserved resources are only usable when the network is in ACTIVATED state.
+Once the access is created devices can be:
+- added to the access, by issuing a POST on the /accesses/{accessId}/devices collection endpoint
+- removed from the access, by issuing a DELETE on the /accesses/{accessId}/devices collection endpoint
+- queried, by issuing a GET on the /accesses/{accessId}/devices collection endpoint
 
-**Figure**: lifecycle of a device access to network
+In the context of the access each device has a state to describe its own access to the dedicated network. The device's access states are: REQUESTED, GRANTED, and DENIED.
+
+On successful acceptance of the access creation request, an HTTP resource is created for the access and a collection resource is created for the requested and accepted devices. For each accepted device a device information resource is created and device's status is initialised to a REQUESTED state. Reserved resources are only usable when the network is in ACTIVATED state.
+
+**Figure**: lifecycle of a device's access to network within an access
 
 ```mermaid
 stateDiagram-v2
     [*] --> REQUESTED: POST /accesses
-    REQUESTED --> GRANTED: Device Access is granted
-    REQUESTED --> DENIED: Device Access is rejected or it failed
-    GRANTED --> DENIED: Device Access is revoked (after having been granted) or it failed.
+    REQUESTED --> GRANTED: Device's access is granted
+    REQUESTED --> DENIED: Device's access is rejected or it failed
+    GRANTED --> DENIED: Device's access is revoked (after having been granted) or it failed.
 ```
 
 Explainations
-- A device access is usable only when it is in GRANTED state while the dedicated network is in ACTIVATED state.
+- A device's access is usable only when its state is GRANTED while the dedicated network is in ACTIVATED state.
 
-- A device access will transition from REQUESTED to GRANTED state (with reason code: REQUEST_APPROVED) when the access to the network is approved.
+- A device's access state will transition from REQUESTED to GRANTED (with reason code: REQUEST_APPROVED) when its access to the network is approved.
 
-- A device access will transition from REQUESTED to DENIED state (with reason code: REQUEST_FAILED) if failure occured while approving the request.
+- A device's access state will transition from REQUESTED to DENIED (with reason code: REQUEST_FAILED) if failure occured while approving the request.
 
-- A device access will transition from REQUESTED to DENIED state (with reason code: REQUEST_REJECTED) if the request is rejected.
+- A device's access state will transition from REQUESTED to DENIED (with reason code: REQUEST_REJECTED) if the request is rejected.
 
-- A device access will transition from GRANTED to DENIED state (with reason code: ACCESS_FAILED) if failure occured after the access has been granted.
+- A device's access state will transition from GRANTED to DENIED (with reason code: ACCESS_FAILED) if failure occured after its access has been granted.
 
-- A device access will transition from GRANTED to DENIED state (with reason code: ACCESS_REVOKED) when the grant to access the network is revoked.
+- A device's access state will transition from GRANTED to DENIED (with reason code: ACCESS_REVOKED) when its grant to access the network is revoked.

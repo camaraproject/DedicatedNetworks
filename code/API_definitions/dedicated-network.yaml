@@ -55,7 +55,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
-  x-camara-commonalities: 0.6
+  x-camara-commonalities: "0.7"
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/DedicatedNetworks
@@ -84,6 +84,8 @@ paths:
           description: name of a network
           schema:
             type: string
+            maxLength: 256
+            # according to name definition
         - $ref: "#/components/parameters/x-correlator"
       responses:
         '200':
@@ -94,6 +96,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NetworkInfo'
+                maxItems: 200
         "400":
           $ref: "#/components/responses/Generic400"
         "401":
@@ -171,6 +174,8 @@ paths:
               schema:
                 type: string
                 format: uri
+                maxLength: 2048
+                # This is typically a relative URL. Thus, 2048 characters can be enough.
         '400':
           $ref: "#/components/responses/Generic400"
         "401":
@@ -260,17 +265,20 @@ components:
     XCorrelator:
       type: string
       pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
       example: "b4333c46-49c0-4f62-80d7-f0ef930f1c46"
 
     NetworkId:
       description: Network id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     NetworkProfileId:
       description: Network profile id in UUID format
       type: string
       format: uuid
+      maxLength: 36
 
     QosProfileName:
       description: |
@@ -291,6 +299,7 @@ components:
     ServiceAreaId:
       type: string
       format: uuid
+      maxLength: 36
 
     BaseNetworkInfo:
       description: Common attributes of a dedicated network
@@ -299,6 +308,10 @@ components:
         name:
           description: A human-readable name to describe the network
           type: string
+          minLength: 1
+          # No empty string name allowed.
+          maxLength: 256
+          # 256 characters should be enough for normal cases.
         networkProfileId:
           $ref: '#/components/schemas/NetworkProfileId'
         qosProfileName:
@@ -311,6 +324,8 @@ components:
           description: The address to which events shall be delivered using the selected protocol.
           type: string
           format: uri
+          maxLength: 2048
+          # Follows the recommendation from CAMARA_event_common.yaml
           pattern: ^https:\/\/.+$
         sinkCredential:
           $ref: '#/components/schemas/SinkCredential'
@@ -370,13 +385,14 @@ components:
         id:
           description: Identifier of this event, that must be unique in the source context.
           type: string
+          maxLength: 256
         source:
-          description: Identifies the context in which an event happened in the specific Provider Implementation.
-          type: string
-          format: uri-reference
+          $ref: "#/components/schemas/Source"
         type:
           description: The type of the event.
           type: string
+          maxLength: 512
+          # Follows CAMARA_event_common.yaml, although this is an enum
           enum:
             - "org.camaraproject.dedicated-network.v0.network-status-changed"
         specversion:
@@ -393,14 +409,35 @@ components:
           description: Event notification details payload, which depends on the event type
           type: object
         time:
-          description: |
-            Timestamp of when the occurrence happened. It must follow RFC 3339
-          type: string
-          format: date-time
+          $ref: "#/components/schemas/DateTime"
       discriminator:
         propertyName: 'type'
         mapping:
           org.camaraproject.dedicated-network.v0.network-status-changed: "#/components/schemas/EventNetworkStatusChanged"
+
+    Source:
+      type: string
+      format: uri-reference
+      minLength: 1
+      maxLength: 2048
+      description: |
+        Identifies the context in which an event happened - be a non-empty `URI-reference` like:
+        - URI with a DNS authority:
+          * https://github.com/cloudevents
+          * mailto:cncf-wg-serverless@lists.cncf.io
+        - Universally-unique URN with a UUID:
+          * urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
+        - Application-specific identifier:
+          * /cloudevents/spec/pull/123
+          * 1-555-123-4567
+      example: "https://notificationSendServer12.example.com"
+
+    DateTime:
+      type: string
+      format: date-time
+      maxLength: 64
+      description: Timestamp of when the occurrence happened. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+      example: "2018-04-05T17:31:00Z"
 
     EventNetworkStatusChanged:
       description: Event to notify a network status change
@@ -426,10 +463,12 @@ components:
         start:
           type: string
           format: date-time
+          maxLength: 64
           description: It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
         end:
           type: string
           format: date-time
+          maxLength: 64
           description: It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
       required:
         - start
@@ -437,42 +476,47 @@ components:
 
     SinkCredential:
       type: object
+      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
       properties:
         credentialType:
           type: string
           enum:
-            - PLAIN
+            # - PLAIN
             - ACCESSTOKEN
-            - REFRESHTOKEN
+            - PRIVATE_KEY_JWT
+          description: |
+            The type of the credential - MUST be set to ACCESSTOKEN or PRIVATE_KEY_JWT for now
       discriminator:
         propertyName: credentialType
         mapping:
-          PLAIN: '#/components/schemas/PlainCredential'
+          # PLAIN: '#/components/schemas/PlainCredential'
           ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
-          REFRESHTOKEN: '#/components/schemas/RefreshTokenCredential'
+          PRIVATE_KEY_JWT: '#/components/schemas/PrivateKeyJWTCredential'
       required:
         - credentialType
 
-    PlainCredential:
-      type: object
-      description: A plain credential as a combination of an identifier and a secret.
-      allOf:
-        - $ref: '#/components/schemas/SinkCredential'
-        - type: object
-          required:
-            - identifier
-            - secret
-          properties:
-            identifier:
-              description: The identifier might be an account or username.
-              type: string
-            secret:
-              description: The secret might be a password or passphrase.
-              type: string
+    # PlainCredential:  # not used in CAMARA
+    #   type: object
+    #   description: A plain credential as a combination of an identifier and a secret.
+    #   allOf:
+    #     - $ref: "#/components/schemas/SinkCredential"
+    #     - type: object
+    #       required:
+    #         - identifier
+    #         - secret
+    #       properties:
+    #         identifier:
+    #           description: The identifier might be an account or username.
+    #           type: string
+    #           maxLength: 256
+    #         secret:
+    #           description: The secret might be a password or passphrase.
+    #           type: string
+    #           maxLength: 512
 
     AccessTokenCredential:
       type: object
-      description: An access token credential.
+      description: An access token credential. This type of credential is meant to be used by API Consumers that have limited capabilities to handle authorization requests.
       allOf:
         - $ref: '#/components/schemas/SinkCredential'
         - type: object
@@ -480,10 +524,17 @@ components:
             accessToken:
               description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
               type: string
+              maxLength: 4096
             accessTokenExpiresUtc:
               type: string
               format: date-time
-              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
+              maxLength: 64
+              description: |
+                REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
+                In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
+                If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
+                It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+              example: "2023-07-03T12:27:08.312Z"
             accessTokenType:
               description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)). For the current version of the API the type MUST be set to `Bearer`.
               type: string
@@ -494,38 +545,11 @@ components:
             - accessTokenExpiresUtc
             - accessTokenType
 
-    RefreshTokenCredential:
+    PrivateKeyJWTCredential:
       type: object
-      description: An access token credential with a refresh token.
+      description: Use PRIVATE_KEY_JWT to get an access token. The authorization server information needed for this type of sink credential (token endpoint, client ID, JWKS URL) is shared upfront between the client and the CAMARA entity. This type of credential is to be used by clients that have an authorization server.
       allOf:
-        - $ref: '#/components/schemas/SinkCredential'
-        - type: object
-          properties:
-            accessToken:
-              description: REQUIRED. An access token is a previously acquired token granting access to the target resource.
-              type: string
-            accessTokenExpiresUtc:
-              type: string
-              format: date-time
-              description: REQUIRED. An absolute UTC instant at which the token shall be considered expired.
-            accessTokenType:
-              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
-              type: string
-              enum:
-                - bearer
-            refreshToken:
-              description: REQUIRED. An refresh token credential used to acquire access tokens.
-              type: string
-            refreshTokenEndpoint:
-              type: string
-              format: uri
-              description: REQUIRED. A URL at which the refresh token can be traded for an access token.
-      required:
-        - accessToken
-        - accessTokenExpiresUtc
-        - accessTokenType
-        - refreshToken
-        - refreshTokenEndpoint
+        - $ref: "#/components/schemas/SinkCredential"
 
     ErrorInfo:
       type: object
@@ -536,12 +560,17 @@ components:
       properties:
         status:
           type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
           description: HTTP response status code
         code:
           type: string
+          maxLength: 96
           description: A human-readable code to describe the error
         message:
           type: string
+          maxLength: 512
           description: A human-readable description of what the event represents
 
   responses:

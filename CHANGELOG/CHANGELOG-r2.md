@@ -64,7 +64,7 @@ The API definition(s) are based on
 
 ## dedicated-network-accesses 0.2.0-alpha.1
 
-**dedicated-network-accesses 0.2.0-alpha.1 is ...**
+**dedicated-network-accesses 0.2.0-alpha.1 is an alpha of the version 0.2.0 of the Dedicated Network Accesses API.**
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-accesses.yaml&nocors)
@@ -73,48 +73,39 @@ The API definition(s) are based on
 
 ### Added
 
-* _To be filled during release review_
+* Support for asynchronous events for device access creation and device access lifecycle.
+  * by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/91
+* Support operations to manage access to dedicated network for multiple devices at a time
+  * by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/98
 
 ### Changed
 
-* _To be filled during release review_
-
-### Fixed
-
-* _To be filled during release review_
-
-### Removed
-
-* _To be filled during release review_
+* Adding a clear description of the `MaxNumberOfDevices` parameter and its relation to aggregated UL/DL throughput parameters.
+  * by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/88 
+* New 409 Error Code called INCOMPATIBLE_STATE is used, indicating that the dedicated network resource referenced in the POST request is in an incompatible state, e.g. in TERMINATED state.
+  * by in https://github.com/camaraproject/DedicatedNetworks/pull/81
 
 ## dedicated-network-profiles 0.2.0-alpha.1
 
-**dedicated-network-profiles 0.2.0-alpha.1 is ...**
+**dedicated-network-profiles 0.2.0-alpha.1 is an alpha of version 0.2.0 of the Dedicated Network Profiles API.**
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-profiles.yaml&nocors)
   - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-profiles.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.1/code/API_definitions/dedicated-network-profiles.yaml)
 
-### Added
-
-* _To be filled during release review_
 
 ### Changed
 
-* _To be filled during release review_
+* Adding a clear description of the `MaxNumberOfDevices` parameter and its relation to aggregated UL/DL throughput parameters.
+  * by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/88 
+* Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs. 
+  * by tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/83
 
-### Fixed
-
-* _To be filled during release review_
-
-### Removed
-
-* _To be filled during release review_
 
 ## dedicated-network 0.2.0-alpha.1
 
-**dedicated-network 0.2.0-alpha.1 is ...**
+**dedicated-network 0.2.0-alpha.1 is an alpha of the version 0.2.0 of the Dedicated Network API.**
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network.yaml&nocors)
@@ -123,23 +114,20 @@ The API definition(s) are based on
 
 ### Added
 
-* _To be filled during release review_
+* Allowing the API Consumer to assign an own `name` to a dedicated network resource, which is returned when the network is read or listed.
+  * by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/97
+* A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported. 
+  * by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
 
 ### Changed
 
-* _To be filled during release review_
+* Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs. 
+  * by tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/83
 
-### Fixed
-
-* _To be filled during release review_
-
-### Removed
-
-* _To be filled during release review_
 
 ## dedicated-network-areas 0.1.0-alpha.1
 
-**dedicated-network-areas 0.1.0-alpha.1 is ...**
+**dedicated-network-areas 0.1.0-alpha.1 is an alpha of version 0.1.0 of the Dedicated Network Areas API.**
 
 - API definition **with inline documentation**:
   - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-areas.yaml&nocors)
@@ -148,19 +136,9 @@ The API definition(s) are based on
 
 ### Added
 
-* _To be filled during release review_
+* A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported. 
+  * by in https://github.com/camaraproject/DedicatedNetworks/pull/87
 
-### Changed
-
-* _To be filled during release review_
-
-### Fixed
-
-* _To be filled during release review_
-
-### Removed
-
-* _To be filled during release review_
 
 **Full Changelog**: https://github.com/camaraproject/DedicatedNetworks/compare/r1.2...r2.1
 

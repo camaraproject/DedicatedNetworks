@@ -78,14 +78,13 @@ info:
 
     This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
     <!-- CAMARA:MANDATORY:request-body-strictness:END -->
-
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
-  x-camara-commonalities: 0.8
+  version: 0.1.0-rc.1
+  x-camara-commonalities: 0.8.0
 servers:
-  - url: "{apiRoot}/dedicated-network-areas/vwip"
+  - url: '{apiRoot}/dedicated-network-areas/v0.1rc1'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -109,7 +108,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RetrieveServiceAreasRequest"
+              $ref: '#/components/schemas/RetrieveServiceAreasRequest'
         required: true
       responses:
         '200':
@@ -122,14 +121,13 @@ paths:
                   $ref: '#/components/schemas/ServiceArea'
                 maxItems: 100000000
         '400':
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-        "404":
-          $ref: "#/components/responses/Generic404"
-
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
   /areas/{areaId}:
     get:
       tags:
@@ -146,8 +144,8 @@ paths:
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/ServiceAreaId"
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+            $ref: '#/components/schemas/ServiceAreaId'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: Information about the network service area
@@ -156,29 +154,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServiceArea'
         '400':
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-        "404":
-          $ref: "#/components/responses/Generic404"
-
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
 components:
   securitySchemes:
     openId:
       description: OpenID Connect authentication
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
-
   schemas:
-
     NetworkProfileId:
       description: Network profile id in UUID format
       type: string
       format: uuid
       maxLength: 36
-
     QosProfileName:
       description: |
         A unique name for identifying a specific QoS profile.
@@ -193,33 +187,30 @@ components:
       minLength: 3
       maxLength: 256
       format: string
-      pattern: "^[a-zA-Z0-9_.-]+$"
-
+      pattern: ^[a-zA-Z0-9_.-]+$
     ServiceAreaId:
       description: Unique identifier of a network service area
       type: string
       format: uuid
       maxLength: 36
-
     RetrieveServiceAreasRequest:
       description: Request object to retrieve service areas that match all the given properties
       type: object
       properties:
         atLocation:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Point"
+          $ref: '#/components/schemas/Point'
         overlappingArea:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Area"
+          $ref: '#/components/schemas/Area'
         coveringArea:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Area"
+          $ref: '#/components/schemas/Area'
         byName:
           description: Only service areas with a name matching exactly this parameter are to be returned
           type: string
           maxLength: 1024
         byNetworkProfileId:
-          $ref: "#/components/schemas/NetworkProfileId"
+          $ref: '#/components/schemas/NetworkProfileId'
         byQosProfileName:
-          $ref: "#/components/schemas/QosProfileName"
-
+          $ref: '#/components/schemas/QosProfileName'
     ServiceArea:
       description: Common attributes of a service area, i.e. where the network service is supported
       properties:
@@ -234,12 +225,12 @@ components:
           type: string
           maxLength: 4096
         area:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Area"
+          $ref: '#/components/schemas/Area'
         networkProfiles:
           description: Dedicated network profiles which are supported in this area.
           type: array
           items:
-            $ref: "#/components/schemas/NetworkProfileId"
+            $ref: '#/components/schemas/NetworkProfileId'
           minItems: 1
           maxItems: 1024
         qosProfiles:
@@ -257,14 +248,121 @@ components:
             - networkProfiles
         - required:
             - qosProfiles
-
+    Latitude:
+      description: Latitude component of a location
+      type: number
+      format: double
+      minimum: -90
+      maximum: 90
+    Longitude:
+      description: Longitude component of location
+      type: number
+      format: double
+      minimum: -180
+      maximum: 180
+    Point:
+      type: object
+      description: Coordinates (latitude, longitude) defining a location in a map
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          $ref: '#/components/schemas/Latitude'
+        longitude:
+          $ref: '#/components/schemas/Longitude'
+      example:
+        latitude: 50.735851
+        longitude: 7.10066
+    Area:
+      description: Base schema for all areas
+      type: object
+      properties:
+        areaType:
+          $ref: '#/components/schemas/AreaType'
+      required:
+        - areaType
+      discriminator:
+        propertyName: areaType
+        mapping:
+          CIRCLE: '#/components/schemas/Circle'
+          POLYGON: '#/components/schemas/Polygon'
+    Circle:
+      description: Circular area
+      allOf:
+        - $ref: '#/components/schemas/Area'
+        - type: object
+          required:
+            - center
+            - radius
+          properties:
+            center:
+              $ref: '#/components/schemas/Point'
+            radius:
+              type: number
+              description: Distance from the center in meters
+              minimum: 1
+    PointList:
+      description: List of points defining a polygon
+      type: array
+      items:
+        $ref: '#/components/schemas/Point'
+      minItems: 3
+      maxItems: 15
+    Polygon:
+      description: Polygonal area. The Polygon should be a simple polygon, i.e. should not intersect itself.
+      allOf:
+        - $ref: '#/components/schemas/Area'
+        - type: object
+          required:
+            - boundary
+          properties:
+            boundary:
+              $ref: '#/components/schemas/PointList'
+    AreaType:
+      type: string
+      description: |
+        Type of this area.
+        CIRCLE - The area is defined as a circle.
+        POLYGON - The area is defined as a polygon.
+      enum:
+        - CIRCLE
+        - POLYGON
+    ErrorInfo:
+      type: object
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: HTTP response status code
+        code:
+          type: string
+          maxLength: 96
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          maxLength: 512
+          description: A human-readable description of what the event represents
+    XCorrelator:
+      type: string
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
+      example: b4333c46-49c0-4f62-80d7-f0ef930f1c46
   responses:
     Generic400:
       description: Bad Request
       content:
         application/json:
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+            $ref: '#/components/schemas/ErrorInfo'
           examples:
             GENERIC_400_INVALID_ARGUMENT:
               description: Invalid Argument. Generic Syntax Exception
@@ -278,16 +376,15 @@ components:
                 status: 400
                 code: OUT_OF_RANGE
                 message: Client specified an invalid range.
-
     Generic401:
       description: Unauthorized
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+            $ref: '#/components/schemas/ErrorInfo'
           examples:
             GENERIC_401_UNAUTHENTICATED:
               description: Request cannot be authenticated
@@ -301,16 +398,15 @@ components:
                 status: 401
                 code: AUTHENTICATION_REQUIRED
                 message: New authentication is required.
-
     Generic403:
       description: Forbidden
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+            $ref: '#/components/schemas/ErrorInfo'
           examples:
             GENERIC_403_PERMISSION_DENIED:
               description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
@@ -323,17 +419,16 @@ components:
               value:
                 status: 403
                 code: INVALID_TOKEN_CONTEXT
-                message: "{{field}} is not consistent with access token."
-
+                message: '{{field}} is not consistent with access token.'
     Generic404:
       description: Not found
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+            $ref: '#/components/schemas/ErrorInfo'
           examples:
             GENERIC_404_NOT_FOUND:
               description: Resource is not found
@@ -341,3 +436,15 @@ components:
                 status: 404
                 code: NOT_FOUND
                 message: The specified resource is not found.
+  headers:
+    x-correlator:
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
+  parameters:
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'

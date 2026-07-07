@@ -63,17 +63,13 @@ info:
 
     This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
     <!-- CAMARA:MANDATORY:request-body-strictness:END -->
-
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
-  x-camara-commonalities: 0.8
-externalDocs:
-  description: Product documentation at CAMARA
-  url: https://github.com/camaraproject/DedicatedNetworks
+  version: 0.2.0-rc.1
+  x-camara-commonalities: 0.8.0
 servers:
-  - url: "{apiRoot}/dedicated-network-profiles/vwip"
+  - url: '{apiRoot}/dedicated-network-profiles/v0.2rc1'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -81,6 +77,9 @@ servers:
 tags:
   - name: Profiles
     description: Discover and read dedicated network profiles
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/DedicatedNetworks
 paths:
   /profiles:
     get:
@@ -98,41 +97,40 @@ paths:
           description: |
             Number of network profiles to return per page
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/PerPage"
+            $ref: '#/components/schemas/PerPage'
         - name: page
           in: query
           description: |
             Number of the page of network profiles to return
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/Page"
+            $ref: '#/components/schemas/Page'
         - name: name
           in: query
           description: Only network profiles with this name are to be returned
           schema:
             type: string
             maxLength: 1024
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: List of available network profiles
           headers:
             X-Total-Count:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-total-count'
+              $ref: '#/components/headers/x-total-count'
             X-Total-Pages:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-total-pages'
+              $ref: '#/components/headers/x-total-pages'
             Link:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/link'
+              $ref: '#/components/headers/link'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NetworkProfilesPage'
         '400':
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
   /profiles/{profileId}:
     get:
       tags:
@@ -149,8 +147,8 @@ paths:
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/NetworkProfileId"
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+            $ref: '#/components/schemas/NetworkProfileId'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: List of available network profiles
@@ -159,14 +157,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/NetworkProfile'
         '400':
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-        "404":
-          $ref: "#/components/responses/Generic404"
-
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
 components:
   securitySchemes:
     openId:
@@ -174,13 +171,11 @@ components:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
   schemas:
-
     NetworkProfileId:
       description: Network profile id in UUID format
       type: string
       format: uuid
       maxLength: 36
-
     NetworkProfilesPage:
       description: A page of network profiles
       type: object
@@ -192,11 +187,10 @@ components:
           type: array
           description: A list of network profiles in a page
           items:
-            $ref: "#/components/schemas/NetworkProfile"
+            $ref: '#/components/schemas/NetworkProfile'
           maxItems: 100
         pagination:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Pagination"
-
+          $ref: '#/components/schemas/Pagination'
     NetworkProfile:
       description: A predefined set of network capabilities and performance characteristics for a dedicated network
       type: object
@@ -215,9 +209,9 @@ components:
           minimum: 1
           maximum: 9007199254740991
         aggregatedUlThroughput:
-          $ref: "#/components/schemas/BitRate"
+          $ref: '#/components/schemas/BitRate'
         aggregatedDlThroughput:
-          $ref: "#/components/schemas/BitRate"
+          $ref: '#/components/schemas/BitRate'
         qosProfiles:
           description: Qos Profiles, which are supported by the dedicated network.
           type: array
@@ -234,7 +228,6 @@ components:
         - aggregatedDlThroughput
         - qosProfiles
         - defaultQosProfile
-
     BitRate:
       description: Specification of bitrate
       type: object
@@ -247,8 +240,7 @@ components:
           minimum: 1
           maximum: 1024
         unit:
-          $ref: "#/components/schemas/BitRateUnitEnum"
-
+          $ref: '#/components/schemas/BitRateUnitEnum'
     BitRateUnitEnum:
       description: Units of bitrate
       type: string
@@ -258,7 +250,6 @@ components:
         - Mbps
         - Gbps
         - Tbps
-
     QosProfileName:
       description: |
         A unique name for identifying a specific QoS profile.
@@ -273,19 +264,88 @@ components:
       minLength: 3
       maxLength: 256
       format: string
-      pattern: "^[a-zA-Z0-9_.-]+$"
-
+      pattern: ^[a-zA-Z0-9_.-]+$
+    PerPage:
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 100
+      default: 20
+      description: Number of items per page.
+      example: 20
+    Page:
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 2147483647
+      default: 1
+      description: Current page number (1-indexed).
+      example: 1
+    XCorrelator:
+      type: string
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
+      example: b4333c46-49c0-4f62-80d7-f0ef930f1c46
+    TotalCount:
+      type: integer
+      format: int32
+      minimum: 0
+      maximum: 2147483647
+      description: Total number of items matching the query, after filters applied. MAY be omitted where a full count query is prohibitively expensive.
+      example: 87
+    TotalPages:
+      type: integer
+      format: int32
+      minimum: 0
+      maximum: 2147483647
+      description: Total number of pages. Equals ceil(totalCount / perPage). MAY be omitted where totalCount is omitted.
+      example: 5
+    Pagination:
+      description: Pagination details helping to navigate through paged results efficiently.
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/Page'
+        perPage:
+          $ref: '#/components/schemas/PerPage'
+        totalCount:
+          $ref: '#/components/schemas/TotalCount'
+        totalPages:
+          $ref: '#/components/schemas/TotalPages'
+    ErrorInfo:
+      type: object
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: HTTP response status code
+        code:
+          type: string
+          maxLength: 96
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          maxLength: 512
+          description: A human-readable description of what the event represents
   responses:
     Generic400:
       description: Bad Request
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -308,17 +368,16 @@ components:
                 status: 400
                 code: OUT_OF_RANGE
                 message: Client specified an invalid range.
-
     Generic401:
       description: Unauthorized
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -334,17 +393,16 @@ components:
                 status: 401
                 code: UNAUTHENTICATED
                 message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
-
     Generic403:
       description: Forbidden
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -366,18 +424,17 @@ components:
               value:
                 status: 403
                 code: INVALID_TOKEN_CONTEXT
-                message: "{{field}} is not consistent with access token."
-
+                message: '{{field}} is not consistent with access token.'
     Generic404:
       description: Not found
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -400,3 +457,41 @@ components:
                 status: 404
                 code: IDENTIFIER_NOT_FOUND
                 message: Device identifier not found.
+  parameters:
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
+  headers:
+    x-total-count:
+      description: Total number of items. Mirrors `pagination.totalCount` in the response body.
+      required: false
+      schema:
+        $ref: '#/components/schemas/TotalCount'
+    x-total-pages:
+      description: Total number of pages. Mirrors `pagination.totalPages` in the response body.
+      required: false
+      schema:
+        $ref: '#/components/schemas/TotalPages'
+    link:
+      description: |
+        Navigation links for paginated results following
+        [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288).
+        Includes only the rels applicable to the current position
+        (`first`, `prev`, `next`, `last`). All original query parameters
+        are preserved in Link URLs.
+        Example:
+          Link: <https://api.example.com/v1/resources?page=1&perPage=20>; rel="first",
+                <https://api.example.com/v1/resources?page=2&perPage=20>; rel="prev",
+                <https://api.example.com/v1/resources?page=4&perPage=20>; rel="next",
+                <https://api.example.com/v1/resources?page=5&perPage=20>; rel="last"
+      required: false
+      schema:
+        type: string
+        maxLength: 8192
+    x-correlator:
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'

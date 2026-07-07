@@ -62,17 +62,13 @@ info:
 
     This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
     <!-- CAMARA:MANDATORY:request-body-strictness:END -->
-
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
-  x-camara-commonalities: 0.8
-externalDocs:
-  description: Product documentation at CAMARA
-  url: https://github.com/camaraproject/DedicatedNetworks
+  version: 0.2.0-rc.1
+  x-camara-commonalities: 0.8.0
 servers:
-  - url: "{apiRoot}/dedicated-network/vwip"
+  - url: '{apiRoot}/dedicated-network/v0.2rc1'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -80,6 +76,9 @@ servers:
 tags:
   - name: Networks
     description: Manage a dedicated network
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/DedicatedNetworks
 paths:
   /networks:
     get:
@@ -98,7 +97,7 @@ paths:
           schema:
             type: string
             maxLength: 1024
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: List of dedicated networks (the list can be empty)
@@ -109,13 +108,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/NetworkInfo'
                 maxItems: 100000000
-        "400":
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
     post:
       tags:
         - Networks
@@ -132,44 +130,44 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateNetwork'
       parameters:
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       callbacks:
         notifications:
-          "{$request.body#/sink}":
+          '{$request.body#/sink}':
             post:
               tags:
                 - Network status callback
-              summary: "Network status notifications callback"
+              summary: Network status notifications callback
               description: |
                 Important: this endpoint is to be implemented by the API consumer.
                 It will be called upon change of the network request status.
                 Currently only NETWORK_STATUS_CHANGED event is defined.
               operationId: postNotification
               parameters:
-                - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+                - $ref: '#/components/parameters/x-correlator'
               requestBody:
                 required: true
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: "#/components/schemas/NetworkNotificationEvent"
+                      $ref: '#/components/schemas/NetworkNotificationEvent'
                     examples:
                       NETWORK_STATUS_CHANGED_EXAMPLE:
-                        $ref: "#/components/examples/NETWORK_STATUS_CHANGED_EXAMPLE"
+                        $ref: '#/components/examples/NETWORK_STATUS_CHANGED_EXAMPLE'
               responses:
-                "204":
+                '204':
                   description: Successful notification
                   headers:
                     x-correlator:
-                      $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-                "400":
-                  $ref: "#/components/responses/Generic400"
-                "401":
-                  $ref: "#/components/responses/Generic401"
-                "403":
-                  $ref: "#/components/responses/Generic403"
-                "410":
-                  $ref: "#/components/responses/Generic410"
+                      $ref: '#/components/headers/x-correlator'
+                '400':
+                  $ref: '#/components/responses/Generic400'
+                '401':
+                  $ref: '#/components/responses/Generic401'
+                '403':
+                  $ref: '#/components/responses/Generic403'
+                '410':
+                  $ref: '#/components/responses/Generic410'
               security:
                 - {}
                 - notificationsBearerAuth: []
@@ -182,19 +180,18 @@ paths:
                 $ref: '#/components/schemas/NetworkInfo'
           headers:
             Location:
-              description: 'URL including the resource identifier of the newly created dedicated network.'
+              description: URL including the resource identifier of the newly created dedicated network.
               required: true
               schema:
                 type: string
                 format: uri
                 maxLength: 2048
         '400':
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
   /networks/{networkId}:
     get:
       tags:
@@ -211,8 +208,8 @@ paths:
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/NetworkId"
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+            $ref: '#/components/schemas/NetworkId'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: Current dedicated network information
@@ -221,13 +218,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/NetworkInfo'
         '400':
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
         '404':
-          $ref: "#/components/responses/Generic404"
+          $ref: '#/components/responses/Generic404'
     delete:
       tags:
         - Networks
@@ -243,20 +240,19 @@ paths:
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/NetworkId"
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+            $ref: '#/components/schemas/NetworkId'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '204':
           description: Successful deletion of a dedicated network
-        "400":
-          $ref: "#/components/responses/Generic400"
-        "401":
-          $ref: "#/components/responses/Generic401"
-        "403":
-          $ref: "#/components/responses/Generic403"
-        "404":
-          $ref: "#/components/responses/Generic404"
-
+        '400':
+          $ref: '#/components/responses/Generic400'
+        '401':
+          $ref: '#/components/responses/Generic401'
+        '403':
+          $ref: '#/components/responses/Generic403'
+        '404':
+          $ref: '#/components/responses/Generic404'
 components:
   securitySchemes:
     openId:
@@ -266,25 +262,21 @@ components:
     notificationsBearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: "{$request.body#/sinkCredential.credentialType}"
+      bearerFormat: '{$request.body#/sinkCredential.credentialType}'
       description: |
         Bearer token for notification delivery. Token format is determined
         by `sinkCredential.credentialType` in the subscription request.
-
   schemas:
-
     NetworkId:
       description: Network id in UUID format
       type: string
       format: uuid
       maxLength: 36
-
     NetworkProfileId:
       description: Network profile id in UUID format
       type: string
       format: uuid
       maxLength: 36
-
     QosProfileName:
       description: |
         A unique name for identifying a specific QoS profile.
@@ -299,14 +291,12 @@ components:
       minLength: 3
       maxLength: 256
       format: string
-      pattern: "^[a-zA-Z0-9_.-]+$"
-
+      pattern: ^[a-zA-Z0-9_.-]+$
     ServiceAreaId:
       description: Unique identifier of a network service area
       type: string
       format: uuid
       maxLength: 36
-
     BaseNetworkInfo:
       description: Common attributes of a dedicated network
       type: object
@@ -331,7 +321,7 @@ components:
           maxLength: 2048
           pattern: ^https:\/\/.+$
         sinkCredential:
-          $ref: '../common/CAMARA_event_common.yaml#/components/schemas/SinkCredential'
+          $ref: '#/components/schemas/SinkCredential'
       required:
         - serviceTime
         - serviceAreaId
@@ -340,11 +330,10 @@ components:
             - networkProfileId
         - required:
             - qosProfileName
-
     NetworkInfo:
       description: Current dedicated network information
       allOf:
-        - $ref: "#/components/schemas/BaseNetworkInfo"
+        - $ref: '#/components/schemas/BaseNetworkInfo'
         - type: object
           properties:
             id:
@@ -354,13 +343,10 @@ components:
           required:
             - id
             - status
-
     CreateNetwork:
       description: Attributes required to create a dedicated network
-      # NOTE this design prepares for adding request specific attributes later
       allOf:
-        - $ref: "#/components/schemas/BaseNetworkInfo"
-
+        - $ref: '#/components/schemas/BaseNetworkInfo'
     NetworkStatus:
       description: |
         The current status of the requested network. The status can be one of the following:
@@ -368,38 +354,33 @@ components:
         * `RESERVED` - Request is accepted by the CSP (CSP has committed the requested resources), but the Network cannot be used (outside of requested time-window)
         * `ACTIVATED` - Network turns from reserved into Activated. Now, devices with access can use the network. Possible transitions to RESERVED or TERMINATED states
         * `TERMINATED` - The Network resource is used and up for deletion. The API does not allow any action (except delete).
-
       type: string
       enum:
         - REQUESTED
         - RESERVED
         - ACTIVATED
         - TERMINATED
-
     NetworkEventType:
       description: Enum of event types for the Dedicated Network API.
       type: string
       enum:
         - org.camaraproject.dedicated-network.v0.network-status-changed
-
     NetworkNotificationEvent:
       description: Notification event for dedicated network status changes. Constrains the CloudEvent `type` to network-specific event types.
       allOf:
-        - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/CloudEvent"
+        - $ref: '#/components/schemas/CloudEvent'
         - type: object
           properties:
             type:
-              $ref: "#/components/schemas/NetworkEventType"
+              $ref: '#/components/schemas/NetworkEventType'
       discriminator:
-        propertyName: 'type'
+        propertyName: type
         mapping:
-          org.camaraproject.dedicated-network.v0.network-status-changed: "#/components/schemas/EventNetworkStatusChanged"
-
-
+          org.camaraproject.dedicated-network.v0.network-status-changed: '#/components/schemas/EventNetworkStatusChanged'
     EventNetworkStatusChanged:
       description: Event to notify a network status change
       allOf:
-        - $ref: "#/components/schemas/NetworkNotificationEvent"
+        - $ref: '#/components/schemas/NetworkNotificationEvent'
         - type: object
           properties:
             data:
@@ -410,12 +391,11 @@ components:
                 - status
               properties:
                 networkId:
-                  $ref: "#/components/schemas/NetworkId"
+                  $ref: '#/components/schemas/NetworkId'
                 status:
-                  $ref: "#/components/schemas/NetworkStatus"
+                  $ref: '#/components/schemas/NetworkStatus'
           required:
             - data
-
     ServiceTime:
       description: The time window during which the dedicated network shall be available
       type: object
@@ -433,18 +413,185 @@ components:
       required:
         - start
         - end
-
+    XCorrelator:
+      type: string
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
+      example: b4333c46-49c0-4f62-80d7-f0ef930f1c46
+    SinkCredential:
+      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
+      type: object
+      properties:
+        credentialType:
+          type: string
+          enum:
+            - ACCESSTOKEN
+            - PRIVATE_KEY_JWT
+          description: |
+            The type of the credential - MUST be set to ACCESSTOKEN or PRIVATE_KEY_JWT for now
+      discriminator:
+        propertyName: credentialType
+        mapping:
+          ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
+          PRIVATE_KEY_JWT: '#/components/schemas/PrivateKeyJWTCredential'
+      required:
+        - credentialType
+    AccessTokenCredential:
+      type: object
+      description: An access token credential. This type of credential is meant to be used by API Consumers that have limited capabilities to handle authorization requests.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a token granting access to the target resource.
+              type: string
+              maxLength: 4096
+              writeOnly: true
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              maxLength: 64
+              description: |
+                REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
+                In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
+                If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
+                It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+              example: '2023-07-03T12:27:08.312Z'
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
+              type: string
+              writeOnly: true
+              enum:
+                - bearer
+          required:
+            - accessToken
+            - accessTokenExpiresUtc
+            - accessTokenType
+    PrivateKeyJWTCredential:
+      type: object
+      description: Use PRIVATE_KEY_JWT to get an access token. This type of credential is to be used by clients that have an authorization server.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            clientId:
+              description: The client ID used to authenticate when requesting an access token using PRIVATE_KEY_JWT.
+              type: string
+              maxLength: 128
+              writeOnly: true
+            tokenUri:
+              description: The URI where to request an access token using PRIVATE_KEY_JWT.
+              type: string
+              format: uri
+              maxLength: 2048
+              pattern: ^https:\/\/.+$
+              writeOnly: true
+            jwksUri:
+              description: The URI used to request the public key to verify that the JWT assertion was signed by PRIVATE_KEY_JWT.
+              type: string
+              format: uri
+              maxLength: 2048
+              pattern: ^https:\/\/.+$
+              readOnly: true
+    ErrorInfo:
+      type: object
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: HTTP response status code
+        code:
+          type: string
+          maxLength: 96
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          maxLength: 512
+          description: A human-readable description of what the event represents
+    Source:
+      type: string
+      format: uri-reference
+      minLength: 1
+      maxLength: 2048
+      description: |
+        Identifies the context in which an event happened - be a non-empty `URI-reference` like:
+        - URI with a DNS authority:
+          * https://github.com/cloudevents
+          * mailto:cncf-wg-serverless@lists.cncf.io
+        - Universally-unique URN with a UUID:
+          * urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
+        - Application-specific identifier:
+          * /cloudevents/spec/pull/123
+          * 1-555-123-4567
+      example: https://notificationSendServer12.example.com
+    DateTime:
+      type: string
+      format: date-time
+      maxLength: 64
+      description: Timestamp. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+      example: '2018-04-05T17:31:00Z'
+    CloudEvent:
+      type: object
+      description: |
+        CloudEvents 1.0 specification envelope.
+        This schema is the stable base for all CAMARA event notifications.
+        It imposes no constraints on `type` values or `data` structure —
+        those concerns belong to the API-specific and lifecycle group schemas.
+      required:
+        - id
+        - source
+        - specversion
+        - type
+        - time
+      properties:
+        id:
+          type: string
+          maxLength: 256
+          description: Identifier of this event, unique within the source context.
+        source:
+          $ref: '#/components/schemas/Source'
+        type:
+          type: string
+          maxLength: 512
+          description: |
+            Identifies the event type. CAMARA APIs use reverse-DNS notation:
+            `org.camaraproject.<api-name>.<event-version>.<event-name>`
+            The api-name segment makes each type globally unique across API groups.
+        specversion:
+          type: string
+          description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
+          enum:
+            - '1.0'
+        datacontenttype:
+          type: string
+          description: media-type that describes the event payload encoding, must be "application/json" for CAMARA APIs
+          enum:
+            - application/json
+        data:
+          type: object
+          description: Event details payload. Structure is defined by each concrete event schema.
+        time:
+          $ref: '#/components/schemas/DateTime'
   responses:
     Generic400:
       description: Bad Request
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -467,17 +614,16 @@ components:
                 status: 400
                 code: OUT_OF_RANGE
                 message: Client specified an invalid range.
-
     Generic401:
       description: Unauthorized
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -493,17 +639,16 @@ components:
                 status: 401
                 code: UNAUTHENTICATED
                 message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
-
     Generic403:
       description: Forbidden
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -525,18 +670,17 @@ components:
               value:
                 status: 403
                 code: INVALID_TOKEN_CONTEXT
-                message: "{{field}} is not consistent with access token."
-
+                message: '{{field}} is not consistent with access token.'
     Generic404:
       description: Not found
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -559,17 +703,16 @@ components:
                 status: 404
                 code: IDENTIFIER_NOT_FOUND
                 message: Device identifier not found.
-
     Generic410:
       description: Gone
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -585,18 +728,28 @@ components:
                 status: 410
                 code: GONE
                 message: Access to the target resource is no longer available.
-
   examples:
-
     NETWORK_STATUS_CHANGED_EXAMPLE:
       summary: Network status changed
       description: Cloud event example for network status change to ACTIVATED
       value:
         id: 625b2d4b-4da7-4f07-9169-e60ffdf7667c
-        source: 'https://api.example.com/dedicated-network/v0/networks/b69e5404-3871-448d-8f9f-11dc5d29a4c8'
+        source: https://api.example.com/dedicated-network/v0/networks/b69e5404-3871-448d-8f9f-11dc5d29a4c8
         specversion: '1.0'
-        type: "org.camaraproject.dedicated-network.v0.network-status-changed"
+        type: org.camaraproject.dedicated-network.v0.network-status-changed
         time: '2024-11-29T13:04:00Z'
         data:
-          networkId: 'b69e5404-3871-448d-8f9f-11dc5d29a4c8'
-          status: 'ACTIVATED'
+          networkId: b69e5404-3871-448d-8f9f-11dc5d29a4c8
+          status: ACTIVATED
+  parameters:
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
+  headers:
+    x-correlator:
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'

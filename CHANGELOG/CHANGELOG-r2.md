@@ -91,25 +91,28 @@ Changes documented below are compared to version 0.1.0.
   - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-accesses.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network-accesses.yaml)
 
-### Breaking changes
-
-* N/A
-
 ### Added
 
-* N/A
+* Support device access states and state notifications by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/91
+* Support operations to manage access to dedicated network for multiple devices at a time by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/98
 
 ### Changed
 
-* N/A
+* New error code when network in wrong state by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/81
+* Adding description of the MaxNumberOfDevices parameter by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/88
+* Update pagination to align with commonalities by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/122
+* Addressing limit restrictions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
+* Updating API test definitions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
+* Mandatory info.description template elements by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
 
 ### Fixed
 
-* N/A
+* Sync common files from Commonalities r4.3 by @camara-release-automation[bot] in https://github.com/camaraproject/DedicatedNetworks/pull/115
+* Fix r2.2 sync validation errors by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/118
+* Fix: align CloudEvent schemas with Commonalities pattern by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/120
+* Fix/use common schemas by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
+* Fix missing description warnings across the DN APIs  by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
 
-### Removed
-
-* N/A
 
 ## dedicated-network-profiles 0.2.0-rc.1
 
@@ -122,25 +125,24 @@ Changes documented below are compared to version 0.1.0.
   - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-profiles.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network-profiles.yaml)
 
-### Breaking changes
-
-* N/A
-
 ### Added
 
-* N/A
+* Add pagination for network profiles by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/125
 
 ### Changed
 
-* N/A
+* Format profile id as UUID by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* Adding description of the MaxNumberOfDevices parameter by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/88
+* Addressing limit restrictions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
+* Adding missing range restriction for strings in query line by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126
+* Mandatory info.description template elements by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
 
 ### Fixed
 
-* N/A
-
-### Removed
-
-* N/A
+* Sync common files from Commonalities r4.3 by @camara-release-automation[bot] in https://github.com/camaraproject/DedicatedNetworks/pull/115
+* Fix global tags for dedicted network areas and profiles by @jordijoangimenez in https://github.com/camaraproject/DedicatedNetworks/pull/117
+* Fix/use common schemas by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
+* Fix missing description warnings across the DN APIs  by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
 
 ## dedicated-network 0.2.0-rc.1
 
@@ -153,25 +155,27 @@ Changes documented below are compared to version 0.1.0.
   - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network.yaml)
 
-### Breaking changes
-
-* N/A
-
 ### Added
 
-* N/A
+* New error code when network in wrong state by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/81
+* Areas API proposal by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* New network name property by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/97
 
 ### Changed
 
-* N/A
+* Format profile id as UUID by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* Addressing limit restrictions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
+* Updating API test definitions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
+* Adding missing range restriction for strings in query line by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126
+* Mandatory info.description template elements by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
 
 ### Fixed
 
-* N/A
-
-### Removed
-
-* N/A
+* Sync common files from Commonalities r4.3 by @camara-release-automation[bot] in https://github.com/camaraproject/DedicatedNetworks/pull/115
+* Fix r2.2 sync validation errors by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/118
+* Fix: align CloudEvent schemas with Commonalities pattern by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/120
+* Fix/use common schemas by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
+* Fix missing description warnings across the DN APIs  by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
 
 ## dedicated-network-areas 0.1.0-rc.1
 
@@ -182,25 +186,29 @@ Changes documented below are compared to version 0.1.0.
   - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-areas.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network-areas.yaml)
 
-### Breaking changes
-
-* N/A
-
 ### Added
 
-* N/A
+* Areas API proposal by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Updating API test definitions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
 
 ### Changed
 
-* N/A
+* Addressing limit restrictions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
+* Correcting URL in API test definition file by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/127
+* Mandatory info.description template elements by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
 
 ### Fixed
 
-* N/A
+* Sync common files from Commonalities r4.3 by @camara-release-automation[bot] in https://github.com/camaraproject/DedicatedNetworks/pull/115
+* Fix global tags for dedicted network areas and profiles by @jordijoangimenez in https://github.com/camaraproject/DedicatedNetworks/pull/117
+* Fix r2.2 sync validation errors by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/118
+* Fix/use common schemas by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
+* Fix missing description warnings across the DN APIs  by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
 
-### Removed
-
-* N/A
+## New Contributors
+* @hubertp-ericsson made their first contribution in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* @jordijoangimenez made their first contribution in https://github.com/camaraproject/DedicatedNetworks/pull/117
+* @jimfengjinhua made their first contribution in https://github.com/camaraproject/DedicatedNetworks/pull/120
 
 **Full Changelog**: https://github.com/camaraproject/DedicatedNetworks/compare/r1.2...r2.2
 

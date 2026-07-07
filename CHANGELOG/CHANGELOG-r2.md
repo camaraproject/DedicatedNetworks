@@ -113,7 +113,6 @@ Changes documented below are compared to version 0.1.0.
 * Fix/use common schemas by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
 * Fix missing description warnings across the DN APIs  by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
 
-
 ## dedicated-network-profiles 0.2.0-rc.1
 
 **dedicated-network-profiles 0.2.0-rc.1 is a release-candidate version of this API.**

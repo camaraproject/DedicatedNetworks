@@ -108,7 +108,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @areas_retrieveServiceAreas_04_error_invalid_coordinates
   Scenario: Retrieve service areas with invalid coordinates
-    Given the resource "/dedicated-network-areas/v0.1-eri/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.atLocation.latitude" is set to "999"
@@ -118,7 +118,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @areas_readServiceArea_02_error_invalid_uuid
   Scenario: Read service area with invalid UUID
-    Given the resource "/dedicated-network-areas/v0.1-eri/areas/{areaId}"
+    Given the resource "/dedicated-network-areas/vwip/areas/{areaId}"
     And the path parameter "areaId" is set to an invalid UUID
     When the request "readServiceArea" is sent
     # Then the response status code is 400
@@ -126,7 +126,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @areas_readServiceArea_03_error_not_found
   Scenario: Read non-existent service area
-    Given the resource "/dedicated-network-areas/v0.1-eri/areas/{areaId}"
+    Given the resource "/dedicated-network-areas/vwip/areas/{areaId}"
     And the path parameter "areaId" is set to a non-existent UUID
     When the request "readServiceArea" is sent
     Then the response status code is 404

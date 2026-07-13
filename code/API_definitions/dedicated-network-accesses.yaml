@@ -29,7 +29,6 @@ info:
     This API requires the API consumer to identify a device as the subject of the API as follows:
     - Since this API can handle multiple devices in one request it is strongly recommended to use a two-legged access token
     - When the API is invoked using a two-legged access token, each device will be identified by the respective `device` identifier, which therefore MUST be provided.
-    - If a three-legged access token is used however, the corresponding `device` identifier MUST be provided and must match the identifier in the access token.
 
     ## Error handling:
 
@@ -881,7 +880,6 @@ components:
       example: QCI_1_voice
       minLength: 3
       maxLength: 256
-      format: string
       pattern: "^[a-zA-Z0-9_.-]+$"
 
   responses:

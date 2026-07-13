@@ -118,10 +118,10 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   # Success scenarios for POST /devices/remove
 
   @dedicated_network_accesses_removeNetworkaccess_01_success
-  Scenario: Remove a device to an existing network access
+  Scenario: Remove a device from an existing network access
     Given an existing dedicated network
     And an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"

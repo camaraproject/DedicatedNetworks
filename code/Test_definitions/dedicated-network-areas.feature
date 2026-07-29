@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
+Feature: CAMARA Dedicated Network API, v0.1.0-rc.1 - Areas API Operations
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -18,7 +18,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @dedicated_network_areas_retrieveServiceAreas_01_success
   Scenario: Retrieve all service areas (basic success)
-    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/v0.1rc1/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     When the request "retrieveServiceAreas" is sent
@@ -28,7 +28,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @dedicated_network_areas_retrieveServiceAreas_02_success_filtered_by_atLocation
   Scenario: List areas filtered by atLocation
-    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/v0.1rc1/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.atLocation" is set to valid coordinates
@@ -39,7 +39,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @dedicated_network_areas_retrieveServiceAreas_03_success_filtered_by_overlappingArea
   Scenario: List areas filtered by overlappingArea
-    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/v0.1rc1/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.overlappingArea" is set to a valid area
@@ -50,7 +50,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @dedicated_network_areas_retrieveServiceAreas_04_success_filtered_by_coveringArea
   Scenario: List areas filtered by coveringArea
-    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/v0.1rc1/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.coveringArea" is set to a valid area
@@ -61,7 +61,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @dedicated_network_areas_retrieveServiceAreas_05_success_filtered_by_byName
   Scenario: List areas filtered by byName
-    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/v0.1rc1/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.byName" is set to a valid area name
@@ -72,7 +72,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @dedicated_network_areas_retrieveServiceAreas_06_success_filtered_by_byNetworkProfileId
   Scenario: List areas filtered by byNetworkProfileId
-    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/v0.1rc1/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.byNetworkProfileId" is set to a valid network profile
@@ -83,7 +83,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @dedicated_network_areas_retrieveServiceAreas_06_success_filtered_by_byQosProfileName
   Scenario: List areas filtered by byQosProfileName
-    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/v0.1rc1/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.byQosProfileName" is set to a valid qos profile
@@ -96,7 +96,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @dedicated_network_areas_readServiceAreas_01_success
   Scenario: Get details of a specific service area
-    Given the resource "/dedicated-network-areas/vwip/areas/{areaId}"
+    Given the resource "/dedicated-network-areas/v0.1rc1/areas/{areaId}"
     And the path parameter "areaId" is set to a valid service area ID
     When the request "readServiceArea" is sent
     Then the response status code is 200
@@ -108,7 +108,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @areas_retrieveServiceAreas_04_error_invalid_coordinates
   Scenario: Retrieve service areas with invalid coordinates
-    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    Given the resource "/dedicated-network-areas/v0.1rc1/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.atLocation.latitude" is set to "999"
@@ -118,7 +118,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @areas_readServiceArea_02_error_invalid_uuid
   Scenario: Read service area with invalid UUID
-    Given the resource "/dedicated-network-areas/vwip/areas/{areaId}"
+    Given the resource "/dedicated-network-areas/v0.1rc1/areas/{areaId}"
     And the path parameter "areaId" is set to an invalid UUID
     When the request "readServiceArea" is sent
     # Then the response status code is 400
@@ -126,7 +126,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
   @areas_readServiceArea_03_error_not_found
   Scenario: Read non-existent service area
-    Given the resource "/dedicated-network-areas/vwip/areas/{areaId}"
+    Given the resource "/dedicated-network-areas/v0.1rc1/areas/{areaId}"
     And the path parameter "areaId" is set to a non-existent UUID
     When the request "readServiceArea" is sent
     Then the response status code is 404

@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
+Feature: CAMARA Dedicated Network API, v0.2.0-rc.1 - Network Accesses API Operations
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -20,7 +20,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
 
   @dedicated_network_accesses_listAccesses_01_success_all_first_page
   Scenario: List first page of all network accesses
-    Given the resource "/dedicated-network-accesses/vwip/accesses"
+    Given the resource "/dedicated-network-accesses/v0.2rc1/accesses"
     When the request "listAccesses" is sent
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
@@ -31,7 +31,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   @dedicated_network_accesses_listAccesses_02_success_filtered_by_network_first_page
   Scenario: List first page of network accesses filtered by network ID
     Given an existing dedicated network
-    And the resource "/dedicated-network-accesses/vwip/accesses"
+    And the resource "/dedicated-network-accesses/v0.2rc1/accesses"
     And the query parameter "networkId" is set to the ID of the existing network
     When the request "listAccesses" is sent
     Then the response status code is 200
@@ -44,7 +44,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   @dedicated_network_accesses_listAccesses_03_success_filtered_by_device_first_page
   Scenario: List first page of network accesses filtered by device
     Given a valid device identifier
-    And the resource "/dedicated-network-accesses/vwip/accesses"
+    And the resource "/dedicated-network-accesses/v0.2rc1/accesses"
     And the header "x-device" is set to a RFC 8941 structured field value representing the Device schema (#/components/schemas/Device) (e.g., 'phonenumber="+123456789"')
     When the request "listAccesses" is sent
     Then the response status code is 200
@@ -59,7 +59,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   @dedicated_network_accesses_createAccess_01_success
   Scenario: Create a network access with valid parameters
     Given an existing dedicated network
-    And the resource "/dedicated-network-accesses/vwip/accesses"
+    And the resource "/dedicated-network-accesses/v0.2rc1/accesses"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/CreateAccessRequest"
     And the request body property "$.networkId" is set to the ID of the existing network
@@ -80,7 +80,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   Scenario: Get details of a specific network access
     Given an existing dedicated network
     And an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}"
+    And the resource "/dedicated-network-accesses/v0.2rc1/accesses/{accessId}"
     And the path parameter "accessId" is set to the ID of the existing access
     When the request "readAccess" is sent
     Then the response status code is 200
@@ -96,7 +96,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   Scenario: Delete a network access
     Given an existing dedicated network
     And an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}"
+    And the resource "/dedicated-network-accesses/v0.2rc1/accesses/{accessId}"
     And the path parameter "accessId" is set to the ID of the existing access
     When the request "deleteAccess" is sent
     Then the response status code is 204
@@ -108,7 +108,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   Scenario: List first page of all devices of a specific network access
     Given an existing dedicated network
     And an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    And the resource "/dedicated-network-accesses/v0.2rc1/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of the existing access
     When the request "listDevices" is sent
     Then the response status code is 200
@@ -123,7 +123,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   Scenario: Add a device to an existing network access
     Given an existing dedicated network
     And an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    And the resource "/dedicated-network-accesses/v0.2rc1/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -138,7 +138,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
   Scenario: Remove a device from an existing network access
     Given an existing dedicated network
     And an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    And the resource "/dedicated-network-accesses/v0.2rc1/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"

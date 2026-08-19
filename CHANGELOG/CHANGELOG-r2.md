@@ -106,8 +106,11 @@ Changes documented below are compared to version 0.1.0.
 
 ### Added
 
-* Support device access states and state notifications by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/91
 * New error code when network in wrong state by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/81
+* Support device access states and state notifications by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/91
+* Support operations to manage access to dedicated network for multiple devices at a time by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/98
+* Update pagination to align with commonalities by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/122
+* Completing pagination support or all remaining relevant methods/endpoints by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
 
 ### Changed
 
@@ -126,7 +129,6 @@ Changes documented below are compared to version 0.1.0.
 * Addressing critical Release Management review corrections (on three-legged access token) by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/136
 * fix: add missing x-correlator request parameter and response header by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/141
 * fix: align test feature files with API definition operationIds by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/148
-* fix: add missing x-correlator request parameter and response header by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/141
 * fix: remove three-legged access token note from createAccess operation by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/140
 * fix: [Access API] update the device identification section in info.description by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/146
 
@@ -146,8 +148,12 @@ Changes documented below are compared to version 0.1.0.
 * Format profile id as UUID by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
 * Add pagination for network profiles by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/125
 
+### Added
+* Add pagination for network profiles by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/125
+
 ### Changed
 
+* Format profile id as UUID by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
 * Adding description of the MaxNumberOfDevices parameter by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/88
 * Addressing limit restrictions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
 * Adding missing range restriction for strings in query line by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126
@@ -182,9 +188,12 @@ Changes documented below are compared to version 0.1.0.
 
 * New error code when network in wrong state by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/81
 * New network name property by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/97
+* Completing pagination support or all remaining relevant methods/endpoints by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
 
 ### Changed
 
+* Format profile id as UUID by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* Areas API proposal (usage of Area Id) by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
 * Addressing limit restrictions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
 * Updating API test definitions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
 * Adding missing range restriction for strings in query line by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126

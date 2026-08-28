@@ -53,15 +53,15 @@ For background on Dedicated Networks concepts and workflows, see the [General De
 
 ### Upcoming Release Preview
 
-* Pre-release: [r2.1](https://github.com/camaraproject/DedicatedNetworks/releases/tag/r2.1) (alpha)
-  * **dedicated-network-accesses 0.2.0-alpha.1**
-  [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r2.1/code/API_definitions/dedicated-network-accesses.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-accesses.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-accesses.yaml)
-  * **dedicated-network-profiles 0.2.0-alpha.1**
-  [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r2.1/code/API_definitions/dedicated-network-profiles.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-profiles.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-profiles.yaml)
-  * **dedicated-network 0.2.0-alpha.1**
-  [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r2.1/code/API_definitions/dedicated-network.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network.yaml)
-  * **dedicated-network-areas 0.1.0-alpha.1**
-  [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r2.1/code/API_definitions/dedicated-network-areas.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-areas.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.1/code/API_definitions/dedicated-network-areas.yaml)
+* Pre-release: [r2.2](https://github.com/camaraproject/DedicatedNetworks/releases/tag/r2.2) (release candidate)
+  * **dedicated-network-accesses 0.2.0-rc.1**
+  [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network-accesses.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-accesses.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-accesses.yaml)
+  * **dedicated-network-profiles 0.2.0-rc.1**
+  [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network-profiles.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-profiles.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-profiles.yaml)
+  * **dedicated-network 0.2.0-rc.1**
+  [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network.yaml)
+  * **dedicated-network-areas 0.1.0-rc.1**
+  [[YAML]](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network-areas.yaml)  [[ReDoc]](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-areas.yaml&nocors)  [[Swagger]](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-areas.yaml)
 
 
 _The above section is automatically synchronized by CAMARA project-administration._

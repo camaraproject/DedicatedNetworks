@@ -285,7 +285,8 @@ paths:
                 CREATE_ACCESS_GROUP_SUCCESS_EXAMPLE:
                   $ref: '#/components/examples/CREATE_ACCESS_GROUP_SUCCESS_EXAMPLE'
         '207':
-          description: Successful creation of the access group; devices were supplied, with a per-device outcome for each
+          description: |
+            Successful creation of the access group; devices were supplied, with a per-device outcome for each. `results` carries exactly one entry per requested device, in request order. `summary.succeeded` is the number of devices admitted.
           headers:
             x-correlator:
               $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
@@ -587,7 +588,8 @@ paths:
               $ref: '#/components/schemas/CreateAccessesRequest'
       responses:
         '207':
-          description: The batch was processed; the response carries a per-device outcome for every requested device, whatever the mix of successes and failures
+          description: |
+            The batch was processed; the response carries a per-device outcome for every requested device, whatever the mix of successes and failures. `results` carries exactly one entry per requested device, in request order. `summary.succeeded` is the number of devices admitted.
           headers:
             x-correlator:
               $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
@@ -636,7 +638,8 @@ paths:
               $ref: '#/components/schemas/DeleteAccessesRequest'
       responses:
         '207':
-          description: The batch was processed; the response carries a per-access outcome for every requested accessId, whatever the mix of successes and failures
+          description: |
+            The batch was processed; the response carries a per-access outcome for every requested accessId, whatever the mix of successes and failures. `results` carries exactly one entry per requested accessId, in request order. `summary.succeeded` is the number of accesses deleted.
           headers:
             x-correlator:
               $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
@@ -991,6 +994,36 @@ components:
         devices:
           $ref: "#/components/schemas/Devices"
 
+    BatchSummary:
+      description: |
+        Counts for the outcome of a batch operation. `requested` equals the number of
+        entries in `results`, so `succeeded == requested` means every requested item
+        was processed successfully.
+      type: object
+      required:
+        - requested
+        - succeeded
+        - failed
+      properties:
+        requested:
+          description: The number of items in the request, equal to the number of entries in `results`
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+        succeeded:
+          description: The number of requested items processed successfully
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 100
+        failed:
+          description: The number of requested items that could not be processed
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 100
+
     CreateAccessesResult:
       description: |
         Outcome for one device in a batch admit request (whether via `POST /access-groups` or
@@ -1026,6 +1059,7 @@ components:
       type: object
       required:
         - results
+        - summary
       properties:
         results:
           description: |
@@ -1035,6 +1069,8 @@ components:
             $ref: '#/components/schemas/CreateAccessesResult'
           minItems: 1
           maxItems: 100
+        summary:
+          $ref: '#/components/schemas/BatchSummary'
 
     CreateAccessGroupPartialSuccess:
       description: |
@@ -1137,6 +1173,7 @@ components:
       type: object
       required:
         - results
+        - summary
       properties:
         results:
           description: A list of per-access delete outcomes, one per requested accessId
@@ -1145,6 +1182,8 @@ components:
             $ref: '#/components/schemas/BatchDeleteAccessResult'
           minItems: 1
           maxItems: 100
+        summary:
+          $ref: '#/components/schemas/BatchSummary'
 
     RetrieveAccessesRequest:
       description: Parameters to retrieve accesses by device
@@ -1695,6 +1734,10 @@ components:
               phoneNumber: "+491234500001"
             code: ALREADY_EXISTS
             message: The resource that a client tried to create already exists.
+        summary:
+          requested: 2
+          succeeded: 1
+          failed: 1
 
     LIST_ACCESS_GROUPS_EXAMPLE:
       summary: A page of access groups
@@ -1780,6 +1823,10 @@ components:
               device:
                 phoneNumber: "+491234500001"
               status: REQUESTED
+        summary:
+          requested: 2
+          succeeded: 2
+          failed: 0
 
     BATCH_CREATE_PARTIAL_SUCCESS_EXAMPLE:
       summary: One device admitted, one rejected
@@ -1802,6 +1849,10 @@ components:
               phoneNumber: "+491234500001"
             code: ALREADY_EXISTS
             message: The resource that a client tried to create already exists.
+        summary:
+          requested: 2
+          succeeded: 1
+          failed: 1
 
     BATCH_DELETE_PARTIAL_SUCCESS_EXAMPLE:
       summary: One access deleted, one not found
@@ -1812,6 +1863,10 @@ components:
           - accessId: 15f2c4b0-6b1a-4b0a-9b0a-1c2d3e4f5061
             code: NOT_FOUND
             message: The specified resource is not found.
+        summary:
+          requested: 2
+          succeeded: 1
+          failed: 1
 
     RETRIEVE_ACCESSES_EXAMPLE:
       summary: One access found for the device

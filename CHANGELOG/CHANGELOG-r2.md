@@ -242,15 +242,9 @@ Changes documented below are compared to version 0.1.0.
 * A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
 * Updating existing API test definitions and adding a new test definition for the Areas API by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
 * Completing pagination support for operations `retrieveNetworkServiceAreas`, `listNetworks` and `listAccesses` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
-
-### Changed
-
 * Implementing range limits for integer, array and string datatypes, as needed by Commonalities r4.3 by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
 * Correcting URL in API test definition file by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/127
 * Adding the missing mandatory template elements into the info.description section by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
-
-### Fixed
-
 * Sync common files from Commonalities r4.3 by @camara-release-automation[bot] in https://github.com/camaraproject/DedicatedNetworks/pull/115
 * Fix global tags for dedicted network areas and profiles by @jordijoangimenez in https://github.com/camaraproject/DedicatedNetworks/pull/117
 * Fixing `Schema must declare a type or combiner` (S-016), `Write operation must be security-restricted` (S-303) and `Operation must document a 401 response` (S-307) validation errors by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/118

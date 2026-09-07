@@ -253,7 +253,6 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
 ############################ Error Scenarios - readNetworkServiceArea #############################################
 
-
   # Syntax Error scenarios
 
   @dedicated_network_areas_readNetworkServiceArea_400.06_invalid_x-correlator

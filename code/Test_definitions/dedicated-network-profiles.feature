@@ -126,7 +126,6 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
     And the response property "$.code" is "PERMISSION_DENIED"
     And the response property "$.message" contains a user friendly text
 
-
     ############################ Error Scenarios readNetworkProfile #############################################
 
   # Syntax Error scenarios

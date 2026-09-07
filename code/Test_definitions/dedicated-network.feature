@@ -95,8 +95,6 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
     Then the response status code is 204
     And the response header "x-correlator" has the same value as the request header "x-correlator"
 
-
-
 ############################ Error Scenarios - listNetworks #############################################
 
   # Syntax Error scenarios

@@ -240,7 +240,6 @@ Changes documented below are compared to version 0.1.0.
 ### Added
 
 * A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
-* Updating API test definitions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
 * Updating existing API test definitions and adding a new test definition for the Areas API by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
 * Completing pagination support for operations `retrieveNetworkServiceAreas`, `listNetworks` and `listAccesses` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
 

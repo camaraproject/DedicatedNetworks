@@ -252,7 +252,6 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
     And the response property "$.message" contains a user friendly text
 
 ############################ Error Scenarios - readNetworkServiceArea #############################################
-
   # Syntax Error scenarios
 
   @dedicated_network_areas_readNetworkServiceArea_400.06_invalid_x-correlator

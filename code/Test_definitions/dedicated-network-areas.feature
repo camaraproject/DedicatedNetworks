@@ -131,7 +131,6 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
     And the response body complies with the OAS schema at "/components/schemas/ServiceArea"
     And the response property "$.id" is equal to the path parameter "areaId"
 
-
 ############################ Error Scenarios - retrieveNetworkServiceAreas #############################################
 
 

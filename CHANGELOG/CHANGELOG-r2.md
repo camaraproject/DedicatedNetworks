@@ -108,6 +108,7 @@ Changes documented below are compared to version 0.1.0.
 * Support operations to manage access to dedicated network for multiple devices at a time by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/98
 * Update pagination realization to align with commonalities by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/122
 * Completing pagination support for operations `retrieveNetworkServiceAreas`, `listNetworks` and `listAccesses` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
+* `Devices.items` narrowed from `Device` to a new `ValidDevice` requiring `phoneNumber` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/170
 
 ### Added
 
@@ -166,6 +167,7 @@ Changes documented below are compared to version 0.1.0.
 * Implementing range limits for integer, array and string datatypes, as needed by Commonalities r4.3 by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
 * Adding missing range restrictions for two query line parameters and removing API readiness checklist file by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126
 * Adding the missing mandatory template elements into the info.description section by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
+* `BitRate.required: [value, unit]` newly enforced by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 
 ### Fixed
 
@@ -198,6 +200,7 @@ Changes documented below are compared to version 0.1.0.
 
 * Allowing the API Consumer to assign an own `name` to a dedicated network resource, which is returned when the network is read or listed by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/97
 * Completing pagination support for operations `retrieveNetworkServiceAreas`, `listNetworks` and `listAccesses` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
+* `createNetwork` gains `404`/`422` responses and four new `DEDICATED_NETWORK.*` error codes by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 
 ### Changed
 
@@ -207,7 +210,7 @@ Changes documented below are compared to version 0.1.0.
 * Updating API test definitions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
 * Adding missing range restriction for strings in query line by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126
 * Adding the missing mandatory template elements into the info.description section by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
-
+* Documented `ACTIVATED` → `RESERVED` transition removed from NetworkStatus by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 
 ### Fixed
 
@@ -220,6 +223,10 @@ Changes documented below are compared to version 0.1.0.
 * Correction inconsistencies and errors (lifecycle, response codes, QoS Profile usage, etc) on the Networks and the Profiles API by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 * Correcting multiple assertions that do not match the API definitions (Issue #166) by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/171
 * Fixes small corrections in the test definitions (Issue #167) identified during release review by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/172
+
+### Removed
+
+* `IDENTIFIER_NOT_FOUND` removed from the `Generic404` code enum by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 
 ## dedicated-network-areas 0.1.0-rc.1
 

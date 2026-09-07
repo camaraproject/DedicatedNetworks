@@ -134,8 +134,6 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 ############################ Error Scenarios - retrieveNetworkServiceAreas #############################################
 
 
-
-
   # Syntax Error scenarios
 
   @dedicated_network_areas_retrieveNetworkServiceAreas_400.01_schema_not_compliant

@@ -56,7 +56,7 @@ info:
 
     Initially, each device added to the access is in `REQUESTED` state. Before granting the access the API provider checks if it is possible and feasible to allow the device access to the network in accordance with the network/access configuration. The device can access the network only when it is in `GRANTED` state. If the state is `DENIED` it means that the API provider was not able to grant the access or the grant had to be revoked.
 
-    Each device added to the access is identified by an accessDeviceId returned in the response. The accessDeviceId is a unique identifier of the device included in the access and is the same across all the accesses in which the device is included. The deviceAccessId can be used to individually query the status of a single AccessDevice (GET /accesses/{accessId}/devices/{accessDeviceId}) and to delete it (DELETE accesses/{accessId}/devices/{accessDeviceId}) from the access.
+    Each device added to the access is identified by an accessDeviceId returned in the response. The accessDeviceId is a unique identifier of the device included in the access and is the same across all the accesses in which the device is included. The accessDeviceId can be used to individually query the status of a single AccessDevice (GET /accesses/{accessId}/devices/{accessDeviceId}) and to delete it (DELETE accesses/{accessId}/devices/{accessDeviceId}) from the access.
 
     If callback related information is provided, it will be used to notify of state transitions for all devices included in the access.
 
@@ -89,11 +89,11 @@ info:
 
     The API Consumer provides the following information
 
-    - a list of identifiers of the devices to be removed, using a deviceAccessId as device identifier
+    - a list of identifiers of the devices to be removed, using a accessDeviceId as device identifier
 
     The API returns a confirmation of removal and, if not all devices could be removed, a result detailing which devices failed to be removed.
 
-    A single device can be removed from an access by performing a `DELETE` operation on the `/accesses/{accessId}/devices/{deviceAccessId}` endpoint.
+    A single device can be removed from an access by performing a `DELETE` operation on the `/accesses/{accessId}/devices/{accessDeviceId}` endpoint.
 
     If callback related information was provided for the access, there will be no further notifications related to the deleted devices.
 
@@ -103,7 +103,7 @@ info:
 
     These filter criteria can be combined according to the CAMARA filtering rules to allow the API consumer to retrieve information about devices included in the access of particular interest, e.g. devices added in the recent operation and which reached the `GRANTED` status.
 
-    A single device in an access can be queried by performing a `GET` operation on the `/accesses/{accessId}/devices/{deviceAccessId}` endpoint.
+    A single device in an access can be queried by performing a `GET` operation on the `/accesses/{accessId}/devices/{accessDeviceId}` endpoint.
 
     # Querying one or more accesses
 

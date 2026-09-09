@@ -64,7 +64,7 @@ info:
 
     - If the dedicated network identified by the networkId is in an incompatible state when creating a network access, e.g. it is in the TERMINATED state, then the server will return an error with the `409 INCOMPATIBLE_STATE` error code.
     - If not all requested devices could be added, the API returns `results` with an error result for each failed device detailing why it failed.
-      - If a devices cannot be added because the `maxNumberOfDevices` is already reached, the device status will be returned with `429 QUOTA_EXCEEDED` error code.
+      - If a device cannot be added because the `maxNumberOfDevices` is already reached, the device status will be returned with `429 QUOTA_EXCEEDED` error code.
 
     # Adding devices to an access
 

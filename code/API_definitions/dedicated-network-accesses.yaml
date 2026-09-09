@@ -1464,9 +1464,11 @@ components:
         data:
           accessId: b69e5404-3871-448d-8f9f-11dc5d29a4c8
           accessDevices:
-            - device:
+            - deviceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              device:
                 phoneNumber: "+49123456789"
               status: GRANTED
               statusInfo:
-                code: REQUEST_APPROVED
-                message: The request to grant the device access to the network was approved.
+                reason:
+                  code: REQUEST_APPROVED
+                  message: The request to grant the device access to the network was approved.

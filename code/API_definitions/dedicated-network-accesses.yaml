@@ -103,7 +103,7 @@ info:
 
     These filter criteria can be combined according to the CAMARA filtering rules to allow the API consumer to retrieve information about devices included in the access of particular interest, e.g. devices added in the recent operation and which reached the `GRANTED` status.
 
-    A single devices in an access can be queried by performing a `GET` operation on the `/accesses/{accessId}/devices/{deviceAccessId}` endpoint.
+    A single device in an access can be queried by performing a `GET` operation on the `/accesses/{accessId}/devices/{deviceAccessId}` endpoint.
 
     # Querying one or more accesses
 

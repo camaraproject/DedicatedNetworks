@@ -81,7 +81,7 @@ info:
     ## Error handling:
 
     - If not all requested devices could be added, the API returns a result detailing which devices were added and which failed.
-      - If a devices cannot be added because the `maxNumberOfDevices` is already reached, the device status will be returned with `429 QUOTA_EXCEEDED` error code.
+      - If a device cannot be added because the `maxNumberOfDevices` is already reached, the device status will be returned with `429 QUOTA_EXCEEDED` error code.
 
     # Removing devices from an access
 

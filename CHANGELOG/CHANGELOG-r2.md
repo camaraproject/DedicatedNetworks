@@ -96,7 +96,7 @@ The API definition(s) are based on
 
 ## dedicated-network-accesses 0.2.0-rc.1
 
-**dedicated-network-accesses 0.2.0-rc.1 is a release-candidate version of this API.**
+**dedicated-network-accesses 0.2.0-rc.1 is a release-candidate version of this API.** A rc.2 release-candidate version will be available soon.
 
 Changes documented below are compared to version 0.1.0.
 

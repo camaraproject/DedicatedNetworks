@@ -174,34 +174,221 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
     And the response body complies with the OAS schema at "/components/schemas/ServiceArea"
     And the response property "$.id" is equal to the path parameter "areaId"
 
-  # Error scenarios
+############################ Error Scenarios - retrieveNetworkServiceAreas #############################################
 
-  @dedicated_network_areas_retrieveNetworkServiceAreas_08_error_invalid_coordinates
+  # Syntax Error scenarios
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_400.01_schema_not_compliant
+  Scenario: Invalid Argument. Generic Syntax Exception
+    Given the request body is included but is not compliant with the schema at "#/components/schemas/RetrieveServiceAreasRequest"
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_400.02_no_request_body
+  Scenario: Missing request body
+    Given the request body is not included
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_400.06_invalid_x-correlator
+  Scenario: Invalid x-correlator header
+    Given the header "x-correlator" does not comply with the schema at "#/components/schemas/XCorrelator"
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 400
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_400.07_invalid_coordinates
   Scenario: Retrieve service areas with invalid coordinates
     Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
-    And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
+    And the request body is set to a request body compliant with the schema at "#/components/schemas/RetrieveServiceAreasRequest"
     And the request body property "$.atLocation.latitude" is set to "999"
     And the request body property "$.atLocation.longitude" is set to "7.10066"
     When the request "retrieveNetworkServiceAreas" is sent
     Then the response status code is 400
-    And the response header "x-correlator" has the same value as the request header "x-correlator"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response property "$.code" is "OUT_OF_RANGE"
 
-  @dedicated_network_areas_readNetworkServiceArea_02_error_invalid_uuid
+  @dedicated_network_areas_retrieveNetworkServiceAreas_400.09_out_of_range_pagination
+  Scenario Outline: Error response for out of range pagination parameters
+    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    And the header "Content-Type" is set to "application/json"
+    And the request body is set to a request body compliant with the schema at "#/components/schemas/RetrieveServiceAreasRequest"
+    And the query parameter "<query_parameter>" is set to "<invalid_value>"
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "OUT_OF_RANGE"
+    And the response property "$.message" contains a user friendly text
+
+    Examples:
+      | query_parameter | invalid_value |
+      | page            | 0             |
+      | perPage         | 0             |
+      | perPage         | 101           |
+
+  # Service Error scenarios
+
+  ## Authentication/Authorization errors
+
+    # Generic 401 errors
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_401.01_no_authorization_header
+  Scenario: Error response for no header "Authorization"
+    Given the header "Authorization" is not sent
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_401.02_expired_access_token
+  Scenario: Error response for expired access token
+    Given the header "Authorization" is set to an expired access token
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_401.03_invalid_access_token
+  Scenario: Error response for invalid access token
+    Given the header "Authorization" is set to an invalid access token
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  # Generic 403 errors
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_403.01_missing_access_token_scope
+  Scenario: Missing access token scope
+    Given the header "Authorization" is set to an access token that does not include scope "dedicated-network-areas:areas:read"
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 403
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 403
+    And the response property "$.code" is "PERMISSION_DENIED"
+    And the response property "$.message" contains a user friendly text
+
+############################ Error Scenarios - readNetworkServiceArea #############################################
+  # Syntax Error scenarios
+
+  @dedicated_network_areas_readNetworkServiceArea_400.06_invalid_x-correlator
+  Scenario: Invalid x-correlator header
+    Given the header "x-correlator" does not comply with the schema at "#/components/schemas/XCorrelator"
+    When the request "readNetworkServiceArea" is sent
+    Then the response status code is 400
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_readNetworkServiceArea_400.08_invalid_uuid
   Scenario: Read service area with invalid UUID
     Given the resource "/dedicated-network-areas/vwip/areas/{areaId}"
     And the path parameter "areaId" is set to an invalid UUID
     When the request "readNetworkServiceArea" is sent
     Then the response status code is 400
-    And the response header "x-correlator" has the same value as the request header "x-correlator"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response property "$.code" is "INVALID_ARGUMENT"
 
-  @dedicated_network_areas_readNetworkServiceArea_03_error_not_found
-  Scenario: Read non-existent service area
+  # Service Error scenarios
+
+  ## Authentication/Authorization errors
+
+    # Generic 401 errors
+
+  @dedicated_network_areas_readNetworkServiceArea_401.01_no_authorization_header
+  Scenario: Error response for no header "Authorization"
+    Given the header "Authorization" is not sent
+    When the request "readNetworkServiceArea" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_readNetworkServiceArea_401.02_expired_access_token
+  Scenario: Error response for expired access token
+    Given the header "Authorization" is set to an expired access token
+    When the request "readNetworkServiceArea" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_readNetworkServiceArea_401.03_invalid_access_token
+  Scenario: Error response for invalid access token
+    Given the header "Authorization" is set to an invalid access token
+    When the request "readNetworkServiceArea" is sent
+    Then the response status code is 401
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 401
+    And the response property "$.code" is "UNAUTHENTICATED"
+    And the response property "$.message" contains a user friendly text
+
+  # Generic 403 errors
+
+  @dedicated_network_areas_readNetworkServiceArea_403.01_missing_access_token_scope
+  Scenario: Missing access token scope
+    Given the header "Authorization" is set to an access token that does not include scope "dedicated-network-areas:areas:read"
+    When the request "readNetworkServiceArea" is sent
+    Then the response status code is 403
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 403
+    And the response property "$.code" is "PERMISSION_DENIED"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_areas_readNetworkServiceArea_403.02_api_client_token_mismatch
+  Scenario: "areaId" not created by the API client given in the access token
+    # To test this, a token has to be obtained for a different client
+    # here: eligibility
+    Given the header "Authorization" is set to a valid access token emitted to an API client which did not have rights to access/manage the "areaId"
+    When the request "readNetworkServiceArea" is sent
+    Then the response status code is 403
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 403
+    And the response property "$.code" is "PERMISSION_DENIED"
+    And the response property "$.message" contains a user friendly text
+
+  # Generic 404 Errors
+
+  @dedicated_network_areas_readNetworkServiceArea_404.01_not_found
+  Scenario: non-existing "{areaId}"
     Given the resource "/dedicated-network-areas/vwip/areas/{areaId}"
-    And the path parameter "areaId" is set to a non-existent UUID
+    And the path parameter "areaId" is set to a random UUID
     When the request "readNetworkServiceArea" is sent
     Then the response status code is 404
-    And the response header "x-correlator" has the same value as the request header "x-correlator"
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 404
     And the response property "$.code" is "NOT_FOUND"
+    And the response property "$.message" contains a user friendly text

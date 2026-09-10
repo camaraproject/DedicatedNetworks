@@ -176,7 +176,6 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
 
 ############################ Error Scenarios - retrieveNetworkServiceAreas #############################################
 
-
   # Syntax Error scenarios
 
   @dedicated_network_areas_retrieveNetworkServiceAreas_400.01_schema_not_compliant
@@ -393,4 +392,3 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
     And the response property "$.status" is 404
     And the response property "$.code" is "NOT_FOUND"
     And the response property "$.message" contains a user friendly text
-

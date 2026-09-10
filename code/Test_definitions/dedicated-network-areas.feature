@@ -10,6 +10,8 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
   # * Valid network profile ID (for byNetworkProfileId filter testing)
   # * Valid QoS profile name (for byQosProfileName filter testing)
   # * Valid coordinates (latitude, longitude for atLocation filter testing)
+  # * A combination of area name, network profile ID and QoS profile name matching at least one area (for combined filter testing)
+  # * At least two existing areas (for pagination testing)
   # * A non-existent UUID (for 404 error testing)
   # * A malformed UUID (for 400 error testing)
   #
@@ -117,6 +119,47 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
     And the response body complies with the OAS schema at "/components/schemas/ServiceAreasPage"
     And the response property "$.items" is an array where each item complies with the OAS schema at "/components/schemas/ServiceArea"
     And each item in the response array has property "$.qosProfiles" containing the value specified in "$.byQosProfileName"
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_09_success_filtered_by_several_properties_first_page
+  Scenario: List first page of areas matching all of several given filters
+    Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    And the header "Content-Type" is set to "application/json"
+    And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
+    # RetrieveServiceAreasRequest returns the service areas that match all the given properties
+    And the request body property "$.byName" is set to a valid area name
+    And the request body property "$.byNetworkProfileId" is set to a valid network profile ID
+    And the request body property "$.byQosProfileName" is set to a valid QoS profile name
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has the same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "/components/schemas/ServiceAreasPage"
+    And the response property "$.items" is an array where each item complies with the OAS schema at "/components/schemas/ServiceArea"
+    And each item in the response array has property "$.name" equal to the value specified in "$.byName"
+    And each item in the response array has property "$.networkProfiles" containing the value specified in "$.byNetworkProfileId"
+    And each item in the response array has property "$.qosProfiles" containing the value specified in "$.byQosProfileName"
+
+  @dedicated_network_areas_retrieveNetworkServiceAreas_10_success_pagination
+  Scenario: Retrieve a specific page of service areas with an explicit page size
+    Given there are at least 2 service areas
+    And the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
+    And the header "Content-Type" is set to "application/json"
+    And the request body is set to a request body compliant with the schema at "/components/schemas/RetrieveServiceAreasRequest"
+    And the query parameter "perPage" is set to 1
+    And the query parameter "page" is set to 2
+    When the request "retrieveNetworkServiceAreas" is sent
+    Then the response status code is 200
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has the same value as the request header "x-correlator"
+    And the response header "X-Total-Count" exists and is the total number of service areas
+    And the response header "X-Total-Pages" exists and is the total number of pages
+    And the response header "Link" exists
+    And the response body complies with the OAS schema at "/components/schemas/ServiceAreasPage"
+    And the response property "$.items" is an array with exactly 1 item
+    And the response property "$.pagination.page" is equal to the query parameter "page"
+    And the response property "$.pagination.perPage" is equal to the query parameter "perPage"
+    And the response property "$.pagination.totalCount" has the same value as the response header "X-Total-Count"
+    And the response property "$.pagination.totalPages" has the same value as the response header "X-Total-Pages"
 
   # Success scenarios for GET /areas/{areaId}
 

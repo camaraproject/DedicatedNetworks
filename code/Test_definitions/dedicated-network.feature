@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
+Feature: CAMARA Dedicated Network API, v0.2.0-rc.1 - Networks API Operations
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -25,7 +25,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_listNetworks_01_success_all_first_page
   Scenario: List first page of all dedicated networks
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.2rc1/networks"
     When the request "listNetworks" is sent
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
@@ -35,7 +35,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_listNetworks_02_success_filtered_by_name
   Scenario: List first page of dedicated networks filtered by name
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.2rc1/networks"
     And the query parameter "name" is set to a valid network name
     When the request "listNetworks" is sent
     Then the response status code is 200
@@ -48,7 +48,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
   @dedicated_network_listNetworks_03_success_pagination
   Scenario: List a specific page of dedicated networks with an explicit page size
     Given there are at least 2 dedicated networks
-    And the resource "/dedicated-network/vwip/networks"
+    And the resource "/dedicated-network/v0.2rc1/networks"
     And the query parameter "perPage" is set to 1
     And the query parameter "page" is set to 2
     When the request "listNetworks" is sent
@@ -69,7 +69,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_createNetwork_01_success_basic
   Scenario: Create a dedicated network (basic success)
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.2rc1/networks"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/CreateNetwork"
     And the request body property "$.networkProfileId" is set to a valid network profile ID
@@ -87,7 +87,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_createNetwork_02_success_echo
   Scenario: Create a dedicated network (response echoes request fields)
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.2rc1/networks"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/CreateNetwork"
     And the request body property "$.networkProfileId" is set to a valid network profile ID
@@ -107,7 +107,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_createNetwork_03_success_with_qos_profile_name
   Scenario: Create a dedicated network with a QoS profile name instead of a network profile ID
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.2rc1/networks"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/CreateNetwork"
     # CreateNetwork requires oneOf networkProfileId / qosProfileName
@@ -128,7 +128,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_createNetwork_04_success_with_name
   Scenario: Create a dedicated network with the optional name property
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.2rc1/networks"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/CreateNetwork"
     And the request body property "$.name" is set to a valid network name
@@ -148,7 +148,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
   @dedicated_network_readNetwork_01_success
   Scenario: Get details of a specific network
     Given an existing dedicated network
-    And the resource "/dedicated-network/vwip/networks/{networkId}"
+    And the resource "/dedicated-network/v0.2rc1/networks/{networkId}"
     And the path parameter "networkId" is set to the ID of the existing network
     When the request "readNetwork" is sent
     Then the response status code is 200
@@ -162,7 +162,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
   @dedicated_network_deleteNetwork_01_success
   Scenario: Delete a dedicated network
     Given an existing dedicated network
-    And the resource "/dedicated-network/vwip/networks/{networkId}"
+    And the resource "/dedicated-network/v0.2rc1/networks/{networkId}"
     And the path parameter "networkId" is set to the ID of the existing network
     When the request "deleteNetwork" is sent
     Then the response status code is 204
@@ -183,7 +183,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_listNetworks_400.07_out_of_range_pagination
   Scenario Outline: Error response for out of range pagination parameters
-    Given the resource "/dedicated-network/vwip/networks"
+    Given the resource "/dedicated-network/v0.2rc1/networks"
     And the query parameter "<query_parameter>" is set to "<invalid_value>"
     When the request "listNetworks" is sent
     Then the response status code is 400
@@ -552,7 +552,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_readNetwork_404.01_not_found
   Scenario: non-existing "{networkId}"
-    Given the resource "/dedicated-network/vwip/networks/{networkId}"
+    Given the resource "/dedicated-network/v0.2rc1/networks/{networkId}"
     And the path parameter "networkId" is set to a random network ID
     When the request "readNetwork" is sent
     Then the response status code is 404
@@ -641,7 +641,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
 
   @dedicated_network_deleteNetwork_404.01_not_found
   Scenario: non-existing "{networkId}"
-    Given the resource "/dedicated-network/vwip/networks/{networkId}"
+    Given the resource "/dedicated-network/v0.2rc1/networks/{networkId}"
     And the path parameter "networkId" is set to a random network ID
     When the request "deleteNetwork" is sent
     Then the response status code is 404

@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
+Feature: CAMARA Dedicated Network API, v0.2.0-rc.1 - Network Profiles API Operations
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -20,7 +20,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
 
   @dedicated_network_profiles_readNetworkProfiles_01_success_all_first_page
   Scenario: List first page of all available network profiles
-    Given the resource "/dedicated-network-profiles/vwip/profiles"
+    Given the resource "/dedicated-network-profiles/v0.2rc1/profiles"
     When the request "readNetworkProfiles" is sent
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
@@ -31,7 +31,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
 
   @dedicated_network_profiles_readNetworkProfiles_02_success_filtered_by_name
   Scenario: List first page of network profiles filtered by name
-    Given the resource "/dedicated-network-profiles/vwip/profiles"
+    Given the resource "/dedicated-network-profiles/v0.2rc1/profiles"
     And the query parameter "name" is set to a valid network profile name
     When the request "readNetworkProfiles" is sent
     Then the response status code is 200
@@ -44,7 +44,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
   @dedicated_network_profiles_readNetworkProfiles_03_success_pagination
   Scenario: List a specific page of network profiles with an explicit page size
     Given there are at least 2 network profiles
-    And the resource "/dedicated-network-profiles/vwip/profiles"
+    And the resource "/dedicated-network-profiles/v0.2rc1/profiles"
     And the query parameter "perPage" is set to 1
     And the query parameter "page" is set to 2
     When the request "readNetworkProfiles" is sent
@@ -66,7 +66,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
   @dedicated_network_profiles_readNetworkProfile_01_success
   Scenario: Get details of a specific network profile
     Given an existing network profile
-    And the resource "/dedicated-network-profiles/vwip/profiles/{profileId}"
+    And the resource "/dedicated-network-profiles/v0.2rc1/profiles/{profileId}"
     And the path parameter "profileId" is set to the ID of the existing profile
     When the request "readNetworkProfile" is sent
     Then the response status code is 200
@@ -92,7 +92,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
 
   @dedicated_network_profiles_readNetworkProfiles_400.07_out_of_range_pagination
   Scenario Outline: Error response for out of range pagination parameters
-    Given the resource "/dedicated-network-profiles/vwip/profiles"
+    Given the resource "/dedicated-network-profiles/v0.2rc1/profiles"
     And the query parameter "<query_parameter>" is set to "<invalid_value>"
     When the request "readNetworkProfiles" is sent
     Then the response status code is 400
@@ -240,7 +240,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
 
   @dedicated_network_profiles_readNetworkProfile_404.01_identifier_not_found
   Scenario: non-existing "{profileId}"
-    Given the resource "/dedicated-network-profiles/vwip/profiles/{profileId}"
+    Given the resource "/dedicated-network-profiles/v0.2rc1/profiles/{profileId}"
     And the path parameter "profileId" is set to a random UUID
     When the request "readNetworkProfile" is sent
     Then the response status code is 404

@@ -142,6 +142,10 @@ Changes documented below are compared to version 0.1.0.
 * Correcting multiple assertions that do not match the API definitions (Issue #166) by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/171
 * Fixes small corrections in the test definitions (Issue #167) identified during release review by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/172
 
+### Removed
+
+* N/A
+
 ## dedicated-network-profiles 0.2.0-rc.1
 
 **dedicated-network-profiles 0.2.0-rc.1 is a release-candidate version of this API.**
@@ -182,6 +186,10 @@ Changes documented below are compared to version 0.1.0.
 * Adding missing x-correlator request parameter and response header by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/141
 * Correction inconsistencies and errors (lifecycle, response codes, QoS Profile usage, etc) on the Networks and the Profiles API by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 * Fixes small corrections in the test definitions (Issue #167) identified during release review by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/172
+
+### Removed
+
+* N/A
 
 ## dedicated-network 0.2.0-rc.1
 

@@ -243,6 +243,10 @@ Changes documented below are compared to version 0.1.0.
   - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.2/code/API_definitions/dedicated-network-areas.yaml)
   - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.2/code/API_definitions/dedicated-network-areas.yaml)
 
+### Breaking changes
+
+* N/A
+
 ### Added
 
 * A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
@@ -263,6 +267,18 @@ Changes documented below are compared to version 0.1.0.
 * Fixes small corrections in the test definitions (Issue #167) identified during release review by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/172
 * Adding error scenarios according to CAMARA testing guideline to networks, profiles and areas APIs by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/177
 * Adding additional sunny day test definitions for networks, areas and profiles APIs, testing additional query parameter combinations and pagination by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/178
+
+### Changed
+
+* N/A
+
+### Fixed
+
+* N/A
+
+### Removed
+
+* N/A
 
 ## New Contributors
 * @hubertp-ericsson made their first contribution in https://github.com/camaraproject/DedicatedNetworks/pull/83

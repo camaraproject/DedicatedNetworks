@@ -7,11 +7,7 @@ info:
 
     An Access to a dedicated network represents the permission for its devices to use the Dedicated Network's reserved connectivity resources. The usage of the resources can be tailored by the access within the constraints of the applicable Network Profile. For example, the access may define a subset of the QoS Profiles defined in the Network Profile and thus limit the set of QoS profiles applicable for the devices using it. The access may also select a different default QoS Profile than the one in the Network Profile. This allows having different QoS profile combinations for different device categories, such as QoS Profile combinations for InterCom devices are separated from those for video cameras within a Media Production case.
 
-    A device is identified by the CAMARA `device` object. Out of the four identifiers defined by the `device` object, this API supports the Phone Number assigned by the mobile network operator as the only option.
-
-    Notes:
-    1. Phone Number is the required identifier in a `device` object for this API. Any other identifier present in a `device` object received by this API will be silently ignored but will be retained and echoed back.
-    2. A `device` object without a Phone Number will be rejected by this API.
+    A device is identified by the CAMARA `device` object.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
 
@@ -809,7 +805,7 @@ components:
         deviceId:
           $ref: "#/components/schemas/AccessDeviceId"
         device:
-          $ref: "#/components/schemas/ValidDevice"
+          $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
         status:
           $ref: "#/components/schemas/DeviceStatus"
         statusInfo:
@@ -1058,7 +1054,7 @@ components:
         - type: object
           properties:
             device:
-              $ref: "#/components/schemas/ValidDevice"
+              $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
             status:
               enum:
                 - 404
@@ -1074,7 +1070,7 @@ components:
         - type: object
           properties:
             device:
-              $ref: "#/components/schemas/ValidDevice"
+              $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
             status:
               enum:
                 - 409
@@ -1099,6 +1095,7 @@ components:
               enum:
                 - SERVICE_NOT_APPLICABLE
                 - MISSING_IDENTIFIER
+                - UNSUPPORTED_IDENTIFIER
 
     DeviceMaxExceededError:
       description: Error when device exceeds maximum number of allowed devices
@@ -1107,7 +1104,7 @@ components:
         - type: object
           properties:
             device:
-              $ref: "#/components/schemas/ValidDevice"
+              $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
             status:
               enum:
                 - 429
@@ -1158,22 +1155,12 @@ components:
           required:
             - data
 
-    ValidDevice:
-      description: |
-        A device is identified by the CAMARA `device` object. Out of the four identifiers defined by the `device` object, this API supports the Phone Number assigned by the mobile network operator as the only option.
-        NOTE1: Phone Number is the required identifier in a `device` object for this API. Any other identifier present in a `device` object received by this API will be silently ignored but will be retained and echoed back.
-        NOTE2: A `device` object without a Phone Number will be rejected by this API.
-      allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
-        - required:
-            - phoneNumber
-
     Devices:
       description: A list of devices
       type: array
       maxItems: 9007199254740991
       items:
-        $ref: "#/components/schemas/ValidDevice"
+        $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
 
     InvalidDevice:
       description: |

@@ -697,7 +697,7 @@ components:
 
     AccessDeviceId:
       description: |
-        Network access device id of a device included in a network access in UUID format
+        Network access device id in UUID format of a device included in one or more network accesses
         It is a unique identifier of the device included in the access and is the same across all the accesses in which the device is included
       type: string
       format: uuid

@@ -651,36 +651,48 @@ components:
   parameters:
     AddedAtOrAfter:
       in: query
-      description: Only devices currently included in the access which were successfully added to the access no earlier than the given time are to be returned
+      description: |
+        Only devices currently included in the access which were successfully added to the access no earlier than the given time are to be returned.
+        It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
       name: addedAt.gte
       required: false
       schema:
         format: date-time
         type: string
+        maxLength: 64
     AddedAfter:
       in: query
-      description: Only devices currently included in the access which were successfully added to the access later than the given time are to be returned
+      description: |
+        Only devices currently included in the access which were successfully added to the access later than the given time are to be returned.
+        It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
       name: addedAt.gt
       required: false
       schema:
         format: date-time
         type: string
+        maxLength: 64
     AddedAtOrBefore:
       in: query
-      description: Only devices currently included in the access which were successfully added to the access no later than the given time are to be returned
+      description: |
+        Only devices currently included in the access which were successfully added to the access no later than the given time are to be returned.
+        It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
       name: addedAt.lte
       required: false
       schema:
         format: date-time
         type: string
+        maxLength: 64
     AddedBefore:
       in: query
-      description: Only devices currently included in the access which were successfully added to the access earlier than the given time are to be returned
+      description: |
+        Only devices currently included in the access which were successfully added to the access earlier than the given time are to be returned.
+        It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z).
       name: addedAt.lt
       required: false
       schema:
         format: date-time
         type: string
+        maxLength: 64
 
   schemas:
     AccessId:
@@ -788,10 +800,11 @@ components:
             - maxItems: 100
         addedAt:
           description: |
-            Timestamp when the access devices listed in `addedAccessDevices` were added to the access.
+            Timestamp when the access devices listed in `addedAccessDevices` were added to the access. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
             **NOTE:** The timestamp is provided only if `addedAccessDevices` is present.
           type: string
           format: date-time
+          maxLength: 64
 
     AccessDevice:
       description: |

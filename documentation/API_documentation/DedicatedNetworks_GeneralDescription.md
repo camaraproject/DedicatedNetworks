@@ -237,16 +237,16 @@ stateDiagram-v2
     GRANTED --> DENIED: Device's access is revoked (after having been granted) or it failed.
 ```
 
-Explainations
+Explanations
 - A device's access is usable only when its state is GRANTED while the dedicated network is in ACTIVATED state.
 
 - A device's access state will transition from REQUESTED to GRANTED (with reason code: REQUEST_APPROVED) when its access to the network is approved.
 
-- A device's access state will transition from REQUESTED to DENIED (with reason code: REQUEST_FAILED) if failure occured while approving the request.
+- A device's access state will transition from REQUESTED to DENIED (with reason code: REQUEST_FAILED) if failure occurred while approving the request.
 
 - A device's access state will transition from REQUESTED to DENIED (with reason code: REQUEST_REJECTED) if the request is rejected.
 
-- A device's access state will transition from GRANTED to DENIED (with reason code: ACCESS_FAILED) if failure occured after its access has been granted.
+- A device's access state will transition from GRANTED to DENIED (with reason code: ACCESS_FAILED) if failure occurred after its access has been granted.
 
 - A device's access state will transition from GRANTED to DENIED (with reason code: ACCESS_REVOKED) when its grant to access the network is revoked.
 

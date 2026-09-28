@@ -1038,12 +1038,10 @@ components:
     ErrorResults:
       description: |
         Response body used when none of the devices could be processed successfully.
-        It contains the overall error information and a list of error results, one result per device.
+        It contains the overall error information and a list of error results (if any), one result per device.
       allOf:
         - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
         - $ref: "#/components/schemas/ErrorResultsForDevices"
-        - required:
-            - results
 
     ErrorResultsForDevices:
       description: An object describing error results of an operation targeting multiple devices

@@ -58,6 +58,7 @@ info:
 
     ## Error handling:
 
+    - If no dedicated network exists with the given networkId when creating a network access, then the server will return an error with the `404 DEDICATED_NETWORK_ACCESSES.NETWORK_IDENTIFIER_NOT_FOUND` error code.
     - If the dedicated network identified by the networkId is in an incompatible state when creating a network access, e.g. it is in the TERMINATED state, then the server will return an error with the `409 INCOMPATIBLE_STATE` error code.
     - If not all requested devices could be added, the API returns `results` with an error result for each failed device detailing why it failed.
       - If a device cannot be added because the `maxNumberOfDevices` is already reached, the device status will be returned with `429 QUOTA_EXCEEDED` error code.
@@ -117,7 +118,7 @@ info:
 
     The list of error codes in this API specification is not exhaustive. Therefore the API specification MAY not document some non-mandatory error statuses as indicated in `CAMARA API Design Guide`.
 
-    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified in the `API Readiness Checklist` document associated to this API version.
+    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified from the `x-camara-commonalities` field, the changelog and the metadata of the released API version.
 
     As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible error response if it is explicitly documented in the API.
     <!-- CAMARA:MANDATORY:additional-error-responses:END -->
@@ -132,7 +133,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
-  x-camara-commonalities: 0.8
+  x-camara-commonalities: 0.9
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/DedicatedNetworks
@@ -207,11 +208,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessInfosPage'
         "400":
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
 
     post:
       tags:
@@ -261,13 +262,13 @@ paths:
                     x-correlator:
                       $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
                 "400":
-                  $ref: "#/components/responses/Generic400"
+                  $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
                 "401":
-                  $ref: "#/components/responses/Generic401"
+                  $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
                 "403":
-                  $ref: "#/components/responses/Generic403"
+                  $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
                 "410":
-                  $ref: "#/components/responses/Generic410"
+                  $ref: "../common/CAMARA_event_common.yaml#/components/responses/SinkGone410"
               security:
                 - {}
                 - notificationsBearerAuth: []
@@ -305,17 +306,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreateAccessPartialSuccess'
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "#/components/responses/CreateAccessBadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "#/components/responses/CreateAccessNotFound404"
         "409":
-          $ref: "#/components/responses/Generic409"
+          $ref: "#/components/responses/CreateAccessConflict409"
         "422":
-          $ref: "#/components/responses/Generic422"
+          $ref: "#/components/responses/CreateAccessUnprocessableEntity422"
 
   /accesses/{accessId}:
     get:
@@ -347,13 +348,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessInfo'
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
 
     delete:
       tags:
@@ -380,13 +381,13 @@ paths:
             x-correlator:
               $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
 
   /accesses/{accessId}/devices:
     parameters:
@@ -446,13 +447,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessDevicesPage'
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
   /accesses/{accessId}/devices/add:
     parameters:
       - name: accessId
@@ -498,15 +499,15 @@ paths:
               schema:
                 $ref: "#/components/schemas/AddDevicesPartialSuccess"
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
         "409":
-          $ref: "#/components/responses/Generic409"
+          $ref: "#/components/responses/AccessDevicesConflict409"
         "422":
           $ref: "#/components/responses/NoProcessableDevices422"
 
@@ -550,15 +551,15 @@ paths:
               schema:
                 $ref: "#/components/schemas/RemoveDevicesPartialSuccess"
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
         "409":
-          $ref: "#/components/responses/Generic409"
+          $ref: "#/components/responses/AccessDevicesConflict409"
         "422":
           $ref: "#/components/responses/NoProcessableDevices422"
 
@@ -599,13 +600,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessDevice'
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
 
     delete:
       tags:
@@ -626,13 +627,13 @@ paths:
             x-correlator:
               $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
 
 components:
   securitySchemes:
@@ -850,10 +851,8 @@ components:
           $ref: "#/components/schemas/QosProfileName"
         sink:
           description: The address to which events shall be delivered using the selected protocol.
-          type: string
-          format: uri
-          pattern: ^https:\/\/.+$
-          maxLength: 2048
+          allOf:
+            - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/Sink"
         sinkCredential:
           $ref: '../common/CAMARA_event_common.yaml#/components/schemas/SinkCredential'
       required:
@@ -1197,7 +1196,7 @@ components:
       pattern: "^[a-zA-Z0-9_.-]+$"
 
   responses:
-    Generic400:
+    CreateAccessBadRequest400:
       description: Bad Request
       headers:
         x-correlator:
@@ -1215,81 +1214,20 @@ components:
                   code:
                     enum:
                       - INVALID_ARGUMENT
-                      - OUT_OF_RANGE
+                      - INVALID_CREDENTIAL
+                      - INVALID_TOKEN
+                      - INVALID_SINK
           examples:
             GENERIC_400_INVALID_ARGUMENT:
-              description: Invalid Argument. Generic Syntax Exception
-              value:
-                status: 400
-                code: INVALID_ARGUMENT
-                message: Client specified an invalid argument, request body or query param.
-            GENERIC_400_OUT_OF_RANGE:
-              description: Out of Range. Specific Syntax Exception used when a given field has a pre-defined range or a invalid filter criteria combination is requested
-              value:
-                status: 400
-                code: OUT_OF_RANGE
-                message: Client specified an invalid range.
+              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_400_INVALID_ARGUMENT"
+            GENERIC_400_INVALID_CREDENTIAL:
+              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_CREDENTIAL"
+            GENERIC_400_INVALID_TOKEN:
+              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_TOKEN"
+            GENERIC_400_INVALID_SINK:
+              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_SINK"
 
-    Generic401:
-      description: Unauthorized
-      headers:
-        x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 401
-                  code:
-                    enum:
-                      - UNAUTHENTICATED
-          examples:
-            GENERIC_401_UNAUTHENTICATED:
-              description: Request cannot be authenticated and a new authentication is required
-              value:
-                status: 401
-                code: UNAUTHENTICATED
-                message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
-
-    Generic403:
-      description: Forbidden
-      headers:
-        x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 403
-                  code:
-                    enum:
-                      - PERMISSION_DENIED
-                      - INVALID_TOKEN_CONTEXT
-          examples:
-            GENERIC_403_PERMISSION_DENIED:
-              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
-              value:
-                status: 403
-                code: PERMISSION_DENIED
-                message: Client does not have sufficient permissions to perform this action.
-            GENERIC_403_INVALID_TOKEN_CONTEXT:
-              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
-              value:
-                status: 403
-                code: INVALID_TOKEN_CONTEXT
-                message: "{{field}} is not consistent with access token."
-
-    Generic404:
+    CreateAccessNotFound404:
       description: Not found
       headers:
         x-correlator:
@@ -1306,23 +1244,38 @@ components:
                       - 404
                   code:
                     enum:
-                      - NOT_FOUND
-                      - IDENTIFIER_NOT_FOUND
+                      - DEDICATED_NETWORK_ACCESSES.NETWORK_IDENTIFIER_NOT_FOUND
           examples:
-            GENERIC_404_NOT_FOUND:
-              description: Resource is not found
+            DEDICATED_NETWORK_ACCESSES_404_NETWORK_IDENTIFIER_NOT_FOUND:
+              description: Requested network identifier is not found
               value:
                 status: 404
-                code: NOT_FOUND
-                message: The specified resource is not found.
-            GENERIC_404_IDENTIFIER_NOT_FOUND:
-              description: Some identifier cannot be matched to a device
-              value:
-                status: 404
-                code: IDENTIFIER_NOT_FOUND
-                message: Device identifier not found.
+                code: DEDICATED_NETWORK_ACCESSES.NETWORK_IDENTIFIER_NOT_FOUND
+                message: Network identifier not found.
 
-    Generic409:
+    CreateAccessConflict409:
+      description: Conflict
+      headers:
+        x-correlator:
+          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 409
+                  code:
+                    enum:
+                      - INCOMPATIBLE_STATE
+          examples:
+            DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
+              $ref: "#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE"
+
+    AccessDevicesConflict409:
       description: Conflict
       headers:
         x-correlator:
@@ -1340,55 +1293,14 @@ components:
                   code:
                     enum:
                       - ABORTED
-                      - ALREADY_EXISTS
                       - INCOMPATIBLE_STATE
           examples:
             GENERIC_409_ABORTED:
-              description: Concurrency of processes of the same nature/scope
-              value:
-                status: 409
-                code: ABORTED
-                message: Concurrency conflict.
-            GENERIC_409_ALREADY_EXISTS:
-              description: Trying to create an existing resource
-              value:
-                status: 409
-                code: ALREADY_EXISTS
-                message: The resource that a client tried to create already exists.
-            GENERIC_409_INCOMPATIBLE_STATE:
-              description: A resource referenced in the request is in an incompatible state for the requested operation
-              value:
-                status: 409
-                code: INCOMPATIBLE_STATE
-                message: A referenced resource is in an incompatible state.
+              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_409_ABORTED"
+            DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
+              $ref: "#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE"
 
-    Generic410:
-      description: Gone
-      headers:
-        x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 410
-                  code:
-                    enum:
-                      - GONE
-          examples:
-            GENERIC_410_GONE:
-              description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
-              value:
-                status: 410
-                code: GONE
-                message: Access to the target resource is no longer available.
-
-    Generic422:
+    CreateAccessUnprocessableEntity422:
       description: Unprocessable Content
       headers:
         x-correlator:
@@ -1408,11 +1320,7 @@ components:
                       - SERVICE_NOT_APPLICABLE
           examples:
             GENERIC_422_SERVICE_NOT_APPLICABLE:
-              description: Service not applicable for the provided identifier
-              value:
-                status: 422
-                code: SERVICE_NOT_APPLICABLE
-                message: The service is not available for the provided identifier.
+              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_422_SERVICE_NOT_APPLICABLE"
 
     NoProcessableDevices422:
       description: Unprocessable Content due to that none of the requested devices could be processed successfully
@@ -1451,6 +1359,13 @@ components:
                     code: ALREADY_EXISTS
                     message: Client specified a duplicate device identifier.
   examples:
+
+    DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
+      description: A resource referenced in the request is in an incompatible state for the requested operation
+      value:
+        status: 409
+        code: INCOMPATIBLE_STATE
+        message: A referenced resource is in an incompatible state.
 
     DEVICE_STATUS_CHANGED_EXAMPLE:
       summary: Device is GRANTED access to a dedicated network

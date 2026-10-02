@@ -221,8 +221,8 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response property "$.code" is "OUT_OF_RANGE"
 
-  @dedicated_network_areas_retrieveNetworkServiceAreas_400.08_out_of_range_pagination
-  Scenario Outline: Error response for out of range pagination parameters
+  @dedicated_network_areas_retrieveNetworkServiceAreas_400.08_invalid_pagination
+  Scenario Outline: Error response for invalid pagination parameters
     Given the resource "/dedicated-network-areas/vwip/retrieve-service-areas"
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "#/components/schemas/RetrieveServiceAreasRequest"
@@ -232,7 +232,7 @@ Feature: CAMARA Dedicated Network API, vwip - Areas API Operations
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 400
-    And the response property "$.code" is "OUT_OF_RANGE"
+    And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
     Examples:

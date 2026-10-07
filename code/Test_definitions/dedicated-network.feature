@@ -181,8 +181,8 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @dedicated_network_listNetworks_400.07_out_of_range_pagination
-  Scenario Outline: Error response for out of range pagination parameters
+  @dedicated_network_listNetworks_400.07_invalid_pagination
+  Scenario Outline: Error response for invalid pagination parameters
     Given the resource "/dedicated-network/vwip/networks"
     And the query parameter "<query_parameter>" is set to "<invalid_value>"
     When the request "listNetworks" is sent
@@ -190,7 +190,7 @@ Feature: CAMARA Dedicated Network API, vwip - Networks API Operations
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 400
-    And the response property "$.code" is "OUT_OF_RANGE"
+    And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
     Examples:

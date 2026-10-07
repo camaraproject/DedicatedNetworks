@@ -76,6 +76,25 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
     And the response property "$.id" exists and is a valid UUID
     And the response property "$.stats" exists and complies with the OAS schema at "/components/schemas/AccessStats"
 
+  @dedicated_network_accesses_createAccess_02_success_echo_sink
+  Scenario: Create a network access with sink (response echoes sink)
+    Given an existing dedicated network
+    And the resource "/dedicated-network-accesses/vwip/accesses"
+    And the header "Content-Type" is set to "application/json"
+    And the request body is set to a request body compliant with the schema at "/components/schemas/CreateAccessRequest"
+    And the request body property "$.networkId" is set to the ID of the existing network
+    And the request body property "$.sink" is set to a valid notification URL
+    And the request body property "$.sinkCredential.credentialType" is set to "ACCESSTOKEN"
+    And the request body property "$.sinkCredential.accessToken" is set to a valid access token
+    And the request body property "$.sinkCredential.accessTokenExpiresUtc" is set to a valid expiration time in the future
+    And the request body property "$.sinkCredential.accessTokenType" is set to "bearer"
+    When the request "createAccess" is sent
+    Then the response status code is 201
+    And the response header "Content-Type" is "application/json"
+    And the response header "x-correlator" has the same value as the request header "x-correlator"
+    And the response body complies with the OAS schema at "/components/schemas/CreateAccessSuccess"
+    And the response property "$.sink" has the same value as in the request body
+
   # Success scenarios for GET /accesses/{accessId}
 
   @dedicated_network_accesses_readAccess_01_success
@@ -106,13 +125,13 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
 
   # Success scenarios for GET /accesses/{accessId}/devices
 
-  @dedicated_network_accesses_listDevices_01_success_all_first_page
+  @dedicated_network_accesses_listAccessDevices_01_success_all_first_page
   Scenario: List first page of all devices of a specific network access
     Given an existing dedicated network
     And an existing network access
     And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of the existing access
-    When the request "listDevices" is sent
+    When the request "listAccessDevices" is sent
     Then the response status code is 200
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
@@ -150,3 +169,52 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
     When the request "removeDevicesFromAccess" is sent
     Then the response status code is 204
     And the response header "x-correlator" has the same value as the request header "x-correlator"
+
+  # Error scenarios for POST /accesses
+
+  @dedicated_network_accesses_createAccess_400.07_invalid_sink_credential
+  Scenario Outline: Invalid credential
+    Given the resource "/dedicated-network-accesses/vwip/accesses"
+    And the header "Content-Type" is set to "application/json"
+    And the request body is set to a request body compliant with the schema at "/components/schemas/CreateAccessRequest"
+    And the request body property "$.sinkCredential.credentialType" is set to "<unsupported_credential_type>"
+    When the request "createAccess" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_CREDENTIAL"
+    And the response property "$.message" contains a user friendly text
+
+    Examples:
+      | unsupported_credential_type |
+      | PLAIN                       |
+      | REFRESHTOKEN                |
+
+  @dedicated_network_accesses_createAccess_400.08_sink_credential_invalid_token
+  Scenario: Invalid token
+    Given the resource "/dedicated-network-accesses/vwip/accesses"
+    And the header "Content-Type" is set to "application/json"
+    And the request body is set to a request body compliant with the schema at "/components/schemas/CreateAccessRequest"
+    And the request body property "$.sinkCredential.accessTokenType" is set to a value other than "bearer"
+    When the request "createAccess" is sent
+    Then the response status code is 400
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 400
+    And the response property "$.code" is "INVALID_TOKEN" OR "INVALID_ARGUMENT"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_accesses_createAccess_404.01_networkid_not_found
+  Scenario: Error response for non-existing network identifier
+    Given the resource "/dedicated-network-accesses/vwip/accesses"
+    And the header "Content-Type" is set to "application/json"
+    And the request body is set to a request body compliant with the schema at "/components/schemas/CreateAccessRequest"
+    And the request body property "$.networkId" is set to a random network ID
+    When the request "createAccess" is sent
+    Then the response status code is 404
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 404
+    And the response property "$.code" is "DEDICATED_NETWORK_ACCESSES.NETWORK_IDENTIFIER_NOT_FOUND"
+    And the response property "$.message" contains a user friendly text

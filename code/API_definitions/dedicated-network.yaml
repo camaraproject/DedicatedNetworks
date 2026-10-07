@@ -52,7 +52,7 @@ info:
 
     The list of error codes in this API specification is not exhaustive. Therefore the API specification MAY not document some non-mandatory error statuses as indicated in `CAMARA API Design Guide`.
 
-    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified in the `API Readiness Checklist` document associated to this API version.
+    Please refer to the `CAMARA_common.yaml` of the Commonalities Release associated to this API version for a complete list of error responses. The applicable Commonalities Release can be identified from the `x-camara-commonalities` field, the changelog and the metadata of the released API version.
 
     As a specific rule, error `501 - NOT_IMPLEMENTED` can be only a possible error response if it is explicitly documented in the API.
     <!-- CAMARA:MANDATORY:additional-error-responses:END -->
@@ -67,7 +67,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: wip
-  x-camara-commonalities: 0.8
+  x-camara-commonalities: 0.9
 externalDocs:
   description: Product documentation at CAMARA
   url: https://github.com/camaraproject/DedicatedNetworks
@@ -128,11 +128,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/NetworkInfosPage'
         "400":
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
 
     post:
       tags:
@@ -181,13 +181,13 @@ paths:
                     x-correlator:
                       $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
                 "400":
-                  $ref: "#/components/responses/Generic400"
+                  $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
                 "401":
-                  $ref: "#/components/responses/Generic401"
+                  $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
                 "403":
-                  $ref: "#/components/responses/Generic403"
+                  $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
                 "410":
-                  $ref: "#/components/responses/Generic410"
+                  $ref: "../common/CAMARA_event_common.yaml#/components/responses/SinkGone410"
               security:
                 - {}
                 - notificationsBearerAuth: []
@@ -209,13 +209,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/NetworkInfo'
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "#/components/responses/CreateNetworkBadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         '404':
-          $ref: "#/components/responses/Generic404"
+          $ref: "#/components/responses/CreateNetworkNotFound404"
         '422':
           $ref: "#/components/responses/UnprocessableServiceTime422"
 
@@ -248,13 +248,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/NetworkInfo'
         '400':
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         '404':
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
     delete:
       tags:
         - Networks
@@ -279,13 +279,13 @@ paths:
             x-correlator:
               $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
         "400":
-          $ref: "#/components/responses/Generic400"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
         "401":
-          $ref: "#/components/responses/Generic401"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "#/components/responses/Generic403"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
-          $ref: "#/components/responses/Generic404"
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
 
 components:
   securitySchemes:
@@ -355,10 +355,8 @@ components:
           $ref: '#/components/schemas/ServiceAreaId'
         sink:
           description: The address to which events shall be delivered using the selected protocol.
-          type: string
-          format: uri
-          maxLength: 2048
-          pattern: ^https:\/\/.+$
+          allOf:
+            - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/Sink"
         sinkCredential:
           $ref: '../common/CAMARA_event_common.yaml#/components/schemas/SinkCredential'
       required:
@@ -480,7 +478,7 @@ components:
         - end
 
   responses:
-    Generic400:
+    CreateNetworkBadRequest400:
       description: Bad Request
       headers:
         x-correlator:
@@ -498,81 +496,20 @@ components:
                   code:
                     enum:
                       - INVALID_ARGUMENT
-                      - OUT_OF_RANGE
+                      - INVALID_CREDENTIAL
+                      - INVALID_TOKEN
+                      - INVALID_SINK
           examples:
             GENERIC_400_INVALID_ARGUMENT:
-              description: Invalid Argument. Generic Syntax Exception
-              value:
-                status: 400
-                code: INVALID_ARGUMENT
-                message: Client specified an invalid argument, request body or query param.
-            GENERIC_400_OUT_OF_RANGE:
-              description: Out of Range. Specific Syntax Exception used when a given field has a pre-defined range or a invalid filter criteria combination is requested
-              value:
-                status: 400
-                code: OUT_OF_RANGE
-                message: Client specified an invalid range.
+              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_400_INVALID_ARGUMENT"
+            GENERIC_400_INVALID_CREDENTIAL:
+              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_CREDENTIAL"
+            GENERIC_400_INVALID_TOKEN:
+              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_TOKEN"
+            GENERIC_400_INVALID_SINK:
+              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_SINK"
 
-    Generic401:
-      description: Unauthorized
-      headers:
-        x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 401
-                  code:
-                    enum:
-                      - UNAUTHENTICATED
-          examples:
-            GENERIC_401_UNAUTHENTICATED:
-              description: Request cannot be authenticated and a new authentication is required
-              value:
-                status: 401
-                code: UNAUTHENTICATED
-                message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
-
-    Generic403:
-      description: Forbidden
-      headers:
-        x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 403
-                  code:
-                    enum:
-                      - PERMISSION_DENIED
-                      - INVALID_TOKEN_CONTEXT
-          examples:
-            GENERIC_403_PERMISSION_DENIED:
-              description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
-              value:
-                status: 403
-                code: PERMISSION_DENIED
-                message: Client does not have sufficient permissions to perform this action.
-            GENERIC_403_INVALID_TOKEN_CONTEXT:
-              description: Reflect some inconsistency between information in some field of the API and the related OAuth2 Token
-              value:
-                status: 403
-                code: INVALID_TOKEN_CONTEXT
-                message: "{{field}} is not consistent with access token."
-
-    Generic404:
+    CreateNetworkNotFound404:
       description: Not found
       headers:
         x-correlator:
@@ -589,61 +526,28 @@ components:
                       - 404
                   code:
                     enum:
-                      - NOT_FOUND
                       - DEDICATED_NETWORK.QOS_PROFILE_NAME_NOT_FOUND
                       - DEDICATED_NETWORK.NETWORK_PROFILE_IDENTIFIER_NOT_FOUND
                       - DEDICATED_NETWORK.SERVICE_AREA_IDENTIFIER_NOT_FOUND
           examples:
-            GENERIC_404_NOT_FOUND:
-              description: Resource is not found
-              value:
-                status: 404
-                code: NOT_FOUND
-                message: The specified resource is not found.
-            GENERIC_404_QOS_PROFILE_NAME_NOT_FOUND:
+            DEDICATED_NETWORK_404_QOS_PROFILE_NAME_NOT_FOUND:
               description: Requested QoS profile name is not found
               value:
                 status: 404
                 code: DEDICATED_NETWORK.QOS_PROFILE_NAME_NOT_FOUND
                 message: QoS profile name not found.
-            GENERIC_404_NETWORK_PROFILE_IDENTIFIER_NOT_FOUND:
+            DEDICATED_NETWORK_404_NETWORK_PROFILE_IDENTIFIER_NOT_FOUND:
               description: Requested network profile identifier is not found
               value:
                 status: 404
                 code: DEDICATED_NETWORK.NETWORK_PROFILE_IDENTIFIER_NOT_FOUND
                 message: Network profile identifier not found.
-            GENERIC_404_SERVICE_AREA_IDENTIFIER_NOT_FOUND:
+            DEDICATED_NETWORK_404_SERVICE_AREA_IDENTIFIER_NOT_FOUND:
               description: Requested service area identifier is not found
               value:
                 status: 404
                 code: DEDICATED_NETWORK.SERVICE_AREA_IDENTIFIER_NOT_FOUND
                 message: Service area identifier not found.
-
-    Generic410:
-      description: Gone
-      headers:
-        x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 410
-                  code:
-                    enum:
-                      - GONE
-          examples:
-            GENERIC_410_GONE:
-              description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
-              value:
-                status: 410
-                code: GONE
-                message: Access to the target resource is no longer available.
 
     UnprocessableServiceTime422:
       description: Unprocessable Service Time due to incorrect start and end times

@@ -90,8 +90,8 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @dedicated_network_profiles_readNetworkProfiles_400.07_out_of_range_pagination
-  Scenario Outline: Error response for out of range pagination parameters
+  @dedicated_network_profiles_readNetworkProfiles_400.07_invalid_pagination
+  Scenario Outline: Error response for invalid pagination parameters
     Given the resource "/dedicated-network-profiles/vwip/profiles"
     And the query parameter "<query_parameter>" is set to "<invalid_value>"
     When the request "readNetworkProfiles" is sent
@@ -99,7 +99,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 400
-    And the response property "$.code" is "OUT_OF_RANGE"
+    And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
     Examples:
@@ -238,7 +238,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
 
   # Generic 404 Errors
 
-  @dedicated_network_profiles_readNetworkProfile_404.01_identifier_not_found
+  @dedicated_network_profiles_readNetworkProfile_404.01_not_found
   Scenario: non-existing "{profileId}"
     Given the resource "/dedicated-network-profiles/vwip/profiles/{profileId}"
     And the path parameter "profileId" is set to a random UUID
@@ -247,5 +247,5 @@ Feature: CAMARA Dedicated Network API, vwip - Network Profiles API Operations
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 404
-    And the response property "$.code" is "IDENTIFIER_NOT_FOUND"
+    And the response property "$.code" is "NOT_FOUND"
     And the response property "$.message" contains a user friendly text

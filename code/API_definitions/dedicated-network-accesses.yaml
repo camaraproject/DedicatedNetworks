@@ -7,7 +7,7 @@ info:
 
     An Access to a dedicated network represents the permission for its devices to use the Dedicated Network's reserved connectivity resources. The usage of the resources can be tailored by the access within the constraints of the applicable Network Profile. For example, the access may define a subset of the QoS Profiles defined in the Network Profile and thus limit the set of QoS profiles applicable for the devices using it. The access may also select a different default QoS Profile than the one in the Network Profile. This allows having different QoS profile combinations for different device categories, such as QoS Profile combinations for InterCom devices are separated from those for video cameras within a Media Production case.
 
-    A device is identified by the CAMARA `device` object.
+    A device is identified by either the CAMARA `device` object or the subject in a three-legged access token.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
 
@@ -22,11 +22,17 @@ info:
 
     # Identifying the device from the access token
 
-    This API handles multiple devices in one request and therefore does not support identifying the device from the access token. Only the `device` object is used for identifying a device.
+    This API requires the API consumer to identify one or more devices as the target of the API as follows:
+    - When the API is invoked using a two-legged access token, each targeted device will be identified from the `device` object in the optional `devices` array, which therefore MUST be provided.
+    - When a three-legged access token is used however, only a single device can be targeted and it will be identified from the subject of the access token, and therefore the optional `devices` array MUST NOT be provided.
+
+    This approach simplifies API usage for API consumers using a three-legged access token to invoke the API by relying on the information that is associated with the access token and was identified during the authentication process.
+
     ## Error handling:
 
-    - If there is no `device` object, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
+    - If the subject cannot be identified from the access token and the optional `devices` array is not included in a request that must target at least one device, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
 
+    - If the subject can be identified from the access token and the optional `devices` array (which MUST contain at least one `device` object to pass validation) is also included in the request, then the server will return an error with the `422 UNNECESSARY_IDENTIFIER` error code. This will be the case even if the same device is identified by these two methods, as the server is unable to make this comparison.
 
     # Creating a network access for devices
 
@@ -219,7 +225,16 @@ paths:
         - Accesses
       summary: Create an access to a dedicated network with given configuration, optionally including devices
       description: |
-        Create an access to a dedicated network with given configuration, optionally including devices
+        This endpoint allows the API Consumer to create an Access to a dedicated network with the given configuration, and to optionally add one or more devices to that Access in the same operation.
+        - If the access creation is successful and the request does not include device(s) to be added, the server will return a 201 response
+        - If the access creation is not possible, the server will return a relevant 4xx response
+        - If the access creation is possible and the request does include one or more devices to be added, the server response depends on the success or failure of adding devices to the access:
+          - If the addition is successful for all the devices, the server will return a 201 response
+          - If the addition is successful only for some of the devices, the server will return a 207 response with details of the failed devices
+          - If no device can be added, the server will return a 422 DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE response
+          - If a two-legged access token is used, the `devices` array containing at least one `device` object MUST be included in the request to trigger the addition of devices.
+          - If a three-legged access token is used, the `devices` array MUST NOT be included since the request implies addition of a single device identified from the access token. If the `devices` array is included, a 422 UNNECESSARY_IDENTIFIER response is returned
+          - When a device is successfully added to the access it becomes an access device resource with a device identifier and status initialised to a `REQUESTED` state. If the `device` object was used to identify the device, this object is also included in the access device, otherwise it is omitted. An asynchronous process of granting access for the device is then started
       operationId: createAccess
       security:
         - openId:
@@ -316,7 +331,7 @@ paths:
         "409":
           $ref: "#/components/responses/CreateAccessConflict409"
         "422":
-          $ref: "#/components/responses/CreateAccessUnprocessableEntity422"
+          $ref: "#/components/responses/NoProcessableDevices422"
 
   /accesses/{accessId}:
     get:
@@ -466,9 +481,15 @@ paths:
     post:
       tags:
         - Devices
-      summary: Add devices to the access
+      summary: Add device(s) to the access
       description: |
-        Add devices to the access
+        This endpoint allows the API Consumer to add one or more devices to an existing Access.
+        - If the addition is successful for all the devices, the server will return a 201 response
+        - If the addition is successful only for some of the devices, the server will return a 207 response with details of the failed devices
+        - If no device can be added, the server will return a 422 DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE response
+        - If a two-legged access token is used, the `devices` array containing at least one `device` object MUST be included in the request. If the `devices` array is not included, a 422 MISSING_IDENTIFIER response is returned
+        - If a three-legged access token is used, the `devices` array MUST NOT be included since the request implies addition of a single device identified from the access token. If the `devices` array is included, a 422 UNNECESSARY_IDENTIFIER response is returned
+        - When a device is successfully added to the access it becomes an access device resource with a device identifier and status initialised to a `REQUESTED` state. If the `device` object was used to identify the device, this object is also included in the access device, otherwise it is omitted. An asynchronous process of granting access for the device is then started
       operationId: addDevicesToAccess
       security:
         - openId:
@@ -811,7 +832,7 @@ components:
       description: |
         Information about a single device included in an access:
         * deviceId - a unique identifier of the device included in an access which is the same across all the accesses in which the device is included
-        * device - a valid device object provided by the API Consumer when the device was added to the access
+        * device - a copy of the device object (if any) provided by the API Consumer when the device was added to the access
         * status - the current status of the device in the context of the access
         * statusInfo - optionally, additional information about the reason for the current device status
       type: object
@@ -826,7 +847,6 @@ components:
           $ref: "#/components/schemas/DeviceStatusInfo"
       required:
         - deviceId
-        - device
         - status
 
     BaseAccessInfo:
@@ -859,7 +879,9 @@ components:
         - networkId
 
     CreateAccessRequest:
-      description: Attributes required to create a dedicated network access for devices
+      description: |
+        Request body used to create a dedicated network access and optionally also add devices to it at the same time.
+        **NOTE:** When a three-legged access token is used in the request, the `devices` array MUST NOT be provided.
       allOf:
         - $ref: "#/components/schemas/BaseAccessInfo"
         - type: object
@@ -873,7 +895,7 @@ components:
     CreateAccessSuccess:
       description: |
         Response body used when access was created successfully.
-        If the request contained devices (to be added to the access) this response also implies that they were all added successfully and are listed in `addedAccessDevices`.
+        If the request contained one or more devices (to be added to the access) this response also implies that they were all added successfully and are listed in `addedAccessDevices`.
       allOf:
         - $ref: '#/components/schemas/AccessInfo'
         - $ref: '#/components/schemas/AddedAccessDevices'
@@ -881,13 +903,13 @@ components:
     CreateAccessPartialSuccess:
       description: |
         Response body used when access was created successfully but for some devices only.
-        Devices added successfully (if any) are returned in `addedAccessDevices` while failed devices are listed in `results`.
-        Absence of `addedAccessDevices` means that no device was added successfully.
+        Devices added successfully are returned in `addedAccessDevices` while failed devices are listed in `results`.
       allOf:
         - $ref: '#/components/schemas/AccessInfo'
         - $ref: '#/components/schemas/AddedAccessDevices'
         - $ref: '#/components/schemas/ErrorResultsForDevices'
         - required:
+            - addedAccessDevices
             - results
 
     AccessStats:
@@ -955,10 +977,10 @@ components:
           $ref: "../common/CAMARA_common.yaml#/components/schemas/Pagination"
 
     AddDevicesRequest:
-      description: Request body used to add devices to an access
+      description: |
+        Request body used to add devices to an access.
+        **NOTE:** When a three-legged access token is used in the request, the `devices` array MUST NOT be provided.
       type: object
-      required:
-        - devices
       properties:
         devices:
           description: List of devices to be added to the access
@@ -1015,12 +1037,10 @@ components:
     ErrorResults:
       description: |
         Response body used when none of the devices could be processed successfully.
-        It contains the overall error information and a list of error results, one result per device.
+        It contains the overall error information and a list of error results (if any), one result per device.
       allOf:
         - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
         - $ref: "#/components/schemas/ErrorResultsForDevices"
-        - required:
-            - results
 
     ErrorResultsForDevices:
       description: An object describing error results of an operation targeting multiple devices
@@ -1300,28 +1320,6 @@ components:
             DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
               $ref: "#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE"
 
-    CreateAccessUnprocessableEntity422:
-      description: Unprocessable Content
-      headers:
-        x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 422
-                  code:
-                    enum:
-                      - SERVICE_NOT_APPLICABLE
-          examples:
-            GENERIC_422_SERVICE_NOT_APPLICABLE:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_422_SERVICE_NOT_APPLICABLE"
-
     NoProcessableDevices422:
       description: Unprocessable Content due to that none of the requested devices could be processed successfully
       headers:
@@ -1339,8 +1337,32 @@ components:
                       - 422
                   code:
                     enum:
+                      - SERVICE_NOT_APPLICABLE
+                      - MISSING_IDENTIFIER
+                      - UNSUPPORTED_IDENTIFIER
+                      - UNNECESSARY_IDENTIFIER
                       - DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE
           examples:
+            GENERIC_422_SERVICE_NOT_APPLICABLE:
+              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_422_SERVICE_NOT_APPLICABLE"
+            GENERIC_422_MISSING_IDENTIFIER:
+              description: An identifier is not included in the request and the device or phone number identification cannot be derived from the three-legged access token
+              value:
+                status: 422
+                code: MISSING_IDENTIFIER
+                message: The device cannot be identified.
+            GENERIC_422_UNSUPPORTED_IDENTIFIER:
+              description: None of the provided identifiers is supported by the implementation
+              value:
+                status: 422
+                code: UNSUPPORTED_IDENTIFIER
+                message: The identifier provided is not supported.
+            GENERIC_422_UNNECESSARY_IDENTIFIER:
+              description: An explicit identifier is provided when a device or phone number has already been identified from the access token
+              value:
+                status: 422
+                code: UNNECESSARY_IDENTIFIER
+                message: The device is already identified by the access token.
             DEDICATED_NETWORK_ACCESSES_422_NO_VALID_DEVICE:
               description: The request is syntactically correct but none of the devices given in the request could be processed successfully.
               value:

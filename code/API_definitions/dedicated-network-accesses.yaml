@@ -7,7 +7,7 @@ info:
 
     An Access to a dedicated network represents the permission for its devices to use the Dedicated Network's reserved connectivity resources. The usage of the resources can be tailored by the access within the constraints of the applicable Network Profile. For example, the access may define a subset of the QoS Profiles defined in the Network Profile and thus limit the set of QoS profiles applicable for the devices using it. The access may also select a different default QoS Profile than the one in the Network Profile. This allows having different QoS profile combinations for different device categories, such as QoS Profile combinations for InterCom devices are separated from those for video cameras within a Media Production case.
 
-    A device is identified by the CAMARA `device` object.
+    A device is identified by the CAMARA `device` object. In addition, the single-device operations (adding, reading or deleting one device of an access) can identify the targeted device from the subject of a three-legged access token.
 
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
 
@@ -22,15 +22,24 @@ info:
 
     # Identifying the device from the access token
 
-    This API handles multiple devices in one request and therefore does not support identifying the device from the access token. Only the `device` object is used for identifying a device.
+    This API distinguishes between multiple-device operations (which target a list of devices) and single-device operations (which target one device), and the way a device is identified differs accordingly:
+
+    - **Multiple-device operations** - creating an access with devices (`POST /accesses`), adding devices (`POST /accesses/{accessId}/devices/add`) and removing devices (`POST /accesses/{accessId}/devices/remove`) - operate on a list of devices and are only supported with a two-legged access token. Each targeted device MUST be identified from a `device` object (for add) or an `accessDeviceId` (for remove) provided in the request body.
+
+    - **Single-device operations** - adding a single device (`POST /accesses/{accessId}/devices`), reading a single device (`GET /accesses/{accessId}/devices/{accessDeviceId}`) and deleting a single device (`DELETE /accesses/{accessId}/devices/{accessDeviceId}`) - are supported with either a two-legged or a three-legged access token:
+      - When a two-legged access token is used, the device is identified from the `device` object (for the single-device add) or from the `accessDeviceId` in the path (for read/delete).
+      - When a three-legged access token is used, the device is identified from the subject of the access token. In this case, for the single-device add operation, the `device` object MUST NOT be provided in the request body.
+
     ## Error handling:
 
-    - If there is no `device` object, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
+    - If, on the single-device add operation, a two-legged access token is used and no `device` object is provided, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
+
+    - If, on the single-device add operation, a three-legged access token is used and a `device` object is also provided, then the server will return an error with the `422 UNNECESSARY_IDENTIFIER` error code. This will be the case even if the same device is identified by these two methods, as the server is unable to make this comparison.
 
 
     # Creating a network access for devices
 
-    An Access for devices is created by performing a `POST` operation on the `/accesses` endpoint.
+    An Access for devices is created by performing a `POST` operation on the `/accesses` endpoint. This operation is only supported with a two-legged access token.
 
     The API Consumer provides the following information
 
@@ -65,13 +74,17 @@ info:
 
     # Adding devices to an access
 
-    When an access already exists, additional devices can be added by performing a `POST` operation on the `/accesses/{accessId}/devices/add` endpoint.
+    When an access already exists, additional devices can be added by performing a `POST` operation on the `/accesses/{accessId}/devices/add` endpoint. This multiple-device operation is only supported with a two-legged access token.
 
     The API Consumer provides the following information
 
     - a list of identifiers of the devices to be added, using a device object as device identifier
 
     If all the requested devices could be added, the API returns a response including a list with information for each added device.
+
+    An individual device can be added to an access with the single-device `POST /accesses/{accessId}/devices` operation, which is supported with either a two-legged access token (identifying the device with a `device` object) or a three-legged access token (identifying the device from the access token subject). A single device may also be added through the multiple-device add operation above by supplying a `devices` list with a single entry, but that operation is only supported with a two-legged access token.
+
+    **Single-device vs multiple-device operations.** This API offers two distinct ways to add devices. The *single-device operation* (`POST /accesses/{accessId}/devices`) adds exactly one device and is the only add operation that supports three-legged access tokens. The *multiple-device operation* (`POST /accesses/{accessId}/devices/add`) adds one or more devices from a list and is only supported with a two-legged access token. Adding one device via the multiple-device operation (a `devices` list with a single entry) is **not** the same as the single-device operation: it uses a different scope, requires a two-legged access token, and returns the multiple-device response shape.
 
     If callback related information was provided for the access, it will be used to also notify of state transitions for all the newly added devices.
 
@@ -82,7 +95,7 @@ info:
 
     # Removing devices from an access
 
-    When an access already exists, devices can be removed from it by performing a `POST` operation on the `/accesses/{accessId}/devices/remove` endpoint.
+    When an access already exists, devices can be removed from it by performing a `POST` operation on the `/accesses/{accessId}/devices/remove` endpoint. This multiple-device operation is only supported with a two-legged access token.
 
     The API Consumer provides the following information
 
@@ -90,27 +103,27 @@ info:
 
     The API returns a confirmation of removal and, if not all devices could be removed, a result detailing which devices failed to be removed.
 
-    A single device can be removed from an access by performing a `DELETE` operation on the `/accesses/{accessId}/devices/{accessDeviceId}` endpoint.
+    An individual device can be removed from an access with the single-device `DELETE /accesses/{accessId}/devices/{accessDeviceId}` operation, which is supported with either a two-legged or a three-legged access token. A single device may also be removed through the multiple-device remove operation above by supplying an `accessDeviceIds` list with a single entry, but that operation is only supported with a two-legged access token.
 
     If callback related information was provided for the access, there will be no further notifications related to the deleted devices.
 
     # Querying devices in an access
 
-    All devices included in an access can be queried by performing a `GET` operation on the `/accesses/{accessId}/devices` collection endpoint. The query can be filtered for devices with a specific status, or for devices added to the access after or before certain time.
+    All devices included in an access can be queried by performing a `GET` operation on the `/accesses/{accessId}/devices` collection endpoint. This multiple-device listing is only supported with a two-legged access token. The query can be filtered for devices with a specific status, or for devices added to the access after or before certain time.
 
     These filter criteria can be combined according to the CAMARA filtering rules to allow the API consumer to retrieve information about devices included in the access of particular interest, e.g. devices added in the recent operation and which reached the `GRANTED` status.
 
-    A single device in an access can be queried by performing a `GET` operation on the `/accesses/{accessId}/devices/{accessDeviceId}` endpoint.
+    An individual device in an access can be read with the single-device `GET /accesses/{accessId}/devices/{accessDeviceId}` operation, which is supported with either a two-legged or a three-legged access token. To retrieve several devices at once, use the multiple-device listing (`GET /accesses/{accessId}/devices`) described above, which returns a page of devices and is only supported with a two-legged access token.
 
     # Querying one or more accesses
 
-    All available accesses of the API consumer can be queried by performing a `GET` operation on the `/accesses` endpoint. The query can be filtered for accesses to a specific network, matching a certain name, and/or those including a specific device.
+    All available accesses of the API consumer can be queried by performing a `GET` operation on the `/accesses` endpoint. These access-level query operations are only supported with a two-legged access token. The query can be filtered for accesses to a specific network, matching a certain name, and/or those including a specific device.
 
     A specific access of the API consumer can be queried by performing a `GET` operation on the `/accesses/{accessId}` endpoint, where the accessId has been obtained during the _create_ procedure.
 
     # Deleting an access
 
-    A specific access of the API consumer can be deleted by performing a `DELETE` operation on the `/accesses/{accessId}` endpoint. Deletion of the access can be interpreted as removal of the permission for all the devices included in the access to access the network.
+    A specific access of the API consumer can be deleted by performing a `DELETE` operation on the `/accesses/{accessId}` endpoint. This operation is only supported with a two-legged access token. Deletion of the access can be interpreted as removal of the permission for all the devices included in the access to access the network.
 
     <!-- CAMARA:MANDATORY:additional-error-responses:BEGIN -->
 
@@ -155,9 +168,9 @@ paths:
       tags:
         - Accesses
       summary: Get a paged list of accesses to dedicated networks, optionally filtered for a given device and/or matching a certain name and/or for a given dedicated network
-      description: |
-        Get a paged list of accesses to dedicated networks, optionally filtered for a given device and/or matching a certain name and/or for a given dedicated network
       operationId: listAccesses
+      description: |
+        Get a paged list of accesses to dedicated networks, optionally filtered for a given device and/or matching a certain name and/or for a given dedicated network. This operation is only supported with a two-legged access token.
       security:
         - openId:
             - dedicated-network-accesses:accesses:read
@@ -219,7 +232,14 @@ paths:
         - Accesses
       summary: Create an access to a dedicated network with given configuration, optionally including devices
       description: |
-        Create an access to a dedicated network with given configuration, optionally including devices
+        Create an access to a dedicated network with the given configuration, and optionally add one or more devices to that access in the same operation. This operation is only supported with a two-legged access token. The `devices` array is optional; when provided, each device is identified by a `device` object.
+        - If the request does not include any devices, the access is created and the server returns a `201` response.
+        - If the request includes one or more devices, the response depends on the outcome of adding them:
+          - If all the devices are added successfully, the server returns a `201` response.
+          - If only some of the devices are added successfully, the server returns a `207` response listing the added devices in `addedAccessDevices` and the failed devices in `results`.
+          - If none of the devices can be added, the access is not created and the server returns a `422 DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE` response with a per-device error result for each device.
+        - If the access creation itself is not possible (independently of any devices), the server returns a relevant 4xx response.
+        - When a device is successfully added to the access it becomes an access device resource with a device identifier (`accessDeviceId`) and status initialised to a `REQUESTED` state. An asynchronous process of granting access for the device is then started.
       operationId: createAccess
       security:
         - openId:
@@ -316,7 +336,7 @@ paths:
         "409":
           $ref: "#/components/responses/CreateAccessConflict409"
         "422":
-          $ref: "#/components/responses/CreateAccessUnprocessableEntity422"
+          $ref: "#/components/responses/NoProcessableDevices422"
 
   /accesses/{accessId}:
     get:
@@ -324,7 +344,7 @@ paths:
         - Accesses
       summary: Read access information
       description: |
-        Read access information
+        Read access information. This operation is only supported with a two-legged access token.
       operationId: readAccess
       security:
         - openId:
@@ -361,7 +381,7 @@ paths:
         - Accesses
       summary: Delete an access
       description: |
-        Delete an access
+        Delete an access. This operation is only supported with a two-legged access token.
       operationId: deleteAccess
       security:
         - openId:
@@ -402,7 +422,7 @@ paths:
         - Devices
       summary: Read a paged list of devices with information included in the access, optionally filtered for a given device status and/or by given time constraints when a device was added to the access (can be empty)
       description: |
-        Read a paged list of devices with information included in the access, optionally filtered for a given device status and/or by given time constraints when a device was added to the access (can be empty)
+        Read a paged list of devices with information included in the access, optionally filtered for a given device status and/or by given time constraints when a device was added to the access (can be empty). This operation is only supported with a two-legged access token.
       operationId: listAccessDevices
       security:
         - openId:
@@ -454,6 +474,62 @@ paths:
           $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
         "404":
           $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
+    post:
+      tags:
+        - Devices
+      summary: Add a single device to the access
+      description: |
+        Add an individual device to an existing access. This single-device operation is supported with both two-legged and three-legged access tokens:
+        - If a two-legged access token is used, the device MUST be identified by providing a `device` object in the request body.
+        - If a three-legged access token is used, the device is identified from the subject of the access token and therefore the `device` object MUST NOT be provided in the request body. If the `device` object is included, a `422 UNNECESSARY_IDENTIFIER` response is returned.
+        - If a two-legged access token is used and no `device` object is provided, a `422 MISSING_IDENTIFIER` response is returned.
+        - When the device is successfully added to the access it becomes an access device resource with a device identifier (`accessDeviceId`) and status initialised to a `REQUESTED` state. If the `device` object was used to identify the device, this object is also included in the access device, otherwise it is omitted. An asynchronous process of granting access for the device is then started.
+        - If the device is already included in the access, a `409 ALREADY_EXISTS` response is returned.
+
+        The resulting `accessDeviceId` is returned in the response body and in the `Location` header, and can subsequently be used to read (`GET /accesses/{accessId}/devices/{accessDeviceId}`) or remove (`DELETE /accesses/{accessId}/devices/{accessDeviceId}`) the device.
+
+        To add one or more devices in a single request, use the multiple-device `POST /accesses/{accessId}/devices/add` operation instead (two-legged access token only).
+      operationId: addDeviceToAccess
+      security:
+        - openId:
+            - dedicated-network-accesses:device:create
+      parameters:
+        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddDeviceRequest"
+      responses:
+        '201':
+          description: Successful addition of the device to the access
+          headers:
+            x-correlator:
+              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+            Location:
+              description: 'URL including the resource identifier of the newly added access device.'
+              required: true
+              schema:
+                type: string
+                format: uri
+                maxLength: 2048
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDevice'
+        '400':
+          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
+        "401":
+          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
+        "403":
+          $ref: "#/components/responses/SingleDeviceForbidden403"
+        "404":
+          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
+        "409":
+          $ref: "../common/CAMARA_common.yaml#/components/responses/AlreadyExists409"
+        "422":
+          $ref: "../common/CAMARA_common.yaml#/components/responses/DeviceIdentifier422"
   /accesses/{accessId}/devices/add:
     parameters:
       - name: accessId
@@ -468,7 +544,9 @@ paths:
         - Devices
       summary: Add devices to the access
       description: |
-        Add devices to the access
+        Add one or more devices to an existing access. This multiple-device operation is only supported with a two-legged access token. Each device to be added MUST be identified by a `device` object in the `devices` array.
+
+        To add an individual device, including when identified from a three-legged access token subject, use the single-device `POST /accesses/{accessId}/devices` operation instead. Note that adding one device through this multiple-device operation (a `devices` list with a single entry) is not equivalent to the single-device operation: it uses a different scope and requires a two-legged access token.
       operationId: addDevicesToAccess
       security:
         - openId:
@@ -524,7 +602,10 @@ paths:
       tags:
         - Devices
       summary: Remove devices from the access
-      description: Remove devices from the access
+      description: |
+        Remove one or more devices from the access. This multiple-device operation is only supported with a two-legged access token. Each device to be removed is identified by an `accessDeviceId`.
+
+        To remove an individual device, including when identified from a three-legged access token subject, use the single-device `DELETE /accesses/{accessId}/devices/{accessDeviceId}` operation instead. Note that removing one device through this multiple-device operation (an `accessDeviceIds` list with a single entry) is not equivalent to the single-device operation: it uses a different scope and requires a two-legged access token.
       operationId: removeDevicesFromAccess
       security:
         - openId:
@@ -582,7 +663,13 @@ paths:
         - Devices
       summary: Read access device information
       description: |
-        Read access device information
+        Read information about a single device included in the access, identified by its `accessDeviceId`.
+
+        This single-device operation supports both two-legged and three-legged access tokens. The device(s) that can be read are restricted based on the information in the access token:
+        - When a two-legged access token is used, the access device MUST have been created by the same API client (`client_id`) as the one in the access token.
+        - When a three-legged access token is used, the access device MUST have been created for the end user associated with the access token and by the same API client (`client_id`) as the one in the access token. A three-legged caller can therefore only read the device associated with its own access token subject; attempting to read another subject's device results in a `403 INVALID_TOKEN_CONTEXT` response.
+
+        If the `accessDeviceId` does not correspond to any device known to the server, a `404 IDENTIFIER_NOT_FOUND` response is returned.
       operationId: readAccessDevice
       security:
         - openId:
@@ -604,7 +691,7 @@ paths:
         "401":
           $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
+          $ref: "#/components/responses/SingleDeviceForbidden403"
         "404":
           $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
 
@@ -613,7 +700,15 @@ paths:
         - Devices
       summary: Delete an access device
       description: |
-        Delete an access device
+        Remove an individual device, identified by its `accessDeviceId`, from the access.
+
+        This single-device operation supports both two-legged and three-legged access tokens. The device(s) that can be deleted are restricted based on the information in the access token:
+        - When a two-legged access token is used, the access device MUST have been created by the same API client (`client_id`) as the one in the access token.
+        - When a three-legged access token is used, the access device MUST have been created for the end user associated with the access token and by the same API client (`client_id`) as the one in the access token. A three-legged caller can therefore only delete the device associated with its own access token subject; attempting to delete another subject's device results in a `403 INVALID_TOKEN_CONTEXT` response.
+
+        If the `accessDeviceId` does not correspond to any device known to the server, a `404 IDENTIFIER_NOT_FOUND` response is returned.
+
+        To remove one or more devices in a single request, use the multiple-device `POST /accesses/{accessId}/devices/remove` operation instead (two-legged access token only).
       operationId: deleteAccessDevice
       security:
         - openId:
@@ -631,7 +726,7 @@ paths:
         "401":
           $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
         "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
+          $ref: "#/components/responses/SingleDeviceForbidden403"
         "404":
           $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
 
@@ -710,8 +805,7 @@ components:
 
     AccessDeviceId:
       description: |
-        Network access device id in UUID format of a device included in one or more network accesses
-        It is a unique identifier of the device included in the access and is the same across all the accesses in which the device is included
+        Network access device id in UUID format. It is a unique identifier assigned to a device by the API Provider when the device is first identified (from a `device` object or the subject of a three-legged access token). The same identifier is used for that device across all accesses of the API Consumer, remaining the same in every access in which the device is included.
       type: string
       format: uuid
       maxLength: 36
@@ -810,8 +904,8 @@ components:
     AccessDevice:
       description: |
         Information about a single device included in an access:
-        * deviceId - a unique identifier of the device included in an access which is the same across all the accesses in which the device is included
-        * device - a valid device object provided by the API Consumer when the device was added to the access
+        * deviceId - the unique identifier assigned to the device by the API Provider when it was first identified; it is the same across all accesses in which the device is included
+        * device - a copy of the device object provided by the API Consumer when the device was added to the access. It is omitted when the device was identified from the subject of a three-legged access token.
         * status - the current status of the device in the context of the access
         * statusInfo - optionally, additional information about the reason for the current device status
       type: object
@@ -826,7 +920,6 @@ components:
           $ref: "#/components/schemas/DeviceStatusInfo"
       required:
         - deviceId
-        - device
         - status
 
     BaseAccessInfo:
@@ -859,7 +952,9 @@ components:
         - networkId
 
     CreateAccessRequest:
-      description: Attributes required to create a dedicated network access for devices
+      description: |
+        Attributes used to create a dedicated network access, optionally including one or more devices to be added to the access.
+        The `devices` array is optional: when omitted, the access is created without any devices; when provided, each device is identified by a `device` object.
       allOf:
         - $ref: "#/components/schemas/BaseAccessInfo"
         - type: object
@@ -880,14 +975,14 @@ components:
 
     CreateAccessPartialSuccess:
       description: |
-        Response body used when access was created successfully but for some devices only.
-        Devices added successfully (if any) are returned in `addedAccessDevices` while failed devices are listed in `results`.
-        Absence of `addedAccessDevices` means that no device was added successfully.
+        Response body used when the access was created successfully and at least one, but not all, of the requested devices were added.
+        Devices added successfully are returned in `addedAccessDevices` while failed devices are listed in `results`.
       allOf:
         - $ref: '#/components/schemas/AccessInfo'
         - $ref: '#/components/schemas/AddedAccessDevices'
         - $ref: '#/components/schemas/ErrorResultsForDevices'
         - required:
+            - addedAccessDevices
             - results
 
     AccessStats:
@@ -966,6 +1061,16 @@ components:
             - $ref: "#/components/schemas/Devices"
             - minItems: 1
             - maxItems: 100
+
+    AddDeviceRequest:
+      description: |
+        Request body used to add a single device to an access.
+        **NOTE:** When a two-legged access token is used, the `device` object MUST be provided to identify the device.
+        When a three-legged access token is used, the device is identified from the subject of the access token and the `device` object MUST NOT be provided.
+      type: object
+      properties:
+        device:
+          $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
 
     AddDevicesSuccess:
       description: |
@@ -1196,6 +1301,36 @@ components:
       pattern: "^[a-zA-Z0-9_.-]+$"
 
   responses:
+    SingleDeviceForbidden403:
+      description: |
+        Forbidden. In addition to the generic `PERMISSION_DENIED`, the single-device operations may return `INVALID_TOKEN_CONTEXT` when a three-legged access token is used and the targeted device (identified by `accessDeviceId`) does not correspond to the subject of the access token.
+      headers:
+        x-correlator:
+          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+                      - INVALID_TOKEN_CONTEXT
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_403_PERMISSION_DENIED"
+            DEDICATED_NETWORK_ACCESSES_403_INVALID_TOKEN_CONTEXT:
+              description: The device targeted by `accessDeviceId` is not consistent with the subject of the three-legged access token
+              value:
+                status: 403
+                code: INVALID_TOKEN_CONTEXT
+                message: "accessDeviceId is not consistent with access token."
+
     CreateAccessBadRequest400:
       description: Bad Request
       headers:
@@ -1299,28 +1434,6 @@ components:
               $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_409_ABORTED"
             DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
               $ref: "#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE"
-
-    CreateAccessUnprocessableEntity422:
-      description: Unprocessable Content
-      headers:
-        x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-      content:
-        application/json:
-          schema:
-            allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-              - type: object
-                properties:
-                  status:
-                    enum:
-                      - 422
-                  code:
-                    enum:
-                      - SERVICE_NOT_APPLICABLE
-          examples:
-            GENERIC_422_SERVICE_NOT_APPLICABLE:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_422_SERVICE_NOT_APPLICABLE"
 
     NoProcessableDevices422:
       description: Unprocessable Content due to that none of the requested devices could be processed successfully

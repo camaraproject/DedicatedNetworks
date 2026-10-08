@@ -217,9 +217,9 @@ components:
           description: The maximum number of devices that can simultaneously use and share the dedicated network under this profile up to the limits set by the profile's performance characteristics
           type: integer
           example: 5
-          format: int64
+          format: int32
           minimum: 1
-          maximum: 9007199254740991
+          maximum: 2147483647
         aggregatedUlThroughput:
           $ref: "#/components/schemas/BitRate"
         aggregatedDlThroughput:

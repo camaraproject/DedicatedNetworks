@@ -773,7 +773,11 @@ components:
         - pagination
       properties:
         items:
-          $ref: "#/components/schemas/AccessDevices"
+          description: A list of access devices
+          allOf:
+            - $ref: "#/components/schemas/AccessDevices"
+            - minItems: 0
+            - maxItems: 100
         pagination:
           $ref: "../common/CAMARA_common.yaml#/components/schemas/Pagination"
 
@@ -781,7 +785,7 @@ components:
       description: A list of access devices
       type: array
       minItems: 0
-      maxItems: 9007199254740991
+      maxItems: 2147483647
       items:
         $ref: "#/components/schemas/AccessDevice"
 
@@ -897,21 +901,21 @@ components:
         totalDevices:
           description: the total number of devices included in the access (regardless of status)
           type: integer
-          format: int64
+          format: int32
           minimum: 0
-          maximum: 9007199254740991
+          maximum: 2147483647
         totalGranted:
           description: the total number of devices included in the access with status GRANTED
           type: integer
-          format: int64
+          format: int32
           minimum: 0
-          maximum: 9007199254740991
+          maximum: 2147483647
         totalDenied:
           description: the total number of devices included in the access with status DENIED
           type: integer
-          format: int64
+          format: int32
           minimum: 0
-          maximum: 9007199254740991
+          maximum: 2147483647
       required:
         - totalDevices
         - totalGranted
@@ -1170,7 +1174,7 @@ components:
     Devices:
       description: A list of devices
       type: array
-      maxItems: 9007199254740991
+      maxItems: 2147483647
       items:
         $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
 

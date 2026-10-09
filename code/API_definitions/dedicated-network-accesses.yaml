@@ -239,7 +239,7 @@ paths:
           - If only some of the devices are added successfully, the server returns a `207` response listing the added devices in `addedAccessDevices` and the failed devices in `results`.
           - If none of the devices can be added, the access is not created and the server returns a `422 DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE` response with a per-device error result for each device.
         - If the access creation itself is not possible (independently of any devices), the server returns a relevant 4xx response.
-        - When a device is successfully added to the access it becomes an access device resource with a device identifier (`accessDeviceId`) and status initialised to a `REQUESTED` state. An asynchronous process of granting access for the device is then started.
+        - When a device is successfully added to the access it becomes an access device resource with a device identifier (`accessDeviceId`), the timestamp when it was added (`addedAt`), and status initialised to a `REQUESTED` state. An asynchronous process of granting access for the device is then started.
       operationId: createAccess
       security:
         - openId:
@@ -483,7 +483,7 @@ paths:
         - If a two-legged access token is used, the device MUST be identified by providing a `device` object in the request body.
         - If a three-legged access token is used, the device is identified from the subject of the access token and therefore the `device` object MUST NOT be provided in the request body. If the `device` object is included, a `422 UNNECESSARY_IDENTIFIER` response is returned.
         - If a two-legged access token is used and no `device` object is provided, a `422 MISSING_IDENTIFIER` response is returned.
-        - When the device is successfully added to the access it becomes an access device resource with a device identifier (`accessDeviceId`) and status initialised to a `REQUESTED` state. If the `device` object was used to identify the device, this object is also included in the access device, otherwise it is omitted. An asynchronous process of granting access for the device is then started.
+        - When the device is successfully added to the access it becomes an access device resource with a device identifier (`accessDeviceId`), the timestamp when it was added (`addedAt`), and status initialised to a `REQUESTED` state. If the `device` object was used to identify the device, this object is also included in the access device, otherwise it is omitted. An asynchronous process of granting access for the device is then started.
         - If the device is already included in the access, a `409 ALREADY_EXISTS` response is returned.
 
         The resulting `accessDeviceId` is returned in the response body and in the `Location` header, and can subsequently be used to read (`GET /accesses/{accessId}/devices/{accessDeviceId}`) or remove (`DELETE /accesses/{accessId}/devices/{accessDeviceId}`) the device.
@@ -893,13 +893,6 @@ components:
             - $ref: "#/components/schemas/AccessDevices"
             - minItems: 1
             - maxItems: 100
-        addedAt:
-          description: |
-            Timestamp when the access devices listed in `addedAccessDevices` were added to the access. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
-            **NOTE:** The timestamp is provided only if `addedAccessDevices` is present.
-          type: string
-          format: date-time
-          maxLength: 64
 
     AccessDevice:
       description: |
@@ -908,6 +901,7 @@ components:
         * device - a copy of the device object provided by the API Consumer when the device was added to the access. It is omitted when the device was identified from the subject of a three-legged access token.
         * status - the current status of the device in the context of the access
         * statusInfo - optionally, additional information about the reason for the current device status
+        * addedAt - the timestamp when the device was added to the access
       type: object
       properties:
         deviceId:
@@ -918,9 +912,16 @@ components:
           $ref: "#/components/schemas/DeviceStatus"
         statusInfo:
           $ref: "#/components/schemas/DeviceStatusInfo"
+        addedAt:
+          description: |
+            Timestamp when the device was added to the access. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
+          type: string
+          format: date-time
+          maxLength: 64
       required:
         - deviceId
         - status
+        - addedAt
 
     BaseAccessInfo:
       description: Common attributes of an access to a dedicated network
@@ -1079,7 +1080,6 @@ components:
         - $ref: '#/components/schemas/AddedAccessDevices'
         - required:
             - addedAccessDevices
-            - addedAt
 
     AddDevicesPartialSuccess:
       description: |
@@ -1090,7 +1090,6 @@ components:
         - $ref: "#/components/schemas/ErrorResultsForDevices"
         - required:
             - addedAccessDevices
-            - addedAt
             - results
 
     RemoveDevicesRequest:

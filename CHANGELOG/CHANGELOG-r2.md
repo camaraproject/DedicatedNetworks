@@ -67,23 +67,32 @@ Changes documented below are compared to version 0.2.0-rc.1.
 
 ### Breaking changes
 
-* N/A
+* Reworked access device handling: the `x-device` header is replaced by the `accessDeviceId` query parameter to query accesses by device, and `recentAccessDevices` is replaced by `addedAccessDevices` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
+* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403, except for single-device operations called with a three-legged access token by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* Moved the `addedAt` timestamp from the operation response body to each added `AccessDevice` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/197
 
 ### Added
 
-* N/A
+* Added a stable `accessDeviceId` (used to read and remove a single access device and to query accesses by device), time-based filters for listing access devices and an optional access `name` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
+* Added three-legged access token support for single-device operations, including a new `POST /accesses/{accessId}/devices` operation and the `dedicated-network-accesses:device:create` scope. Single-device operations (add/read/delete) now accept two-legged or three-legged tokens; multiple-device and access-level operations remain two-legged only by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/197
+* Added success and error test scenarios for all nine Accesses API operations by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/195
+* Added test scenarios for three-legged access token support by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/198
 
 ### Changed
 
-* N/A
+* Reworked access device handling: added a stable `accessDeviceId` (used to read and remove a single access device and to query accesses by device, replacing the `x-device` header), replaced `recentAccessDevices` with `addedAccessDevices`, added time-based filters for listing access devices and an optional access `name`, and removed unused `ErrorResultForDevice` codes by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
+* Aligned with Commonalities r4.4 (0.9.0): replaced the deprecated `Generic*` error responses with the r4.4 common responses and the common `Sink` schema, and updated the test definitions; invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403, except for single-device operations called with a three-legged access token by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* Use int32-range bounds for array sizes and device counters by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/196
+* Moved the `addedAt` timestamp from the operation response body to each added `AccessDevice`, and aligned the `createAccess` outcomes (201, 207, 422 `DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE`) with `addDevicesToAccess` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/197
+* Split accesses test definitions into access, multiple-device and single-device feature files, and changed the different-API-client cases to 404 NOT_FOUND by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/198
 
 ### Fixed
 
-* N/A
+* Fixed existing test scenarios to match the current API definition by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/195
 
 ### Removed
 
-* N/A
+* Removed the `x-device` header and unused `ErrorResultForDevice` codes by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
 
 ## dedicated-network-profiles 0.2.0-rc.2
 
@@ -98,7 +107,7 @@ Changes documented below are compared to version 0.2.0-rc.1.
 
 ### Breaking changes
 
-* N/A
+* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
 
 ### Added
 
@@ -106,7 +115,8 @@ Changes documented below are compared to version 0.2.0-rc.1.
 
 ### Changed
 
-* N/A
+* Aligned with Commonalities r4.4 (0.9.0): replaced the deprecated `Generic*` error responses with the r4.4 common responses, and updated the test definitions; invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* Use int32-range bounds for `maxNumberOfDevices` by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/196
 
 ### Fixed
 
@@ -129,7 +139,7 @@ Changes documented below are compared to version 0.2.0-rc.1.
 
 ### Breaking changes
 
-* N/A
+* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
 
 ### Added
 
@@ -137,7 +147,7 @@ Changes documented below are compared to version 0.2.0-rc.1.
 
 ### Changed
 
-* N/A
+* Aligned with Commonalities r4.4 (0.9.0): replaced the deprecated `Generic*` error responses with the r4.4 common responses and the common `Sink` schema, and updated the test definitions; invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
 
 ### Fixed
 
@@ -160,7 +170,7 @@ Changes documented below are compared to version 0.1.0-rc.1.
 
 ### Breaking changes
 
-* N/A
+* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
 
 ### Added
 
@@ -168,7 +178,7 @@ Changes documented below are compared to version 0.1.0-rc.1.
 
 ### Changed
 
-* N/A
+* Aligned with Commonalities r4.4 (0.9.0): replaced the deprecated `Generic*` error responses with the r4.4 common responses, and updated the test definitions; invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
 
 ### Fixed
 

@@ -74,7 +74,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Single-Devic
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/AccessDevice"
-    And the response property "$.deviceId" is equal to the path parameter "accessDeviceId"
+    And the response property "$.accessDeviceId" is equal to the path parameter "accessDeviceId"
 
   @dedicated_network_accesses_readAccessDevice_02_success_three_legged
   Scenario: Get details of the device of a network access identified by a three-legged access token
@@ -88,7 +88,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Single-Devic
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/AccessDevice"
-    And the response property "$.deviceId" is equal to the path parameter "accessDeviceId"
+    And the response property "$.accessDeviceId" is equal to the path parameter "accessDeviceId"
     And the response property "$.device" does not exist
 
   # Success scenarios for DELETE /accesses/{accessId}/devices/{accessDeviceId}
@@ -257,6 +257,38 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Single-Devic
     And the response header "Content-Type" is "application/json"
     And the response property "$.status" is 409
     And the response property "$.code" is "ALREADY_EXISTS"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_accesses_addDeviceToAccess_409.03_incompatible_state
+  Scenario: Add a single device to an access of a network in an incompatible state
+    Given an existing network access to a dedicated network in "TERMINATED" state
+    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    And the path parameter "accessId" is set to the ID of the existing access
+    And the header "Content-Type" is set to "application/json"
+    And the request body property "$.device" is set to the device object of a device not included in the existing access
+    When the request "addDeviceToAccess" is sent
+    Then the response status code is 409
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 409
+    And the response property "$.code" is "INCOMPATIBLE_STATE"
+    And the response property "$.message" contains a user friendly text
+
+  @dedicated_network_accesses_addDeviceToAccess_409.04_aborted
+  Scenario: Add a single device concurrently with another operation on the same access
+    # To test this, another operation modifying the devices of the access has to be in progress
+    Given an existing network access
+    And another operation modifying the devices of the existing access is in progress
+    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    And the path parameter "accessId" is set to the ID of the existing access
+    And the header "Content-Type" is set to "application/json"
+    And the request body property "$.device" is set to the device object of a device not included in the existing access
+    When the request "addDeviceToAccess" is sent
+    Then the response status code is 409
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 409
+    And the response property "$.code" is "ABORTED"
     And the response property "$.message" contains a user friendly text
 
   # Generic 422 errors

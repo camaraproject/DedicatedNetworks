@@ -184,7 +184,8 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
     And the response header "x-correlator" has the same value as the request header "x-correlator"
     And the response header "Location" exists and contains a URL with the created access ID
     And the response body complies with the OAS schema at "/components/schemas/CreateAccessPartialSuccess"
-    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/ErrorResultForDevice"
+    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/AddDeviceErrorResult"
+    And each item in the response property "$.results" has property "$.device" that contains a single device identifier that was included in a device object of the request body property "$.devices"
 
   # Success scenarios for GET /accesses/{accessId}
 
@@ -505,11 +506,12 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API Operations
     Then the response status code is 422
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
-    And the response body complies with the OAS schema at "/components/schemas/ErrorResults"
+    And the response body complies with the OAS schema at "/components/schemas/AddDevicesNoneProcessed"
     And the response property "$.status" is 422
     And the response property "$.code" is "DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE"
     And the response property "$.message" contains a user friendly text
-    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/ErrorResultForDevice"
+    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/AddDeviceErrorResult"
+    And each item in the response property "$.results" has property "$.device" that contains a single device identifier that was included in a device object of the request body property "$.devices"
     And no access is created
 
 ############################ Error Scenarios - readAccess #############################################

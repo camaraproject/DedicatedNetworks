@@ -226,6 +226,21 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Single-Devic
     And the response property "$.code" is "NOT_FOUND"
     And the response property "$.message" contains a user friendly text
 
+  @dedicated_network_accesses_addDeviceToAccess_404.03_identifier_not_found
+  Scenario: Add a single device whose device object cannot be matched to a device
+    Given an existing network access
+    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    And the path parameter "accessId" is set to the ID of the existing access
+    And the header "Content-Type" is set to "application/json"
+    And the request body property "$.device" is set to a syntactically valid device object that cannot be matched to any device
+    When the request "addDeviceToAccess" is sent
+    Then the response status code is 404
+    And the response header "x-correlator" has same value as the request header "x-correlator"
+    And the response header "Content-Type" is "application/json"
+    And the response property "$.status" is 404
+    And the response property "$.code" is "IDENTIFIER_NOT_FOUND"
+    And the response property "$.message" contains a user friendly text
+
   # Generic 409 errors
 
   @dedicated_network_accesses_addDeviceToAccess_409.01_already_exists

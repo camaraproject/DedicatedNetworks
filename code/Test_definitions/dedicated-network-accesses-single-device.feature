@@ -13,6 +13,9 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Single-Devic
   # * Valid three-legged access token whose subject is a device not included in the existing access (for adding the device)
   # * Valid three-legged access token whose subject is a device included in the existing access and added with that token, with at least one other device in the same access (for read, delete and invalid token context testing)
   # * Valid access token emitted to a different API client (for access ownership testing)
+  # * Syntactically valid device object that cannot be matched to any device (for IDENTIFIER_NOT_FOUND testing)
+  # * At least one existing network access to a dedicated network in TERMINATED state (for incompatible state testing)
+  # * Means to have another operation modifying the devices of an access in progress (for ABORTED testing)
   #
   # Unless stated otherwise, scenarios use a two-legged access token. The operations in this
   # feature support both two-legged and three-legged access tokens.

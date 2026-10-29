@@ -6,7 +6,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   #
   # Testing assets:
   # * At least one existing dedicated network
-  # * At least one existing network access to a dedicated network in TERMINATED state, including at least one device (for incompatible state testing)
+  # * At least one existing network access to a dedicated network in TERMINATED state (for incompatible state testing)
   # * Valid device identifier (phoneNumber)
   # * At least one existing network access, including at least two devices (also used for pagination testing)
   # * Means to have another operation modifying the devices of an access in progress (for ABORTED testing)

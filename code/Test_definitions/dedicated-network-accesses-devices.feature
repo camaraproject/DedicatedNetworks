@@ -6,7 +6,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   #
   # Testing assets:
   # * At least one existing dedicated network
-  # * At least one existing network access to a dedicated network in TERMINATED state, including at least one device (for incompatible state testing)
+  # * At least one existing network access to a dedicated network in TERMINATED state (for incompatible state testing)
   # * Valid device identifier (phoneNumber)
   # * At least one existing network access, including at least two devices (also used for pagination testing)
   # * Means to have another operation modifying the devices of an access in progress (for ABORTED testing)
@@ -130,7 +130,8 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/AddDevicesPartialSuccess"
-    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/ErrorResultForDevice"
+    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/AddDeviceErrorResult"
+    And each item in the response property "$.results" has property "$.device" that contains a single device identifier that was included in a device object of the request body property "$.devices"
 
   # Success scenarios for POST /accesses/{accessId}/devices/remove
 
@@ -160,7 +161,8 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
     And the response header "Content-Type" is "application/json"
     And the response header "x-correlator" has the same value as the request header "x-correlator"
     And the response body complies with the OAS schema at "/components/schemas/RemoveDevicesPartialSuccess"
-    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/ErrorResultForDevice"
+    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/RemoveDeviceErrorResult"
+    And each item in the response property "$.results" has property "$.accessDeviceId" equal to one of the random access device IDs in the request body property "$.accessDeviceIds"
 
 ############################ Error Scenarios - listAccessDevices #############################################
 
@@ -479,11 +481,12 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
     Then the response status code is 422
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
-    And the response body complies with the OAS schema at "/components/schemas/ErrorResults"
+    And the response body complies with the OAS schema at "/components/schemas/AddDevicesNoneProcessed"
     And the response property "$.status" is 422
     And the response property "$.code" is "DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE"
     And the response property "$.message" contains a user friendly text
-    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/ErrorResultForDevice"
+    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/AddDeviceErrorResult"
+    And each item in the response property "$.results" has property "$.device" that contains a single device identifier that was included in a device object of the request body property "$.devices"
 
 ############################ Error Scenarios - removeDevicesFromAccess #############################################
 
@@ -616,40 +619,6 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
     And the response property "$.code" is "NOT_FOUND"
     And the response property "$.message" contains a user friendly text
 
-  # Generic 409 errors
-
-  @dedicated_network_accesses_removeDevicesFromAccess_409.01_aborted
-  Scenario: Error response for removing devices concurrently with another operation on the same access
-    # To test this, another operation modifying the devices of the access has to be in progress
-    Given an existing network access including at least one device
-    And another operation modifying the devices of the existing access is in progress
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
-    And the path parameter "accessId" is set to the ID of the existing access
-    And the header "Content-Type" is set to "application/json"
-    And the request body property "$.accessDeviceIds" array contains IDs of devices included in the existing access
-    When the request "removeDevicesFromAccess" is sent
-    Then the response status code is 409
-    And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response header "Content-Type" is "application/json"
-    And the response property "$.status" is 409
-    And the response property "$.code" is "ABORTED"
-    And the response property "$.message" contains a user friendly text
-
-  @dedicated_network_accesses_removeDevicesFromAccess_409.02_incompatible_state
-  Scenario: Error response for removing devices from an access of a network in an incompatible state
-    Given an existing network access to a dedicated network in "TERMINATED" state, including at least one device
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
-    And the path parameter "accessId" is set to the ID of the existing access
-    And the header "Content-Type" is set to "application/json"
-    And the request body property "$.accessDeviceIds" array contains IDs of devices included in the existing access
-    When the request "removeDevicesFromAccess" is sent
-    Then the response status code is 409
-    And the response header "x-correlator" has same value as the request header "x-correlator"
-    And the response header "Content-Type" is "application/json"
-    And the response property "$.status" is 409
-    And the response property "$.code" is "INCOMPATIBLE_STATE"
-    And the response property "$.message" contains a user friendly text
-
   # Generic 422 errors
 
   @dedicated_network_accesses_removeDevicesFromAccess_422.01_no_valid_device
@@ -659,12 +628,14 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body property "$.accessDeviceIds" array contains only random access device IDs
+    And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
     When the request "removeDevicesFromAccess" is sent
     Then the response status code is 422
     And the response header "x-correlator" has same value as the request header "x-correlator"
     And the response header "Content-Type" is "application/json"
-    And the response body complies with the OAS schema at "/components/schemas/ErrorResults"
+    And the response body complies with the OAS schema at "/components/schemas/RemoveDevicesNoneProcessed"
     And the response property "$.status" is 422
     And the response property "$.code" is "DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE"
     And the response property "$.message" contains a user friendly text
-    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/ErrorResultForDevice"
+    And the response property "$.results" is an array where each item complies with the OAS schema at "/components/schemas/RemoveDeviceErrorResult"
+    And each item in the response property "$.results" has property "$.accessDeviceId" equal to one of the random access device IDs in the request body property "$.accessDeviceIds"

@@ -189,17 +189,13 @@ info:
 
     This API rejects requests with JSON request bodies that contain properties not declared in this specification, at any nesting level. Unknown properties result in a `400 INVALID_ARGUMENT` response.
     <!-- CAMARA:MANDATORY:request-body-strictness:END -->
-
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: wip
-  x-camara-commonalities: 0.9
-externalDocs:
-  description: Product documentation at CAMARA
-  url: https://github.com/camaraproject/DedicatedNetworks
+  version: 0.2.0-rc.2
+  x-camara-commonalities: 0.9.0
 servers:
-  - url: "{apiRoot}/dedicated-network-accesses/vwip"
+  - url: '{apiRoot}/dedicated-network-accesses/v0.2rc2'
     variables:
       apiRoot:
         default: http://localhost:9091
@@ -209,8 +205,10 @@ tags:
     description: Manage accesses to a dedicated network for devices
   - name: Devices
     description: Manage devices of an access to a dedicated network
+externalDocs:
+  description: Product documentation at CAMARA
+  url: https://github.com/camaraproject/DedicatedNetworks
 paths:
-
   /accesses:
     get:
       tags:
@@ -228,13 +226,13 @@ paths:
           description: |
             Number of accesses to return per page
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/PerPage"
+            $ref: '#/components/schemas/PerPage'
         - name: page
           in: query
           description: |
             Number of the page of accesses to return
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/Page"
+            $ref: '#/components/schemas/Page'
         - name: networkId
           in: query
           description: Dedicated network id
@@ -251,30 +249,29 @@ paths:
           schema:
             type: string
             maxLength: 1024
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: A list of existing accesses to dedicated networks matching the given criteria and in the requested page (can be empty).
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
             X-Total-Count:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-total-count'
+              $ref: '#/components/headers/x-total-count'
             X-Total-Pages:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-total-pages'
+              $ref: '#/components/headers/x-total-pages'
             Link:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/link'
+              $ref: '#/components/headers/link'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessInfosPage'
-        "400":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-
+        '400':
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/PermissionDenied403'
     post:
       tags:
         - Accesses
@@ -293,7 +290,7 @@ paths:
         - openId:
             - dedicated-network-accesses:accesses:create
       parameters:
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       requestBody:
         description: Configuration of the access to create, optionally including devices to add
         required: true
@@ -303,40 +300,40 @@ paths:
               $ref: '#/components/schemas/CreateAccessRequest'
       callbacks:
         notifications:
-          "{$request.body#/sink}":
+          '{$request.body#/sink}':
             post:
-              summary: "Device access status notifications callback"
+              summary: Device access status notifications callback
               description: |
                 Important: this endpoint is to be implemented by the API consumer.
                 It will be called when the status of one or more access devices changes.
                 Currently only DEVICE_STATUS_CHANGED event is defined.
               operationId: postNotification
               parameters:
-                - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+                - $ref: '#/components/parameters/x-correlator'
               requestBody:
                 description: The device access status change event notification
                 required: true
                 content:
                   application/cloudevents+json:
                     schema:
-                      $ref: "#/components/schemas/AccessDeviceNotificationEvent"
+                      $ref: '#/components/schemas/AccessDeviceNotificationEvent'
                     examples:
                       DEVICE_STATUS_CHANGED_EXAMPLE:
-                        $ref: "#/components/examples/DEVICE_STATUS_CHANGED_EXAMPLE"
+                        $ref: '#/components/examples/DEVICE_STATUS_CHANGED_EXAMPLE'
               responses:
-                "204":
+                '204':
                   description: Successful notification
                   headers:
                     x-correlator:
-                      $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
-                "400":
-                  $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-                "401":
-                  $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-                "403":
-                  $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-                "410":
-                  $ref: "../common/CAMARA_event_common.yaml#/components/responses/SinkGone410"
+                      $ref: '#/components/headers/x-correlator'
+                '400':
+                  $ref: '#/components/responses/BadRequest400'
+                '401':
+                  $ref: '#/components/responses/Unauthenticated401'
+                '403':
+                  $ref: '#/components/responses/PermissionDenied403'
+                '410':
+                  $ref: '#/components/responses/SinkGone410'
               security:
                 - {}
                 - notificationsBearerAuth: []
@@ -345,9 +342,9 @@ paths:
           description: Successful creation of the access for all devices (if any)
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
             Location:
-              description: 'URL including the resource identifier of the newly created network access.'
+              description: URL including the resource identifier of the newly created network access.
               required: true
               schema:
                 type: string
@@ -361,9 +358,9 @@ paths:
           description: Successful creation of the access for some devices
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
             Location:
-              description: 'URL including the resource identifier of the newly created network access.'
+              description: URL including the resource identifier of the newly created network access.
               required: true
               schema:
                 type: string
@@ -374,18 +371,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreateAccessPartialSuccess'
         '400':
-          $ref: "#/components/responses/CreateAccessBadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-        "404":
-          $ref: "#/components/responses/CreateAccessNotFound404"
-        "409":
-          $ref: "#/components/responses/CreateAccessConflict409"
-        "422":
-          $ref: "#/components/responses/AddDevicesNoneProcessed422"
-
+          $ref: '#/components/responses/CreateAccessBadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/PermissionDenied403'
+        '404':
+          $ref: '#/components/responses/CreateAccessNotFound404'
+        '409':
+          $ref: '#/components/responses/CreateAccessConflict409'
+        '422':
+          $ref: '#/components/responses/AddDevicesNoneProcessed422'
   /accesses/{accessId}:
     get:
       tags:
@@ -403,27 +399,26 @@ paths:
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/AccessId"
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+            $ref: '#/components/schemas/AccessId'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: Access information
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessInfo'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-        "404":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
-
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/PermissionDenied403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
     delete:
       tags:
         - Accesses
@@ -440,23 +435,22 @@ paths:
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/AccessId"
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+            $ref: '#/components/schemas/AccessId'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '204':
           description: Successful deletion of the access
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-        "404":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
-
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/PermissionDenied403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
   /accesses/{accessId}/devices:
     parameters:
       - name: accessId
@@ -464,7 +458,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: "#/components/schemas/AccessId"
+          $ref: '#/components/schemas/AccessId'
     get:
       tags:
         - Devices
@@ -481,47 +475,47 @@ paths:
           description: |
             Number of access devices to return per page
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/PerPage"
+            $ref: '#/components/schemas/PerPage'
         - name: page
           in: query
           description: |
             Number of the page of access devices to return
           schema:
-            $ref: "../common/CAMARA_common.yaml#/components/schemas/Page"
+            $ref: '#/components/schemas/Page'
         - name: deviceStatus
           in: query
           description: Only access devices with this status are to be returned
           schema:
-            $ref: "#/components/schemas/DeviceStatus"
-        - $ref: "#/components/parameters/AddedAtOrAfter"
-        - $ref: "#/components/parameters/AddedAfter"
-        - $ref: "#/components/parameters/AddedAtOrBefore"
-        - $ref: "#/components/parameters/AddedBefore"
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+            $ref: '#/components/schemas/DeviceStatus'
+        - $ref: '#/components/parameters/AddedAtOrAfter'
+        - $ref: '#/components/parameters/AddedAfter'
+        - $ref: '#/components/parameters/AddedAtOrBefore'
+        - $ref: '#/components/parameters/AddedBefore'
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: A list of devices matching the given criteria and in the requested page (can be empty).
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
             X-Total-Count:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-total-count'
+              $ref: '#/components/headers/x-total-count'
             X-Total-Pages:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/x-total-pages'
+              $ref: '#/components/headers/x-total-pages'
             Link:
-              $ref: '../common/CAMARA_common.yaml#/components/headers/link'
+              $ref: '#/components/headers/link'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessDevicesPage'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-        "404":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/PermissionDenied403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
     post:
       tags:
         - Devices
@@ -543,22 +537,22 @@ paths:
         - openId:
             - dedicated-network-accesses:device:create
       parameters:
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       requestBody:
         description: The device to add to the access
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AddDeviceRequest"
+              $ref: '#/components/schemas/AddDeviceRequest'
       responses:
         '201':
           description: Successful addition of the device to the access
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
             Location:
-              description: 'URL including the resource identifier of the newly added access device.'
+              description: URL including the resource identifier of the newly added access device.
               required: true
               schema:
                 type: string
@@ -569,19 +563,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessDevice'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-        "404":
-          $ref: "#/components/responses/AddDeviceNotFound404"
-        "409":
-          $ref: "#/components/responses/AddDeviceConflict409"
-        "422":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/DeviceIdentifier422"
-        "429":
-          $ref: "#/components/responses/DeviceMaxExceeded429"
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/PermissionDenied403'
+        '404':
+          $ref: '#/components/responses/AddDeviceNotFound404'
+        '409':
+          $ref: '#/components/responses/AddDeviceConflict409'
+        '422':
+          $ref: '#/components/responses/DeviceIdentifier422'
+        '429':
+          $ref: '#/components/responses/DeviceMaxExceeded429'
   /accesses/{accessId}/devices/add:
     parameters:
       - name: accessId
@@ -589,8 +583,8 @@ paths:
         in: path
         required: true
         schema:
-          $ref: "#/components/schemas/AccessId"
-      - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+          $ref: '#/components/schemas/AccessId'
+      - $ref: '#/components/parameters/x-correlator'
     post:
       tags:
         - Devices
@@ -609,39 +603,38 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AddDevicesRequest"
+              $ref: '#/components/schemas/AddDevicesRequest'
       responses:
         '201':
           description: Successful addition of all the given devices
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AddDevicesSuccess"
+                $ref: '#/components/schemas/AddDevicesSuccess'
         '207':
           description: Partially successful addition of devices, success for at least one of the given devices
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AddDevicesPartialSuccess"
+                $ref: '#/components/schemas/AddDevicesPartialSuccess'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-        "404":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
-        "409":
-          $ref: "#/components/responses/AddDevicesConflict409"
-        "422":
-          $ref: "#/components/responses/AddDevicesNoneProcessed422"
-
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/PermissionDenied403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '409':
+          $ref: '#/components/responses/AddDevicesConflict409'
+        '422':
+          $ref: '#/components/responses/AddDevicesNoneProcessed422'
   /accesses/{accessId}/devices/remove:
     parameters:
       - name: accessId
@@ -649,8 +642,8 @@ paths:
         in: path
         required: true
         schema:
-          $ref: "#/components/schemas/AccessId"
-      - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+          $ref: '#/components/schemas/AccessId'
+      - $ref: '#/components/parameters/x-correlator'
     post:
       tags:
         - Devices
@@ -669,33 +662,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RemoveDevicesRequest"
+              $ref: '#/components/schemas/RemoveDevicesRequest'
       responses:
         '204':
           description: Successful removal of all the given devices
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
         '207':
           description: Partially successful removal of devices, success for at least one of the given devices
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RemoveDevicesPartialSuccess"
+                $ref: '#/components/schemas/RemoveDevicesPartialSuccess'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/PermissionDenied403"
-        "404":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
-        "422":
-          $ref: "#/components/responses/RemoveDevicesNoneProcessed422"
-
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/PermissionDenied403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
+        '422':
+          $ref: '#/components/responses/RemoveDevicesNoneProcessed422'
   /accesses/{accessId}/devices/{accessDeviceId}:
     parameters:
       - name: accessId
@@ -703,13 +695,13 @@ paths:
         in: path
         required: true
         schema:
-          $ref: "#/components/schemas/AccessId"
+          $ref: '#/components/schemas/AccessId'
       - name: accessDeviceId
         description: access device identifier
         in: path
         required: true
         schema:
-          $ref: "#/components/schemas/AccessDeviceId"
+          $ref: '#/components/schemas/AccessDeviceId'
     get:
       tags:
         - Devices
@@ -727,26 +719,25 @@ paths:
         - openId:
             - dedicated-network-accesses:device:read
       parameters:
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '200':
           description: Access device information
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessDevice'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "#/components/responses/SingleDeviceForbidden403"
-        "404":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
-
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/SingleDeviceForbidden403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
     delete:
       tags:
         - Devices
@@ -766,22 +757,21 @@ paths:
         - openId:
             - dedicated-network-accesses:device:delete
       parameters:
-        - $ref: "../common/CAMARA_common.yaml#/components/parameters/x-correlator"
+        - $ref: '#/components/parameters/x-correlator'
       responses:
         '204':
           description: Successful deletion of the access device
           headers:
             x-correlator:
-              $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+              $ref: '#/components/headers/x-correlator'
         '400':
-          $ref: "../common/CAMARA_common.yaml#/components/responses/BadRequest400"
-        "401":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/Unauthenticated401"
-        "403":
-          $ref: "#/components/responses/SingleDeviceForbidden403"
-        "404":
-          $ref: "../common/CAMARA_common.yaml#/components/responses/NotFound404"
-
+          $ref: '#/components/responses/BadRequest400'
+        '401':
+          $ref: '#/components/responses/Unauthenticated401'
+        '403':
+          $ref: '#/components/responses/SingleDeviceForbidden403'
+        '404':
+          $ref: '#/components/responses/NotFound404'
 components:
   securitySchemes:
     openId:
@@ -791,11 +781,10 @@ components:
     notificationsBearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: "{$request.body#/sinkCredential.credentialType}"
+      bearerFormat: '{$request.body#/sinkCredential.credentialType}'
       description: |
         Bearer token for notification delivery. Token format is determined
         by `sinkCredential.credentialType` in the subscription request.
-
   parameters:
     AddedAtOrAfter:
       in: query
@@ -841,20 +830,23 @@ components:
         format: date-time
         type: string
         maxLength: 64
-
+    x-correlator:
+      name: x-correlator
+      in: header
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
   schemas:
     AccessId:
       description: Network access id in UUID format
       type: string
       format: uuid
       maxLength: 36
-
     NetworkId:
       description: Network id in UUID format
       type: string
       format: uuid
       maxLength: 36
-
     AccessDeviceId:
       description: |
         Identifier in UUID format of a device within this Accesses API, assigned by the API Provider when the device is added to its first access. While the device is included in one or more accesses, it uniquely identifies the device among the devices of the API Consumer, and the same value is used for that device in every access it belongs to. Which device identifier types the API Provider supports is at its discretion; within the supported set, identifiers that the API Provider resolves to the same device are assigned the same `accessDeviceId`.
@@ -865,20 +857,17 @@ components:
       type: string
       format: uuid
       maxLength: 36
-
     DeviceStatus:
       description: |
         The current status of the device in the context of the access. The status can be one of the following:
         * `REQUESTED` - The device was requested to have access to the network. Possible transitions to GRANTED and DENIED states.
         * `GRANTED` - The device was granted access to the network by the CSP, and therefore the device can use the Dedicated Network when the network is in the ACTIVATED state. Possible transition to DENIED state.
         * `DENIED` - The device was denied access to the network by the CSP, and therefore the device can not use the Dedicated Network. The denial can be caused by a variety of conditions, such as lack of resources or system failure.
-
       type: string
       enum:
         - REQUESTED
         - GRANTED
         - DENIED
-
     ReasonInfo:
       description: |
         Information about the reason for a change
@@ -895,7 +884,6 @@ components:
           type: string
           maxLength: 4096
           description: A human-readable description of what the reason represents
-
     DeviceStatusInfo:
       description: Additional information about the reason for the current device status
       type: object
@@ -904,7 +892,7 @@ components:
           description: |
             Information about the reason for a device status change in the context of the access
           allOf:
-            - $ref: "#/components/schemas/ReasonInfo"
+            - $ref: '#/components/schemas/ReasonInfo'
             - type: object
               properties:
                 code:
@@ -914,7 +902,6 @@ components:
                     - REQUEST_FAILED
                     - ACCESS_REVOKED
                     - ACCESS_FAILED
-
     AccessDevicesPage:
       description: A page of access devices
       type: object
@@ -925,20 +912,18 @@ components:
         items:
           description: A list of access devices
           allOf:
-            - $ref: "#/components/schemas/AccessDevices"
+            - $ref: '#/components/schemas/AccessDevices'
             - minItems: 0
             - maxItems: 100
         pagination:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Pagination"
-
+          $ref: '#/components/schemas/Pagination'
     AccessDevices:
       description: A list of access devices
       type: array
       minItems: 0
       maxItems: 2147483647
       items:
-        $ref: "#/components/schemas/AccessDevice"
-
+        $ref: '#/components/schemas/AccessDevice'
     AddedAccessDevices:
       description: |
         Information about devices requested and added to the access in either the `createAccess` or the `addDevicesToAccess` operation.
@@ -949,10 +934,9 @@ components:
           description: |
             A list of devices added to the access upon request within either the `createAccess` operation or the `addDevicesToAccess` operation, accepted for further processing (see `DeviceStatus`), i.e. not immediately rejected due to an error condition.
           allOf:
-            - $ref: "#/components/schemas/AccessDevices"
+            - $ref: '#/components/schemas/AccessDevices'
             - minItems: 1
             - maxItems: 100
-
     AccessDevice:
       description: |
         Information about a single device included in an access:
@@ -964,13 +948,13 @@ components:
       type: object
       properties:
         accessDeviceId:
-          $ref: "#/components/schemas/AccessDeviceId"
+          $ref: '#/components/schemas/AccessDeviceId'
         device:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
+          $ref: '#/components/schemas/Device'
         status:
-          $ref: "#/components/schemas/DeviceStatus"
+          $ref: '#/components/schemas/DeviceStatus'
         statusInfo:
-          $ref: "#/components/schemas/DeviceStatusInfo"
+          $ref: '#/components/schemas/DeviceStatusInfo'
         addedAt:
           description: |
             Timestamp when the device was added to the access. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone. Recommended format is yyyy-MM-dd'T'HH:mm:ss.SSSZ (i.e. which allows 2023-07-03T14:27:08.312+02:00 or 2023-07-03T12:27:08.312Z)
@@ -981,7 +965,6 @@ components:
         - accessDeviceId
         - status
         - addedAt
-
     BaseAccessInfo:
       description: Common attributes of an access to a dedicated network
       type: object
@@ -992,39 +975,37 @@ components:
           minLength: 1
           maxLength: 1024
         networkId:
-          $ref: "#/components/schemas/NetworkId"
+          $ref: '#/components/schemas/NetworkId'
         qosProfiles:
           description: (Optional) List of supported QOS profiles usable for the device(s). When absent, all QosProfiles of the network are supported. Only a subset of the QOS profiles of the network is allowed
           type: array
           minItems: 1
           maxItems: 32
           items:
-            $ref: "#/components/schemas/QosProfileName"
+            $ref: '#/components/schemas/QosProfileName'
         defaultQosProfile:
-          $ref: "#/components/schemas/QosProfileName"
+          $ref: '#/components/schemas/QosProfileName'
         sink:
           description: The address to which events shall be delivered using the selected protocol.
           allOf:
-            - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/Sink"
+            - $ref: '#/components/schemas/Sink'
         sinkCredential:
-          $ref: '../common/CAMARA_event_common.yaml#/components/schemas/SinkCredential'
+          $ref: '#/components/schemas/SinkCredential'
       required:
         - networkId
-
     CreateAccessRequest:
       description: |
         Attributes used to create a dedicated network access, optionally including one or more devices to be added to the access.
         The `devices` array is optional: when omitted, the access is created without any devices; when provided, each device is identified by a `device` object.
       allOf:
-        - $ref: "#/components/schemas/BaseAccessInfo"
+        - $ref: '#/components/schemas/BaseAccessInfo'
         - type: object
           properties:
             devices:
               allOf:
-                - $ref: "#/components/schemas/Devices"
+                - $ref: '#/components/schemas/Devices'
                 - minItems: 1
                 - maxItems: 100
-
     CreateAccessSuccess:
       description: |
         Response body used when access was created successfully.
@@ -1032,7 +1013,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/AccessInfo'
         - $ref: '#/components/schemas/AddedAccessDevices'
-
     CreateAccessPartialSuccess:
       description: |
         Response body used when the access was created successfully and at least one, but not all, of the requested devices were added.
@@ -1044,7 +1024,6 @@ components:
         - required:
             - addedAccessDevices
             - results
-
     AccessStats:
       description: Statistical information for a dedicated network access
       type: object
@@ -1071,28 +1050,26 @@ components:
         - totalDevices
         - totalGranted
         - totalDenied
-
     AccessInfo:
       description: |
-       Information about a dedicated network access which includes the following:
-       * id - a unique identifier of the access
-       * networkId - network identifier
-       * qosProfiles - optionally, a list of QoS profiles relevant for this access, which must be a subset of the QoS profiles already defined for the network.
-       * defaultQosProfile - optionally, a default QoS profile for all the devices granted access to this access. This QoS profile must be selected from the QoS profiles defined for this access.
-       * stats - access statistics.
-       * sink and sinkCredential - optionally, callback information for event notifications pertaining to this access.
+        Information about a dedicated network access which includes the following:
+        * id - a unique identifier of the access
+        * networkId - network identifier
+        * qosProfiles - optionally, a list of QoS profiles relevant for this access, which must be a subset of the QoS profiles already defined for the network.
+        * defaultQosProfile - optionally, a default QoS profile for all the devices granted access to this access. This QoS profile must be selected from the QoS profiles defined for this access.
+        * stats - access statistics.
+        * sink and sinkCredential - optionally, callback information for event notifications pertaining to this access.
       allOf:
-        - $ref: "#/components/schemas/BaseAccessInfo"
+        - $ref: '#/components/schemas/BaseAccessInfo'
         - type: object
           properties:
             id:
-              $ref: "#/components/schemas/AccessId"
+              $ref: '#/components/schemas/AccessId'
             stats:
-              $ref: "#/components/schemas/AccessStats"
+              $ref: '#/components/schemas/AccessStats'
           required:
             - id
             - stats
-
     AccessInfosPage:
       description: A page of accesses with information
       type: object
@@ -1104,11 +1081,10 @@ components:
           type: array
           description: A list of accesses with information
           items:
-            $ref: "#/components/schemas/AccessInfo"
+            $ref: '#/components/schemas/AccessInfo'
           maxItems: 100
         pagination:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Pagination"
-
+          $ref: '#/components/schemas/Pagination'
     AddDevicesRequest:
       description: Request body used to add devices to an access
       type: object
@@ -1118,10 +1094,9 @@ components:
         devices:
           description: List of devices to be added to the access
           allOf:
-            - $ref: "#/components/schemas/Devices"
+            - $ref: '#/components/schemas/Devices'
             - minItems: 1
             - maxItems: 100
-
     AddDeviceRequest:
       description: |
         Request body used to add a single device to an access.
@@ -1130,8 +1105,7 @@ components:
       type: object
       properties:
         device:
-          $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
-
+          $ref: '#/components/schemas/Device'
     AddDevicesSuccess:
       description: |
         Response body used when all devices could be added to an access successfully and are listed in `addedAccessDevices`.
@@ -1139,18 +1113,16 @@ components:
         - $ref: '#/components/schemas/AddedAccessDevices'
         - required:
             - addedAccessDevices
-
     AddDevicesPartialSuccess:
       description: |
         Response body used when not all devices could be added successfully.
         Devices added successfully are returned in `addedAccessDevices` while failed devices are listed in `results`.
       allOf:
         - $ref: '#/components/schemas/AddedAccessDevices'
-        - $ref: "#/components/schemas/AddDevicesErrorResults"
+        - $ref: '#/components/schemas/AddDevicesErrorResults'
         - required:
             - addedAccessDevices
             - results
-
     RemoveDevicesRequest:
       description: Request body used to remove devices from an access
       type: object
@@ -1162,20 +1134,18 @@ components:
           description: A list of access device ids identifying the devices to be removed from the access
           type: array
           items:
-            $ref: "#/components/schemas/AccessDeviceId"
+            $ref: '#/components/schemas/AccessDeviceId'
           minItems: 1
           maxItems: 100
-
     RemoveDevicesPartialSuccess:
       description: |
         Response body used when not all devices could be removed successfully.
         It contains a list of error results, one result per failed device, detailing the result of the failed attempt to remove the device from the access.
         Devices which were successfully removed are not listed.
       allOf:
-        - $ref: "#/components/schemas/RemoveDevicesErrorResults"
+        - $ref: '#/components/schemas/RemoveDevicesErrorResults'
         - required:
             - results
-
     AddDevicesErrorResults:
       description: An object describing the per-device error results of an operation adding devices to an access.
       type: object
@@ -1187,27 +1157,24 @@ components:
             $ref: '#/components/schemas/AddDeviceErrorResult'
           minItems: 1
           maxItems: 100
-
     AddDeviceErrorResult:
       description: Information about the error pertaining to a device that could not be added to the access. The device is identified by the `device` object provided in the request.
       oneOf:
-        - $ref: "#/components/schemas/DeviceValidationError"
-        - $ref: "#/components/schemas/DeviceNotFoundError"
-        - $ref: "#/components/schemas/DeviceForbiddenError"
-        - $ref: "#/components/schemas/DeviceConflictError"
-        - $ref: "#/components/schemas/DeviceUnprocessableError"
-        - $ref: "#/components/schemas/DeviceMaxExceededError"
-
+        - $ref: '#/components/schemas/DeviceValidationError'
+        - $ref: '#/components/schemas/DeviceNotFoundError'
+        - $ref: '#/components/schemas/DeviceForbiddenError'
+        - $ref: '#/components/schemas/DeviceConflictError'
+        - $ref: '#/components/schemas/DeviceUnprocessableError'
+        - $ref: '#/components/schemas/DeviceMaxExceededError'
     AddDevicesNoneProcessed:
       description: |
         Response body used when none of the requested devices could be added to the access.
         It contains the overall error information and a list of error results, one result per device.
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-        - $ref: "#/components/schemas/AddDevicesErrorResults"
+        - $ref: '#/components/schemas/ErrorInfo'
+        - $ref: '#/components/schemas/AddDevicesErrorResults'
         - required:
             - results
-
     RemoveDevicesErrorResults:
       description: An object describing the per-device error results of an operation removing devices from an access.
       type: object
@@ -1219,31 +1186,28 @@ components:
             $ref: '#/components/schemas/RemoveDeviceErrorResult'
           minItems: 1
           maxItems: 100
-
     RemoveDeviceErrorResult:
       description: Information about the error pertaining to a device that could not be removed from the access. The device is identified by its `accessDeviceId`.
       oneOf:
-        - $ref: "#/components/schemas/AccessDeviceNotFoundError"
-        - $ref: "#/components/schemas/AccessDeviceForbiddenError"
-
+        - $ref: '#/components/schemas/AccessDeviceNotFoundError'
+        - $ref: '#/components/schemas/AccessDeviceForbiddenError'
     RemoveDevicesNoneProcessed:
       description: |
         Response body used when none of the requested devices could be removed from the access.
         It contains the overall error information and a list of error results, one result per device.
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
-        - $ref: "#/components/schemas/RemoveDevicesErrorResults"
+        - $ref: '#/components/schemas/ErrorInfo'
+        - $ref: '#/components/schemas/RemoveDevicesErrorResults'
         - required:
             - results
-
     DeviceValidationError:
       description: Error when device failed validation
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+        - $ref: '#/components/schemas/ErrorInfo'
         - type: object
           properties:
             device:
-              $ref: "#/components/schemas/InvalidDevice"
+              $ref: '#/components/schemas/InvalidDevice'
             status:
               enum:
                 - 400
@@ -1253,15 +1217,14 @@ components:
                 - OUT_OF_RANGE
           required:
             - device
-
     DeviceForbiddenError:
       description: Error when the API consumer is not authorized to add the device identified by the provided `device` object (for example, because the consumer is not permitted to act on this device).
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+        - $ref: '#/components/schemas/ErrorInfo'
         - type: object
           properties:
             device:
-              $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
+              $ref: '#/components/schemas/Device'
             status:
               enum:
                 - 403
@@ -1270,15 +1233,14 @@ components:
                 - PERMISSION_DENIED
           required:
             - device
-
     DeviceNotFoundError:
       description: Error when the device identified by the provided `device` object cannot be matched to a device.
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+        - $ref: '#/components/schemas/ErrorInfo'
         - type: object
           properties:
             device:
-              $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
+              $ref: '#/components/schemas/Device'
             status:
               enum:
                 - 404
@@ -1287,15 +1249,14 @@ components:
                 - IDENTIFIER_NOT_FOUND
           required:
             - device
-
     DeviceConflictError:
       description: Error when the device cannot be added due to a conflict - it is already included in the access (`ALREADY_EXISTS`), its state does not allow it to be added (`INCOMPATIBLE_STATE`), or its processing was aborted by a concurrent modification of the same device (`ABORTED`).
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+        - $ref: '#/components/schemas/ErrorInfo'
         - type: object
           properties:
             device:
-              $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
+              $ref: '#/components/schemas/Device'
             status:
               enum:
                 - 409
@@ -1306,15 +1267,14 @@ components:
                 - ABORTED
           required:
             - device
-
     DeviceUnprocessableError:
       description: Error when device can not be processed
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+        - $ref: '#/components/schemas/ErrorInfo'
         - type: object
           properties:
             device:
-              $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
+              $ref: '#/components/schemas/Device'
             status:
               enum:
                 - 422
@@ -1324,15 +1284,14 @@ components:
                 - UNSUPPORTED_IDENTIFIER
           required:
             - device
-
     DeviceMaxExceededError:
       description: Error when device exceeds maximum number of allowed devices
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+        - $ref: '#/components/schemas/ErrorInfo'
         - type: object
           properties:
             device:
-              $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
+              $ref: '#/components/schemas/Device'
             status:
               enum:
                 - 429
@@ -1341,15 +1300,14 @@ components:
                 - QUOTA_EXCEEDED
           required:
             - device
-
     AccessDeviceForbiddenError:
       description: Error when the API consumer is not authorized to remove the access device identified by the `accessDeviceId` (for example, because the access device was not created by the same API client).
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+        - $ref: '#/components/schemas/ErrorInfo'
         - type: object
           properties:
             accessDeviceId:
-              $ref: "#/components/schemas/AccessDeviceId"
+              $ref: '#/components/schemas/AccessDeviceId'
             status:
               enum:
                 - 403
@@ -1358,15 +1316,14 @@ components:
                 - PERMISSION_DENIED
           required:
             - accessDeviceId
-
     AccessDeviceNotFoundError:
       description: Error when the access device identified by the `accessDeviceId` is not found.
       allOf:
-        - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+        - $ref: '#/components/schemas/ErrorInfo'
         - type: object
           properties:
             accessDeviceId:
-              $ref: "#/components/schemas/AccessDeviceId"
+              $ref: '#/components/schemas/AccessDeviceId'
             status:
               enum:
                 - 404
@@ -1375,30 +1332,27 @@ components:
                 - NOT_FOUND
           required:
             - accessDeviceId
-
     AccessDeviceEventType:
       description: Enum of event types for the Dedicated Network Accesses API.
       type: string
       enum:
         - org.camaraproject.dedicated-network-accesses.v0.device-status-changed
-
     AccessDeviceNotificationEvent:
       description: Notification event for device access status changes. Constrains the CloudEvent `type` to access-specific event types.
       allOf:
-        - $ref: "../common/CAMARA_event_common.yaml#/components/schemas/CloudEvent"
+        - $ref: '#/components/schemas/CloudEvent'
         - type: object
           properties:
             type:
-              $ref: "#/components/schemas/AccessDeviceEventType"
+              $ref: '#/components/schemas/AccessDeviceEventType'
       discriminator:
-        propertyName: 'type'
+        propertyName: type
         mapping:
-          org.camaraproject.dedicated-network-accesses.v0.device-status-changed: "#/components/schemas/EventDeviceStatusChanged"
-
+          org.camaraproject.dedicated-network-accesses.v0.device-status-changed: '#/components/schemas/EventDeviceStatusChanged'
     EventDeviceStatusChanged:
       description: Event to notify a status change of one or more devices in the context of an access to a dedicated network
       allOf:
-        - $ref: "#/components/schemas/AccessDeviceNotificationEvent"
+        - $ref: '#/components/schemas/AccessDeviceNotificationEvent'
         - type: object
           properties:
             data:
@@ -1409,30 +1363,27 @@ components:
                 - accessDevices
               properties:
                 accessId:
-                  $ref: "#/components/schemas/AccessId"
+                  $ref: '#/components/schemas/AccessId'
                 accessDevices:
                   type: array
                   description: The access devices whose status changed, each with its updated status
                   items:
-                    $ref: "#/components/schemas/AccessDevice"
+                    $ref: '#/components/schemas/AccessDevice'
                   minItems: 1
                   maxItems: 100
           required:
             - data
-
     Devices:
       description: A list of devices
       type: array
       maxItems: 2147483647
       items:
-        $ref: "../common/CAMARA_common.yaml#/components/schemas/Device"
-
+        $ref: '#/components/schemas/Device'
     InvalidDevice:
       description: |
         This object is defined to be able to return any invalid device object to the API invoker.
       type: object
       additionalProperties: true
-
     QosProfileName:
       description: |
         A unique name for identifying a specific QoS profile.
@@ -1446,19 +1397,317 @@ components:
       example: QCI_1_voice
       minLength: 3
       maxLength: 256
-      pattern: "^[a-zA-Z0-9_.-]+$"
+      pattern: ^[a-zA-Z0-9_.-]+$
+    PerPage:
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 100
+      default: 20
+      description: Number of items per page.
+      example: 20
+    Page:
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 2147483647
+      default: 1
+      description: Current page number (1-indexed).
+      example: 1
+    XCorrelator:
+      type: string
+      description: Correlator string, UUID format recommended but any string matching the pattern can be used
+      pattern: ^[a-zA-Z0-9-_:;.\/<>{}]{0,256}$
+      maxLength: 256
+      example: b4333c46-49c0-4f62-80d7-f0ef930f1c46
+    TotalCount:
+      type: integer
+      format: int32
+      minimum: 0
+      maximum: 2147483647
+      description: Total number of items matching the query, after filters applied. MAY be omitted where a full count query is prohibitively expensive.
+      example: 87
+    TotalPages:
+      type: integer
+      format: int32
+      minimum: 0
+      maximum: 2147483647
+      description: Total number of pages. Equals ceil(totalCount / perPage). MAY be omitted where totalCount is omitted.
+      example: 5
+    Sink:
+      description: The address to which events shall be delivered using the selected protocol.
+      type: string
+      format: uri
+      maxLength: 2048
+      pattern: ^https:\/\/.+$
+      example: https://endpoint.example.com/sink
+    SinkCredential:
+      description: A sink credential provides authentication or authorization information necessary to enable delivery of events to a target.
+      type: object
+      properties:
+        credentialType:
+          type: string
+          enum:
+            - ACCESSTOKEN
+            - PRIVATE_KEY_JWT
+          description: |
+            The type of the credential - MUST be set to ACCESSTOKEN or PRIVATE_KEY_JWT for now
+      discriminator:
+        propertyName: credentialType
+        mapping:
+          ACCESSTOKEN: '#/components/schemas/AccessTokenCredential'
+          PRIVATE_KEY_JWT: '#/components/schemas/PrivateKeyJWTCredential'
+      required:
+        - credentialType
+    AccessTokenCredential:
+      type: object
+      description: An access token credential. This type of credential is meant to be used by API Consumers that have limited capabilities to handle authorization requests.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            accessToken:
+              description: REQUIRED. An access token is a token granting access to the target resource.
+              type: string
+              maxLength: 4096
+              writeOnly: true
+            accessTokenExpiresUtc:
+              type: string
+              format: date-time
+              maxLength: 64
+              description: |
+                REQUIRED. An absolute (UTC) timestamp at which the token shall be considered expired.
+                In the case of an ACCESS_TOKEN_EXPIRED termination reason, implementation should notify the client before the expiration date.
+                If the access token is a JWT and registered "exp" (Expiration Time) claim is present, the two expiry times should match.
+                It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+              example: '2023-07-03T12:27:08.312Z'
+            accessTokenType:
+              description: REQUIRED. Type of the access token (See [OAuth 2.0](https://tools.ietf.org/html/rfc6749#section-7.1)).
+              type: string
+              writeOnly: true
+              enum:
+                - bearer
+          required:
+            - accessToken
+            - accessTokenExpiresUtc
+            - accessTokenType
+    PrivateKeyJWTCredential:
+      type: object
+      description: Use PRIVATE_KEY_JWT to get an access token. This type of credential is to be used by clients that have an authorization server.
+      allOf:
+        - $ref: '#/components/schemas/SinkCredential'
+        - type: object
+          properties:
+            clientId:
+              description: The client ID used to authenticate when requesting an access token using PRIVATE_KEY_JWT.
+              type: string
+              maxLength: 128
+              writeOnly: true
+            tokenUri:
+              description: The URI where to request an access token using PRIVATE_KEY_JWT.
+              type: string
+              format: uri
+              maxLength: 2048
+              pattern: ^https:\/\/.+$
+              writeOnly: true
+            jwksUri:
+              description: The URI used to request the public key to verify that the JWT assertion was signed by PRIVATE_KEY_JWT.
+              type: string
+              format: uri
+              maxLength: 2048
+              pattern: ^https:\/\/.+$
+              readOnly: true
+    Pagination:
+      description: Pagination details helping to navigate through paged results efficiently.
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/Page'
+        perPage:
+          $ref: '#/components/schemas/PerPage'
+        totalCount:
+          $ref: '#/components/schemas/TotalCount'
+        totalPages:
+          $ref: '#/components/schemas/TotalPages'
+    ErrorInfo:
+      type: object
+      description: A structured error response providing details about a failed request, including the HTTP status code, an error code, and a human-readable message
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: HTTP response status code
+        code:
+          type: string
+          maxLength: 96
+          description: A human-readable code to describe the error
+        message:
+          type: string
+          maxLength: 512
+          description: A human-readable description of what the event represents
+    PhoneNumber:
+      description: A public identifier addressing a telephone subscription. In mobile networks it corresponds to the MSISDN (Mobile Station International Subscriber Directory Number). In order to be globally unique it has to be formatted in international format, according to E.164 standard, prefixed with '+'.
+      type: string
+      pattern: ^\+[1-9][0-9]{4,14}$
+      maxLength: 16
+      example: '+123456789'
+    NetworkAccessIdentifier:
+      description: A public identifier addressing a subscription in a mobile network. In 3GPP terminology, it corresponds to the GPSI formatted with the External Identifier ({Local Identifier}@{Domain Identifier}). Unlike the telephone number, the network access identifier is not subjected to portability ruling in force, and is individually managed by each operator.
+      type: string
+      maxLength: 2048
+      example: 123456789@example.com
+    SingleIpv4Address:
+      description: A single IPv4 address with no subnet mask
+      type: string
+      format: ipv4
+      maxLength: 15
+      example: 84.125.93.10
+    Port:
+      description: TCP or UDP port number
+      type: integer
+      format: int32
+      minimum: 1
+      maximum: 65535
+    DeviceIpv4Address:
+      type: object
+      description: |
+        The device should be identified by either the public (observed) IP address and port as seen by the application server, or the private (local) and any public (observed) IP addresses in use by the device (this information can be obtained by various means, for example from some DNS servers).
 
+        If the allocated and observed IP addresses are the same (i.e. NAT is not in use) then  the same address should be specified for both publicAddress and privateAddress.
+
+        If NAT64 is in use, the device should be identified by its publicAddress and publicPort, or separately by its allocated IPv6 address (field ipv6Address of the Device object)
+
+        In all cases, publicAddress must be specified, along with at least one of either privateAddress or publicPort, dependent upon which is known. In general, mobile devices cannot be identified by their public IPv4 address alone.
+      properties:
+        publicAddress:
+          $ref: '#/components/schemas/SingleIpv4Address'
+        privateAddress:
+          $ref: '#/components/schemas/SingleIpv4Address'
+        publicPort:
+          $ref: '#/components/schemas/Port'
+      anyOf:
+        - required:
+            - publicAddress
+            - privateAddress
+        - required:
+            - publicAddress
+            - publicPort
+      example:
+        publicAddress: 84.125.93.10
+        publicPort: 59765
+    SingleIpv6Address:
+      description: A single IPv6 address with no subnet mask
+      type: string
+      format: ipv6
+      maxLength: 45
+      example: 2001:db8:85a3:8d3:1319:8a2e:370:7344
+    DeviceIpv6Address:
+      description: |
+        The device should be identified by the observed IPv6 address, or by any single IPv6 address from within the subnet allocated to the device (e.g. adding ::0 to the /64 prefix).
+      allOf:
+        - $ref: '#/components/schemas/SingleIpv6Address'
+    Device:
+      description: |
+        End-user equipment able to connect to a mobile network. Examples of devices include smartphones or IoT sensors/actuators.
+            The developer can choose to provide the below specified device identifiers:
+            * `ipv4Address`
+            * `ipv6Address`
+            * `phoneNumber`
+            * `networkAccessIdentifier`
+            NOTE1: the network operator might support only a subset of these options. The API Consumer can provide multiple identifiers to ensure compatibility across different network operators. In this case, the API Provider will use one of the identifiers for the API logic without performing any matching checks among the provided identifiers.
+            NOTE2: as for this Commonalities release, we are enforcing that the networkAccessIdentifier is only part of the schema for future-proofing, and CAMARA does not currently allow its use. After the CAMARA meta-release work is concluded and the relevant issues are resolved, its use will need to be explicitly documented in the guidelines.
+      type: object
+      properties:
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        networkAccessIdentifier:
+          $ref: '#/components/schemas/NetworkAccessIdentifier'
+        ipv4Address:
+          $ref: '#/components/schemas/DeviceIpv4Address'
+        ipv6Address:
+          $ref: '#/components/schemas/DeviceIpv6Address'
+      minProperties: 1
+    Source:
+      type: string
+      format: uri-reference
+      minLength: 1
+      maxLength: 2048
+      description: |
+        Identifies the context in which an event happened - be a non-empty `URI-reference` like:
+        - URI with a DNS authority:
+          * https://github.com/cloudevents
+          * mailto:cncf-wg-serverless@lists.cncf.io
+        - Universally-unique URN with a UUID:
+          * urn:uuid:6e8bc430-9c3a-11d9-9669-0800200c9a66
+        - Application-specific identifier:
+          * /cloudevents/spec/pull/123
+          * 1-555-123-4567
+      example: https://notificationSendServer12.example.com
+    DateTime:
+      type: string
+      format: date-time
+      maxLength: 64
+      description: Timestamp. It must follow [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) and must have time zone.
+      example: '2018-04-05T17:31:00Z'
+    CloudEvent:
+      type: object
+      description: |
+        CloudEvents 1.0 specification envelope.
+        This schema is the stable base for all CAMARA event notifications.
+        It imposes no constraints on `type` values or `data` structure —
+        those concerns belong to the API-specific and lifecycle group schemas.
+      required:
+        - id
+        - source
+        - specversion
+        - type
+        - time
+      properties:
+        id:
+          type: string
+          maxLength: 256
+          description: Identifier of this event, unique within the source context.
+        source:
+          $ref: '#/components/schemas/Source'
+        type:
+          type: string
+          maxLength: 512
+          description: |
+            Identifies the event type. CAMARA APIs use reverse-DNS notation:
+            `org.camaraproject.<api-name>.<event-version>.<event-name>`
+            The api-name segment makes each type globally unique across API groups.
+        specversion:
+          type: string
+          description: Version of the specification to which this event conforms (must be 1.0 if it conforms to cloudevents 1.0.2 version)
+          enum:
+            - '1.0'
+        datacontenttype:
+          type: string
+          description: media-type that describes the event payload encoding, must be "application/json" for CAMARA APIs
+          enum:
+            - application/json
+        data:
+          type: object
+          description: Event details payload. Structure is defined by each concrete event schema.
+        time:
+          $ref: '#/components/schemas/DateTime'
   responses:
     CreateAccessBadRequest400:
       description: Bad Request
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1472,25 +1721,24 @@ components:
                       - INVALID_SINK
           examples:
             GENERIC_400_INVALID_ARGUMENT:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_400_INVALID_ARGUMENT"
+              $ref: '#/components/examples/GENERIC_400_INVALID_ARGUMENT'
             GENERIC_400_INVALID_CREDENTIAL:
-              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_CREDENTIAL"
+              $ref: '#/components/examples/GENERIC_400_INVALID_CREDENTIAL'
             GENERIC_400_INVALID_TOKEN:
-              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_TOKEN"
+              $ref: '#/components/examples/GENERIC_400_INVALID_TOKEN'
             GENERIC_400_INVALID_SINK:
-              $ref: "../common/CAMARA_event_common.yaml#/components/examples/GENERIC_400_INVALID_SINK"
-
+              $ref: '#/components/examples/GENERIC_400_INVALID_SINK'
     SingleDeviceForbidden403:
       description: |
         Forbidden. In addition to the generic `PERMISSION_DENIED`, the single-device operations may return `INVALID_TOKEN_CONTEXT` when a three-legged access token is used and the targeted device (identified by `accessDeviceId`) does not correspond to the subject of the access token.
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1502,24 +1750,23 @@ components:
                       - INVALID_TOKEN_CONTEXT
           examples:
             GENERIC_403_PERMISSION_DENIED:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_403_PERMISSION_DENIED"
+              $ref: '#/components/examples/GENERIC_403_PERMISSION_DENIED'
             DEDICATED_NETWORK_ACCESSES_403_INVALID_TOKEN_CONTEXT:
               description: The device targeted by `accessDeviceId` is not consistent with the subject of the three-legged access token
               value:
                 status: 403
                 code: INVALID_TOKEN_CONTEXT
-                message: "accessDeviceId is not consistent with access token."
-
+                message: accessDeviceId is not consistent with access token.
     CreateAccessNotFound404:
       description: Not found
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1535,18 +1782,17 @@ components:
                 status: 404
                 code: DEDICATED_NETWORK_ACCESSES.NETWORK_IDENTIFIER_NOT_FOUND
                 message: Network identifier not found.
-
     AddDeviceNotFound404:
       description: |
         Not found. `NOT_FOUND` is returned when the access identified by `accessId` does not exist; `IDENTIFIER_NOT_FOUND` is returned when the device identified by the provided `device` object cannot be matched to a device.
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1558,20 +1804,19 @@ components:
                       - IDENTIFIER_NOT_FOUND
           examples:
             GENERIC_404_NOT_FOUND:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_404_NOT_FOUND"
+              $ref: '#/components/examples/GENERIC_404_NOT_FOUND'
             GENERIC_404_IDENTIFIER_NOT_FOUND:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_404_IDENTIFIER_NOT_FOUND"
-
+              $ref: '#/components/examples/GENERIC_404_IDENTIFIER_NOT_FOUND'
     CreateAccessConflict409:
       description: Conflict
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1582,18 +1827,17 @@ components:
                       - INCOMPATIBLE_STATE
           examples:
             DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
-              $ref: "#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE"
-
+              $ref: '#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE'
     AddDeviceConflict409:
       description: Conflict
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1606,22 +1850,21 @@ components:
                       - INCOMPATIBLE_STATE
           examples:
             GENERIC_409_ALREADY_EXISTS:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_409_ALREADY_EXISTS"
+              $ref: '#/components/examples/GENERIC_409_ALREADY_EXISTS'
             GENERIC_409_ABORTED:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_409_ABORTED"
+              $ref: '#/components/examples/GENERIC_409_ABORTED'
             DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
-              $ref: "#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE"
-
+              $ref: '#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE'
     AddDevicesConflict409:
       description: Conflict
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1633,20 +1876,19 @@ components:
                       - INCOMPATIBLE_STATE
           examples:
             GENERIC_409_ABORTED:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_409_ABORTED"
+              $ref: '#/components/examples/GENERIC_409_ABORTED'
             DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
-              $ref: "#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE"
-
+              $ref: '#/components/examples/DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE'
     AddDevicesNoneProcessed422:
       description: Unprocessable Content due to that none of the requested devices could be added to the access
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/AddDevicesNoneProcessed"
+              - $ref: '#/components/schemas/AddDevicesNoneProcessed'
               - type: object
                 properties:
                   status:
@@ -1664,26 +1906,25 @@ components:
                 message: None of the devices in the request could be added to the access.
                 results:
                   - device:
-                      phoneNumber: "+49123456789"
+                      phoneNumber: '+49123456789'
                     status: 404
                     code: IDENTIFIER_NOT_FOUND
                     message: Device identifier not found.
                   - device:
-                      phoneNumber: "+491234500001"
+                      phoneNumber: '+491234500001'
                     status: 409
                     code: ALREADY_EXISTS
                     message: Client specified a duplicate device identifier.
-
     RemoveDevicesNoneProcessed422:
       description: Unprocessable Content due to that none of the requested devices could be removed from the access
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "#/components/schemas/RemoveDevicesNoneProcessed"
+              - $ref: '#/components/schemas/RemoveDevicesNoneProcessed'
               - type: object
                 properties:
                   status:
@@ -1700,26 +1941,25 @@ components:
                 code: DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE
                 message: None of the devices in the request could be removed from the access.
                 results:
-                  - accessDeviceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                  - accessDeviceId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                     status: 404
                     code: NOT_FOUND
                     message: The access device is not found.
-                  - accessDeviceId: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                  - accessDeviceId: b2c3d4e5-f6a7-8901-bcde-f12345678901
                     status: 403
                     code: PERMISSION_DENIED
                     message: The API consumer is not authorized to remove this access device.
-
     DeviceMaxExceeded429:
       description: |
         Error response when the device being added to the access exceeds the maximum number of allowed devices, defined in the network profile of the dedicated network.
       headers:
         x-correlator:
-          $ref: "../common/CAMARA_common.yaml#/components/headers/x-correlator"
+          $ref: '#/components/headers/x-correlator'
       content:
         application/json:
           schema:
             allOf:
-              - $ref: "../common/CAMARA_common.yaml#/components/schemas/ErrorInfo"
+              - $ref: '#/components/schemas/ErrorInfo'
               - type: object
                 properties:
                   status:
@@ -1730,34 +1970,293 @@ components:
                       - QUOTA_EXCEEDED
           examples:
             GENERIC_429_QUOTA_EXCEEDED:
-              $ref: "../common/CAMARA_common.yaml#/components/examples/GENERIC_429_QUOTA_EXCEEDED"
-
+              $ref: '#/components/examples/GENERIC_429_QUOTA_EXCEEDED'
+    BadRequest400:
+      description: Bad Request
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 400
+                  code:
+                    enum:
+                      - INVALID_ARGUMENT
+          examples:
+            GENERIC_400_INVALID_ARGUMENT:
+              $ref: '#/components/examples/GENERIC_400_INVALID_ARGUMENT'
+    Unauthenticated401:
+      description: Unauthorized
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 401
+                  code:
+                    enum:
+                      - UNAUTHENTICATED
+          examples:
+            GENERIC_401_UNAUTHENTICATED:
+              $ref: '#/components/examples/GENERIC_401_UNAUTHENTICATED'
+    PermissionDenied403:
+      description: Forbidden
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 403
+                  code:
+                    enum:
+                      - PERMISSION_DENIED
+          examples:
+            GENERIC_403_PERMISSION_DENIED:
+              $ref: '#/components/examples/GENERIC_403_PERMISSION_DENIED'
+    SinkGone410:
+      description: Gone
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 410
+                  code:
+                    enum:
+                      - GONE
+          examples:
+            GENERIC_410_GONE:
+              $ref: '#/components/examples/GENERIC_410_GONE'
+    NotFound404:
+      description: Not found
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 404
+                  code:
+                    enum:
+                      - NOT_FOUND
+          examples:
+            GENERIC_404_NOT_FOUND:
+              $ref: '#/components/examples/GENERIC_404_NOT_FOUND'
+    DeviceIdentifier422:
+      description: Unprocessable Content
+      headers:
+        x-correlator:
+          $ref: '#/components/headers/x-correlator'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorInfo'
+              - type: object
+                properties:
+                  status:
+                    enum:
+                      - 422
+                  code:
+                    enum:
+                      - SERVICE_NOT_APPLICABLE
+                      - MISSING_IDENTIFIER
+                      - UNSUPPORTED_IDENTIFIER
+                      - UNNECESSARY_IDENTIFIER
+          examples:
+            GENERIC_422_SERVICE_NOT_APPLICABLE:
+              $ref: '#/components/examples/GENERIC_422_SERVICE_NOT_APPLICABLE'
+            GENERIC_422_MISSING_IDENTIFIER_DEVICE:
+              $ref: '#/components/examples/GENERIC_422_MISSING_IDENTIFIER_DEVICE'
+            GENERIC_422_UNSUPPORTED_IDENTIFIER_DEVICE:
+              $ref: '#/components/examples/GENERIC_422_UNSUPPORTED_IDENTIFIER_DEVICE'
+            GENERIC_422_UNNECESSARY_IDENTIFIER_DEVICE:
+              $ref: '#/components/examples/GENERIC_422_UNNECESSARY_IDENTIFIER_DEVICE'
   examples:
-
     DEDICATED_NETWORK_ACCESSES_409_INCOMPATIBLE_STATE:
       description: A resource referenced in the request is in an incompatible state for the requested operation
       value:
         status: 409
         code: INCOMPATIBLE_STATE
         message: A referenced resource is in an incompatible state.
-
     DEVICE_STATUS_CHANGED_EXAMPLE:
       summary: Device is GRANTED access to a dedicated network
       description: Cloud event example when a device's status in the context of an access to a dedicated network changes to GRANTED
       value:
         id: 625b2d4b-4da7-4f07-9169-e60ffdf7667c
-        source: 'https://api.example.com/dedicated-network-accesses/v0/accesses/b69e5404-3871-448d-8f9f-11dc5d29a4c8'
+        source: https://api.example.com/dedicated-network-accesses/v0/accesses/b69e5404-3871-448d-8f9f-11dc5d29a4c8
         specversion: '1.0'
-        type: "org.camaraproject.dedicated-network-accesses.v0.device-status-changed"
+        type: org.camaraproject.dedicated-network-accesses.v0.device-status-changed
         time: '2024-11-29T13:04:00Z'
         data:
           accessId: b69e5404-3871-448d-8f9f-11dc5d29a4c8
           accessDevices:
-            - accessDeviceId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            - accessDeviceId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
               device:
-                phoneNumber: "+49123456789"
+                phoneNumber: '+49123456789'
               status: GRANTED
               statusInfo:
                 reason:
                   code: REQUEST_APPROVED
                   message: The request to grant the device access to the network was approved.
+    GENERIC_400_INVALID_ARGUMENT:
+      description: Invalid Argument. Generic Syntax Exception
+      value:
+        status: 400
+        code: INVALID_ARGUMENT
+        message: Client specified an invalid argument, request body or query param.
+    GENERIC_401_UNAUTHENTICATED:
+      description: Request cannot be authenticated and a new authentication is required
+      value:
+        status: 401
+        code: UNAUTHENTICATED
+        message: Request not authenticated due to missing, invalid, or expired credentials. A new authentication is required.
+    GENERIC_403_PERMISSION_DENIED:
+      description: Permission denied. OAuth2 token access does not have the required scope or when the user fails operational security
+      value:
+        status: 403
+        code: PERMISSION_DENIED
+        message: Client does not have sufficient permissions to perform this action.
+    GENERIC_400_INVALID_CREDENTIAL:
+      description: Invalid sink credential type
+      value:
+        status: 400
+        code: INVALID_CREDENTIAL
+        message: Only Access token or Private key JWT are supported
+    GENERIC_400_INVALID_TOKEN:
+      description: Invalid access token in the sink credential
+      value:
+        status: 400
+        code: INVALID_TOKEN
+        message: Access token in sink credential is invalid or expired
+    GENERIC_400_INVALID_SINK:
+      description: Invalid sink value
+      value:
+        status: 400
+        code: INVALID_SINK
+        message: sink not valid for the specified protocol
+    GENERIC_410_GONE:
+      description: Use in notifications flow to allow API Consumer to indicate that its callback is no longer available
+      value:
+        status: 410
+        code: GONE
+        message: Access to the target resource is no longer available.
+    GENERIC_404_NOT_FOUND:
+      description: Resource is not found
+      value:
+        status: 404
+        code: NOT_FOUND
+        message: The specified resource is not found.
+    GENERIC_404_IDENTIFIER_NOT_FOUND:
+      description: The identifier cannot be matched to a device or phone number
+      value:
+        status: 404
+        code: IDENTIFIER_NOT_FOUND
+        message: The identifier is not found.
+    GENERIC_409_ALREADY_EXISTS:
+      description: Trying to create an existing resource
+      value:
+        status: 409
+        code: ALREADY_EXISTS
+        message: The resource that a client tried to create already exists.
+    GENERIC_409_ABORTED:
+      description: The resource is undergoing modification by another process
+      value:
+        status: 409
+        code: ABORTED
+        message: Resource is being modified by another operation. Please wait, and retry if appropriate.
+    GENERIC_422_SERVICE_NOT_APPLICABLE:
+      description: Service not applicable for the provided identifier
+      value:
+        status: 422
+        code: SERVICE_NOT_APPLICABLE
+        message: The service is not available for the provided identifier.
+    GENERIC_422_MISSING_IDENTIFIER_DEVICE:
+      description: The device identifier is not included in the request and the device cannot be derived from the access token
+      value:
+        status: 422
+        code: MISSING_IDENTIFIER
+        message: The device cannot be identified.
+    GENERIC_422_UNSUPPORTED_IDENTIFIER_DEVICE:
+      description: None of the provided device identifiers is supported by the implementation
+      value:
+        status: 422
+        code: UNSUPPORTED_IDENTIFIER
+        message: The identifier provided is not supported.
+    GENERIC_422_UNNECESSARY_IDENTIFIER_DEVICE:
+      description: An explicit device identifier is provided when the device has already been identified from the access token
+      value:
+        status: 422
+        code: UNNECESSARY_IDENTIFIER
+        message: The device is already identified by the access token.
+    GENERIC_429_QUOTA_EXCEEDED:
+      description: Request is rejected due to exceeding a business quota limit
+      value:
+        status: 429
+        code: QUOTA_EXCEEDED
+        message: Out of resource quota.
+  headers:
+    x-correlator:
+      description: Correlation id for the different services
+      schema:
+        $ref: '#/components/schemas/XCorrelator'
+    x-total-count:
+      description: Total number of items. Mirrors `pagination.totalCount` in the response body.
+      required: false
+      schema:
+        $ref: '#/components/schemas/TotalCount'
+    x-total-pages:
+      description: Total number of pages. Mirrors `pagination.totalPages` in the response body.
+      required: false
+      schema:
+        $ref: '#/components/schemas/TotalPages'
+    link:
+      description: |
+        Navigation links for paginated results following
+        [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288).
+        Includes only the rels applicable to the current position
+        (`first`, `prev`, `next`, `last`). All original query parameters
+        are preserved in Link URLs.
+        Example:
+          Link: <https://api.example.com/v1/resources?page=1&perPage=20>; rel="first",
+                <https://api.example.com/v1/resources?page=2&perPage=20>; rel="prev",
+                <https://api.example.com/v1/resources?page=4&perPage=20>; rel="next",
+                <https://api.example.com/v1/resources?page=5&perPage=20>; rel="last"
+      required: false
+      schema:
+        type: string
+        maxLength: 8192

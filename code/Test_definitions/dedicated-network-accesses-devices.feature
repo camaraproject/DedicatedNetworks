@@ -1,4 +1,4 @@
-Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Device Operations
+Feature: CAMARA Dedicated Network API, v0.2.0-rc.2 - Network Accesses API, Multiple-Device Operations
   # Input to be provided by the implementation to the tester
   #
   # Implementation indications:
@@ -29,7 +29,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   Scenario: List first page of all devices of a specific network access
     Given an existing dedicated network
     And an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of the existing access
     When the request "listAccessDevices" is sent
     Then the response status code is 200
@@ -41,7 +41,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_listAccessDevices_02_success_filtered_by_device_status
   Scenario Outline: List first page of devices of a network access filtered by device status
     Given an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of the existing access
     And the query parameter "deviceStatus" is set to "<device_status>"
     When the request "listAccessDevices" is sent
@@ -61,7 +61,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_listAccessDevices_03_success_filtered_by_added_time
   Scenario Outline: List first page of devices of a network access filtered by the time they were added
     Given an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of the existing access
     And the query parameter "<time_filter>" is set to a valid RFC 3339 date-time with time zone
     When the request "listAccessDevices" is sent
@@ -82,7 +82,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_listAccessDevices_04_success_pagination
   Scenario: List a specific page of devices of a network access with an explicit page size
     Given an existing network access including at least two devices
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of the existing access
     And the query parameter "perPage" is set to 1
     And the query parameter "page" is set to 2
@@ -106,7 +106,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   Scenario: Add a device to an existing network access
     Given an existing dedicated network
     And an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -120,7 +120,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_addDevicesToAccess_02_partial_success
   Scenario: Add devices to an existing network access where only some of the devices can be added
     Given an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -139,7 +139,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   Scenario: Remove a device from an existing network access
     Given an existing dedicated network
     And an existing network access including at least one device
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
@@ -151,7 +151,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_removeDevicesFromAccess_02_partial_success
   Scenario: Remove devices from an existing network access where only some of the devices can be removed
     Given an existing network access including at least one device
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
@@ -170,7 +170,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_listAccessDevices_400.06_invalid_x-correlator
   Scenario: List access devices with invalid x-correlator header
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "x-correlator" does not comply with the schema at "#/components/schemas/XCorrelator"
     When the request "listAccessDevices" is sent
@@ -181,7 +181,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_listAccessDevices_400.07_invalid_pagination
   Scenario Outline: List access devices with invalid pagination parameters
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of an existing access
     And the query parameter "<query_parameter>" is set to "<invalid_value>"
     When the request "listAccessDevices" is sent
@@ -200,7 +200,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_listAccessDevices_400.08_invalid_filter
   Scenario Outline: List access devices with invalid filter parameters
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of an existing access
     And the query parameter "<query_parameter>" is set to "<invalid_value>"
     When the request "listAccessDevices" is sent
@@ -227,7 +227,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_listAccessDevices_401.01_unauthenticated
   Scenario Outline: List access devices with missing, expired or invalid access token
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Authorization" <authorization_header>
     When the request "listAccessDevices" is sent
@@ -248,7 +248,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_listAccessDevices_403.01_missing_access_token_scope
   Scenario: List access devices with missing access token scope
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Authorization" is set to an access token that does not include scope "dedicated-network-accesses:devices:read"
     When the request "listAccessDevices" is sent
@@ -263,7 +263,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   Scenario: List access devices with a three-legged access token
     # This operation only supports two-legged access tokens. A three-legged access token
     # does not carry the required scope, so authorization fails
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Authorization" is set to a valid three-legged access token
     When the request "listAccessDevices" is sent
@@ -278,7 +278,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_listAccessDevices_404.01_not_found
   Scenario: List devices of a non-existing access
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to a random access ID
     When the request "listAccessDevices" is sent
     Then the response status code is 404
@@ -291,7 +291,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_listAccessDevices_404.02_api_client_token_mismatch
   Scenario: List devices of an access not created by the API client given in the access token
     # To test this, a token has to be obtained for a different client
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Authorization" is set to a valid access token emitted to an API client which did not have rights to access/manage the "{accessId}"
     When the request "listAccessDevices" is sent
@@ -308,7 +308,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_addDevicesToAccess_400.01_invalid_request_body
   Scenario Outline: Add devices to access with invalid request body
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is <invalid_request_body>
@@ -329,7 +329,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_addDevicesToAccess_400.06_invalid_x-correlator
   Scenario: Add devices to access with invalid x-correlator header
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -348,7 +348,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_addDevicesToAccess_401.01_unauthenticated
   Scenario Outline: Add devices to access with missing, expired or invalid access token
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -371,7 +371,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_addDevicesToAccess_403.01_missing_access_token_scope
   Scenario: Add devices to access with missing access token scope
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -388,7 +388,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   Scenario: Add devices to access with a three-legged access token
     # This operation only supports two-legged access tokens. A three-legged access token
     # does not carry the required scope, so authorization fails
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -405,7 +405,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_addDevicesToAccess_404.01_not_found
   Scenario: Add devices to a non-existing access
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to a random access ID
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -420,7 +420,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_addDevicesToAccess_404.02_api_client_token_mismatch
   Scenario: Add devices to an access not created by the API client given in the access token
     # To test this, a token has to be obtained for a different client
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -440,7 +440,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
     # To test this, another operation modifying the devices of the access has to be in progress
     Given an existing network access
     And another operation modifying the devices of the existing access is in progress
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -455,7 +455,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_addDevicesToAccess_409.02_incompatible_state
   Scenario: Error response for adding devices to an access of a network in an incompatible state
     Given an existing network access to a dedicated network in "TERMINATED" state
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -472,7 +472,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_addDevicesToAccess_422.01_no_valid_device
   Scenario: Error response when none of the devices can be added
     Given an existing network access including at least one device
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/add"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/add"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/AddDevicesRequest"
@@ -494,7 +494,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_removeDevicesFromAccess_400.01_invalid_request_body
   Scenario Outline: Remove devices from access with invalid request body
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is <invalid_request_body>
@@ -515,7 +515,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_removeDevicesFromAccess_400.06_invalid_x-correlator
   Scenario: Remove devices from access with invalid x-correlator header
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
@@ -534,7 +534,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_removeDevicesFromAccess_401.01_unauthenticated
   Scenario Outline: Remove devices from access with missing, expired or invalid access token
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
@@ -557,7 +557,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_removeDevicesFromAccess_403.01_missing_access_token_scope
   Scenario: Remove devices from access with missing access token scope
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
@@ -574,7 +574,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   Scenario: Remove devices from access with a three-legged access token
     # This operation only supports two-legged access tokens. A three-legged access token
     # does not carry the required scope, so authorization fails
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
@@ -591,7 +591,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
 
   @dedicated_network_accesses_removeDevicesFromAccess_404.01_not_found
   Scenario: Remove devices from a non-existing access
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to a random access ID
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
@@ -606,7 +606,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_removeDevicesFromAccess_404.02_api_client_token_mismatch
   Scenario: Remove devices from an access not created by the API client given in the access token
     # To test this, a token has to be obtained for a different client
-    Given the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    Given the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of an existing access
     And the header "Content-Type" is set to "application/json"
     And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
@@ -624,7 +624,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
   @dedicated_network_accesses_removeDevicesFromAccess_422.01_no_valid_device
   Scenario: Error response when none of the devices can be removed
     Given an existing network access
-    And the resource "/dedicated-network-accesses/vwip/accesses/{accessId}/devices/remove"
+    And the resource "/dedicated-network-accesses/v0.2rc2/accesses/{accessId}/devices/remove"
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body property "$.accessDeviceIds" array contains only random access device IDs

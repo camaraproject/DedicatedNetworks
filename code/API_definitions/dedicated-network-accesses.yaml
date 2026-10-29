@@ -75,7 +75,7 @@ info:
     - If no dedicated network exists with the given networkId when creating a network access, then the server will return an error with the `404 DEDICATED_NETWORK_ACCESSES.NETWORK_IDENTIFIER_NOT_FOUND` error code.
     - If the dedicated network identified by the networkId is in an incompatible state when creating a network access, e.g. it is in the TERMINATED state, then the server will return an error with the `409 INCOMPATIBLE_STATE` error code.
     - If some but not all requested devices could be added, the API returns a `207` response with `results` containing an error result for each failed device detailing why it failed. If none of the requested devices could be added, the API returns a `422 DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE` response and the access is not created.
-      - If a device cannot be added because the `maxNumberOfDevices` is already reached, the device status will be returned with `429 QUOTA_EXCEEDED` error code.
+      - If a device cannot be added because the `maxNumberOfDevices` is already reached, an error result with the `429 QUOTA_EXCEEDED` error code is returned for that device.
 
     # Adding devices to an access
 

@@ -628,6 +628,7 @@ Feature: CAMARA Dedicated Network API, vwip - Network Accesses API, Multiple-Dev
     And the path parameter "accessId" is set to the ID of the existing access
     And the header "Content-Type" is set to "application/json"
     And the request body property "$.accessDeviceIds" array contains only random access device IDs
+    And the request body is set to a request body compliant with the schema at "/components/schemas/RemoveDevicesRequest"
     When the request "removeDevicesFromAccess" is sent
     Then the response status code is 422
     And the response header "x-correlator" has same value as the request header "x-correlator"

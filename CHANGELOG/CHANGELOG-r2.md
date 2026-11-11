@@ -272,7 +272,7 @@ Changes documented below are compared to version 0.1.0.
 
 ### Added
 
-* A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported, with paginated results for `retrieveNetworkServiceAreas`, by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87 and https://github.com/camaraproject/DedicatedNetworks/pull/149
 * Completing pagination support for operations `retrieveNetworkServiceAreas`, `listNetworks` and `listAccesses` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
 * Implementing range limits for integer, array and string datatypes, as needed by Commonalities r4.3 by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
 * Correcting URL in API test definition file by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/127

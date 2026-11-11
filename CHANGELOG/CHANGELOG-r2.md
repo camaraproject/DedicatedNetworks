@@ -197,7 +197,7 @@ Changes documented below are compared to version 0.1.0.
 * Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
 * Pagination support when reading network profiles by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/125
 * `BitRate.required: [value, unit]` newly enforced by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
-* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters return 400 `INVALID_ARGUMENT`; `OUT_OF_RANGE` is no longer returned with 400, `IDENTIFIER_NOT_FOUND` no longer with 404 on `readNetworkProfile`, and `INVALID_TOKEN_CONTEXT` no longer with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
 
 ### Added
 

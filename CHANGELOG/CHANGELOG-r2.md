@@ -253,7 +253,9 @@ Changes documented below are compared to version 0.1.0.
 
 ### Removed
 
-* `IDENTIFIER_NOT_FOUND` removed from the `Generic404` code enum by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+* Removed `profileId` (replaced by `networkProfileId`) and `serviceArea` (replaced by `serviceAreaId`) by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Removed error codes `400 OUT_OF_RANGE` and `403 INVALID_TOKEN_CONTEXT` by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* Removed error code `404 IDENTIFIER_NOT_FOUND` from `readNetwork` and `deleteNetwork` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 
 ## dedicated-network-areas 0.1.0
 

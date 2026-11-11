@@ -237,6 +237,7 @@ Changes documented below are compared to version 0.1.0.
 * Adding the missing mandatory template elements into the info.description section by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
 * Documented `ACTIVATED` → `RESERVED` transition removed from NetworkStatus by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 * Aligned with Commonalities r4.4 (0.9.0): replaced the deprecated `Generic*` error responses with the r4.4 common responses and the common `Sink` schema by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* `sinkCredential`: credential types `PLAIN` and `REFRESHTOKEN` removed, `PRIVATE_KEY_JWT` added by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95 and @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
 * Improved `info.description` wording: the callback description now refers to the network status by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/208
 
 ### Fixed

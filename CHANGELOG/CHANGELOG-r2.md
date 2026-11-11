@@ -274,10 +274,6 @@ Changes documented below are compared to version 0.1.0.
 
 * A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported, with paginated results for `retrieveNetworkServiceAreas`, by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87 and https://github.com/camaraproject/DedicatedNetworks/pull/149
 * Test definitions for the Areas API with success and error scenarios by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102 and @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/177, https://github.com/camaraproject/DedicatedNetworks/pull/178 and https://github.com/camaraproject/DedicatedNetworks/pull/211
-* Making test case scenario names unique and operation specific by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/183 
-* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
-* Improved `info.description` wording by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/208
-* Aligned the test definitions with the API definition (invalid coordinates now expect 400 `INVALID_ARGUMENT`) by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/211
 
 ### Changed
 

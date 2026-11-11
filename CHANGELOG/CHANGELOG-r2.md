@@ -126,60 +126,29 @@ Changes documented below are compared to version 0.1.0.
 
 ### Breaking changes
 
-* Restructured to support multi-device access management: new operations to add, remove, and list devices in bulk, replacing the single-device-per-access model by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/98
-* Update pagination realization to align with commonalities by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/122
-* Completing pagination support for operation `listAccesses` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
-* Reworked access device handling: the `x-device` header is replaced by the `accessDeviceId` query parameter to query accesses by device, and `recentAccessDevices` is replaced by `addedAccessDevices` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
-* Aligned with Commonalities r4.4 (0.9.0): deprecated `Generic*` error responses replaced with common responses; invalid pagination parameters now return 400 `INVALID_ARGUMENT`; `INVALID_TOKEN_CONTEXT` no longer returned with 403 except for single-device three-legged operations by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
-* Moved the `addedAt` timestamp from the operation response body to each added `AccessDevice` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/197
-* Split the per-device error results between add and remove operations: `ErrorResultForDevice` is replaced by `AddDeviceErrorResult` (keyed by `device`) and `RemoveDeviceErrorResult` (keyed by `accessDeviceId`), each with a required identifier, and the none-processed 422 response is split into `AddDevicesNoneProcessed422` and `RemoveDevicesNoneProcessed422` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/212
-* `POST /accesses/{accessId}/devices/remove`: request body changed from `devices` to the required `accessDeviceIds` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
-* `createAccess`: when none of the devices can be added, the access is not created and `422 DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE` is returned by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/197
+* dedicated-network-accesses 0.2.0 is an evolution of the API and is not backward compatible with 0.1.0. The underlying concepts of the accesses API remained the same. The main differences:
+  * an access groups one or more devices for a network, instead of one access per device; devices are managed through `/accesses/{accessId}/devices`, each identified by an `accessDeviceId`
+  * operations are renamed, and new operations add, list, read and remove the devices of an access, both for a single device and for multiple devices at once
+  * each device has a status (`REQUESTED`, `GRANTED`, `DENIED`), with event notifications on status changes delivered through an implicit subscription model using `sink` and `sinkCredential` on the access
+  * multi-device operations may return partial success (`207`) with per-device error details, and `422 DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE` when no device could be processed; consumers must handle these new response patterns
+  * three-legged access tokens are supported only on the single-device operations; the scope structure is extended to reflect the single-device (`device:create`, `device:read`, `device:delete`) and multi-device (`devices:add`, `devices:remove`, `devices:read`) operations
+  * list operations are paginated, and error responses follow Commonalities r4.4
 
 ### Added
 
-* Introducing a 409 Error Code `INCOMPATIBLE_STATE`, indicating that the dedicated network resource referenced in the POST request is in an incompatible state, e.g. in TERMINATED state by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/81
-* Support for asynchronous events for device access creation and device access lifecycle by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/91
-* Support operations to manage access to dedicated network for multiple devices at a time by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/98
-* Update pagination realization to align with commonalities by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/122
-* Completing pagination support for operation `listAccesses` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
-* Added a stable `accessDeviceId` (used to read and remove a single access device and to query accesses by device), time-based filters for listing access devices and an optional access `name` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
-* Added three-legged access token support for single-device operations, including a new `POST /accesses/{accessId}/devices` operation and the `dedicated-network-accesses:device:create` scope. Single-device operations (add/read/delete) now accept two-legged or three-legged tokens; multiple-device and access-level operations remain two-legged only by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/197
-* Added success and error test scenarios for all Accesses API operations by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/195 and https://github.com/camaraproject/DedicatedNetworks/pull/198
+* See Breaking changes.
 
 ### Changed
 
-* Adding a clear description of the `MaxNumberOfDevices` parameter and its relation to aggregated UL/DL throughput parameters by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/88
-* Implementing range limits for integer, array and string datatypes, as needed by Commonalities by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
-* Updating existing API test definitions and adding a new test definition for the Areas API by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
-* Adding the missing mandatory template elements into the info.description section by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
-* Reworked access device handling: added a stable `accessDeviceId` (used to read and remove a single access device and to query accesses by device, replacing the `x-device` header), replaced `recentAccessDevices` with `addedAccessDevices`, added time-based filters for listing access devices and an optional access `name`, and removed unused `ErrorResultForDevice` codes by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
-* Aligned with Commonalities r4.4 (0.9.0): replaced the deprecated `Generic*` error responses with the r4.4 common responses and the common `Sink` schema by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
-* Use int32-range bounds for array sizes and device counters by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/196
-* Moved the `addedAt` timestamp from the operation response body to each added `AccessDevice`, and aligned the `createAccess` outcomes (201, 207, 422 `DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE`) with `addDevicesToAccess` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/197
-* Improved `info.description` wording: explained per-device access status (`REQUESTED`/`GRANTED`/`DENIED`), documented single-device operations and three-legged access token support by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/208 and https://github.com/camaraproject/DedicatedNetworks/pull/210
-* Aligned device identification (single `accessDeviceId` name and documented semantics), split per-device error results and the none-processed 422 between add and remove operations, clarified the 409 conflict model, documented the `device` vs `devices` scope split, clarified `accessDeviceId` behaviour across identifier types and multiple accesses of the same network, added a 404 response to `addDeviceToAccess`, and updated the test definitions accordingly (issues #205, #206) by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/212
+* See Breaking changes.
 
 ### Fixed
 
-* Fixing `Schema must declare a type or combiner` (S-016), `Write operation must be security-restricted` (S-303) and `Operation must document a 401 response` (S-307) validation errors by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/118
-* Replacing the CloudEvent object definition with a reference and correcting the CloudEvent type to align with Commonalities pattern by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/120
-* Replacing local common data type definitions with direct $ref to CAMARA_common.yaml and removing unused local definitions by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
-* Addressing the "missing description" warnings and "Component may be unused" hints by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
-* Addressing critical Release Management review corrections on three-legged access token by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/136
-* Removed incorrect three-legged access token note from the `createAccess` operation description by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/140
-* Added x-correlator request parameter and response header by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/141
-* Correcting `operationId` within the test definitions to be aligned with the associated APIs by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/148
-* Clarifying the "Identifying the device from the access token" section on 2-legged access token usages by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/146
-* Correcting inconsistencies and errors on the Accesses API: descriptions, error handling, schema corrections, device object usage by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/170
-* Correcting multiple assertions that do not match the API definitions (Issue #166) by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/171
-* Fixes small corrections in the test definitions (Issue #167) identified during release review by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/172
-* Fixed existing test scenarios to match the current API definition by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/195
+N/A 
 
 ### Removed
 
-* Removed the `x-device` header and unused `ErrorResultForDevice` codes by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/179
-* Removed the per-device `MISSING_IDENTIFIER` error (it is a whole-request condition) by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/212
+* See Breaking changes.
 
 ## dedicated-network-profiles 0.2.0
 

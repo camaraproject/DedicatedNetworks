@@ -213,7 +213,8 @@ Changes documented below are compared to version 0.1.0.
 ### Breaking changes
 
 * Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
-* Service areas refactored into the separate dedicated-network-areas API by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* `profileId` renamed to `networkProfileId`; alternatively a `qosProfileName` can be given instead of a network profile by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Service areas refactored into the separate dedicated-network-areas API: the `serviceArea` object is replaced by the required `serviceAreaId` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
 * Completing pagination support for the `listNetworks` operation by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
 * Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
 

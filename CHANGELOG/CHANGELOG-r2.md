@@ -273,20 +273,6 @@ Changes documented below are compared to version 0.1.0.
 ### Added
 
 * A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported, with paginated results for `retrieveNetworkServiceAreas`, by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87 and https://github.com/camaraproject/DedicatedNetworks/pull/149
-* Completing pagination support for operations `retrieveNetworkServiceAreas`, `listNetworks` and `listAccesses` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
-* Implementing range limits for integer, array and string datatypes, as needed by Commonalities r4.3 by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
-* Correcting URL in API test definition file by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/127
-* Adding the missing mandatory template elements into the info.description section by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
-* Fix global tags for dedicted network areas and profiles by @jordijoangimenez in https://github.com/camaraproject/DedicatedNetworks/pull/117
-* Fixing `Schema must declare a type or combiner` (S-016), `Write operation must be security-restricted` (S-303) and `Operation must document a 401 response` (S-307) validation errors by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/118
-* Replacing local common data type definitions with direct $ref to CAMARA_common.yaml. Remove all unused local definitions. In dedicated-network-areas.yaml, Circle.radius has been changed from type integer (with maximum as 200000) to type number (without max limitation) by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
-* Addressing the "missing description" warnings (S-009, S-011, S-014, S-031, S-215) and the "Component may be unused" hints by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
-* Adding missing x-correlator request parameter and response header by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/141
-* Add missing externalDocs to dedicated-network-areas.yaml by @hdamker in https://github.com/camaraproject/DedicatedNetworks/pull/147
-* Correcting `optionationId` within the test definitions to be aligned with the associated APIs by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/148
-* Correcting inconsistencies and errors (like error responses, pagination responses, missing schema types), identified during review  by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/173
-* Correcting multiple assertions that do not match the API definitions (Issue #166) by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/171
-* Fixes small corrections in the test definitions (Issue #167) identified during release review by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/172
 * Test definitions for the Areas API with error and sunny day scenarios by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102, @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/177 and https://github.com/camaraproject/DedicatedNetworks/pull/178
 * Making test case scenario names unique and operation specific by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/183 
 * Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters now return 400 `INVALID_ARGUMENT` and `INVALID_TOKEN_CONTEXT` is no longer returned with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194

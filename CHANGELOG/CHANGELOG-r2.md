@@ -148,7 +148,7 @@ Changes documented below are compared to version 0.1.0.
 
 ### Removed
 
-* See Breaking changes.
+* The `device` property of an access, the `x-device` header (replaced by the `accessDeviceId` query parameter) and error codes that no longer apply to the operations. See also Breaking changes.
 
 ## dedicated-network-profiles 0.2.0
 

@@ -229,7 +229,8 @@ Changes documented below are compared to version 0.1.0.
 ### Changed
 
 * Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
-* Service areas refactored into the separate dedicated-network-areas API by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* `profileId` renamed to `networkProfileId`; alternatively a `qosProfileName` can be given instead of a network profile by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Service areas refactored into the separate dedicated-network-areas API: the `serviceArea` object is replaced by the required `serviceAreaId` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
 * Implementing range limits for integer, array and string datatypes, as needed by Commonalities by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
 * Updating API test definitions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
 * Adding missing range restriction for strings in query line by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126

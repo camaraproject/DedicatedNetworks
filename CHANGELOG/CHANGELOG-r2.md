@@ -144,7 +144,7 @@ Changes documented below are compared to version 0.1.0.
 
 ### Fixed
 
-N/A 
+* N/A
 
 ### Removed
 

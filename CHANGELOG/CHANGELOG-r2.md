@@ -228,7 +228,7 @@ Changes documented below are compared to version 0.1.0.
 
 ### Removed
 
-* N/A
+* Removed error codes `400 OUT_OF_RANGE`, `404 IDENTIFIER_NOT_FOUND` and `403 INVALID_TOKEN_CONTEXT` by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
 
 ## dedicated-network 0.2.0
 

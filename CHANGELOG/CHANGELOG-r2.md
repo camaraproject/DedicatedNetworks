@@ -222,7 +222,7 @@ Changes documented below are compared to version 0.1.0.
 ### Added
 
 * Allowing the API Consumer to assign an own `name` to a dedicated network resource, which is returned when the network is read or listed by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/97
-* Completing pagination support for the `listNetworks` operation by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
+* Pagination support for the `listNetworks` operation by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
 * `createNetwork` gains `404`/`422` responses and four new `DEDICATED_NETWORK.*` error codes by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
 * Adding error scenarios and sunny day test definitions for the Networks API by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/177 and https://github.com/camaraproject/DedicatedNetworks/pull/178
 

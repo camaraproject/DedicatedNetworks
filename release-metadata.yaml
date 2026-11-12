@@ -2,7 +2,7 @@ repository:
   repository_name: DedicatedNetworks
   release_tag: r2.4
   release_type: public-release
-  release_date: null
+  release_date: '2026-11-12T11:51:27Z'
   src_commit_sha: 78437781c82a34edd6f5221a072390de59efee7c
 apis:
 - api_name: dedicated-network-accesses

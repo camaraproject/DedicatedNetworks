@@ -2,6 +2,7 @@
 
 <!-- TOC:START -->
 ## Table of Contents
+- **[r2.4](#r24)**
 - [r2.3](#r23)
 - [r2.2](#r22)
 - [r2.1](#r21)
@@ -15,6 +16,201 @@ The below sections record the changes for each API version in each release as fo
 * for the first release-candidate, all changes since the last public release
 * for subsequent release-candidate(s), only the delta to the previous release-candidate
 * for a public release, the consolidated changes since the previous public release
+
+# r2.4
+
+## Release Notes
+
+This public release contains the definition and documentation of
+* dedicated-network-accesses 0.2.0
+* dedicated-network-profiles 0.2.0
+* dedicated-network 0.2.0
+* dedicated-network-areas 0.1.0
+
+The API definition(s) are based on
+* Commonalities r4.4 (0.9.0)
+* Identity and Consent Management r4.2 (0.5.0)
+
+## dedicated-network-accesses 0.2.0
+
+**dedicated-network-accesses 0.2.0 is an initial public version of this API.**
+
+Changes documented below are compared to version 0.1.0.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.4/code/API_definitions/dedicated-network-accesses.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.4/code/API_definitions/dedicated-network-accesses.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.4/code/API_definitions/dedicated-network-accesses.yaml)
+
+### Breaking changes
+
+* dedicated-network-accesses 0.2.0 is an evolution of the API and is not backward compatible with 0.1.0. The underlying concepts of the accesses API remained the same. The main differences:
+  * an access groups one or more devices for a network, instead of one access per device; devices are managed through `/accesses/{accessId}/devices`, each identified by an `accessDeviceId`
+  * operations are renamed, and new operations add, list, read and remove the devices of an access, both for a single device and for multiple devices at once
+  * each device has a status (`REQUESTED`, `GRANTED`, `DENIED`), with event notifications on status changes delivered through an implicit subscription model using `sink` and `sinkCredential` on the access
+  * multi-device operations may return partial success (`207`) with per-device error details, and `422 DEDICATED_NETWORK_ACCESSES.NO_VALID_DEVICE` when no device could be processed; consumers must handle these new response patterns
+  * three-legged access tokens are supported only on the single-device operations; the scope structure is extended to reflect the single-device (`device:create`, `device:read`, `device:delete`) and multi-device (`devices:add`, `devices:remove`, `devices:read`) operations
+  * list operations are paginated, and error responses follow Commonalities r4.4
+
+### Added
+
+* See Breaking changes.
+
+### Changed
+
+* See Breaking changes.
+
+### Fixed
+
+* N/A
+
+### Removed
+
+* The `device` property of an access, the `x-device` header (replaced by the `accessDeviceId` query parameter) and error codes that no longer apply to the operations. See also Breaking changes.
+
+## dedicated-network-profiles 0.2.0
+
+**dedicated-network-profiles 0.2.0 is an initial public version of this API.**
+
+Changes documented below are compared to version 0.1.0.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.4/code/API_definitions/dedicated-network-profiles.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.4/code/API_definitions/dedicated-network-profiles.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.4/code/API_definitions/dedicated-network-profiles.yaml)
+
+### Breaking changes
+
+* Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* Pagination support when reading network profiles by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/125
+* `BitRate.required: [value, unit]` newly enforced by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters return 400 `INVALID_ARGUMENT`; `OUT_OF_RANGE` is no longer returned with 400, `IDENTIFIER_NOT_FOUND` no longer with 404 on `readNetworkProfile`, and `INVALID_TOKEN_CONTEXT` no longer with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+
+### Added
+
+* Pagination support when reading network profiles by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/125
+* Adding error scenarios and sunny day test definitions for the Profiles API by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/177 and https://github.com/camaraproject/DedicatedNetworks/pull/178
+
+### Changed
+
+* Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* Adding a clear description of the `MaxNumberOfDevices` parameter and its relation to aggregated UL/DL throughput parameters by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/88
+* Implementing range limits for integer, array and string datatypes, as needed by Commonalities by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
+* Adding the missing mandatory template elements into the info.description section by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
+* Adding missing range restrictions for query parameters and removing API readiness checklist file by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126
+* `BitRate.required: [value, unit]` newly enforced by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+* Aligned with Commonalities r4.4 (0.9.0): replaced the deprecated `Generic*` error responses with the r4.4 common responses by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* Use int32-range bounds for `maxNumberOfDevices` by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/196
+* Improved `info.description` wording and grammar by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/208
+
+### Fixed
+
+* Correcting global tags for dedicated network profiles by @jordijoangimenez in https://github.com/camaraproject/DedicatedNetworks/pull/117
+* Replacing local common data type definitions with direct $ref to CAMARA_common.yaml and removing unused local definitions by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
+* Addressing the "missing description" warnings and "Component may be unused" hints by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
+* Adding missing x-correlator request parameter and response header by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/141
+* Fixes small corrections in the test definitions (Issue #167) identified during release review by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/172
+* Correcting inconsistencies and errors on the Profiles API: lifecycle, response codes, QoS Profile usage by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+* Making test case scenario names unique and operation specific by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/183 
+
+### Removed
+
+* Removed error codes `400 OUT_OF_RANGE`, `404 IDENTIFIER_NOT_FOUND` and `403 INVALID_TOKEN_CONTEXT` by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+
+## dedicated-network 0.2.0
+
+**dedicated-network 0.2.0 is an initial public version of this API.**
+
+Changes documented below are compared to version 0.1.0.
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.4/code/API_definitions/dedicated-network.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.4/code/API_definitions/dedicated-network.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.4/code/API_definitions/dedicated-network.yaml)
+
+### Breaking changes
+
+* Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* `profileId` renamed to `networkProfileId`; alternatively a `qosProfileName` can be given instead of a network profile by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Service areas refactored into the separate dedicated-network-areas API: the `serviceArea` object is replaced by the required `serviceAreaId` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Pagination support for the `listNetworks` operation: the response is a page object instead of an array by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
+* Aligned with Commonalities r4.4 (0.9.0): invalid pagination parameters return 400 `INVALID_ARGUMENT`; `OUT_OF_RANGE` is no longer returned with 400 and `INVALID_TOKEN_CONTEXT` no longer with 403 by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* `IDENTIFIER_NOT_FOUND` is no longer returned with 404 on `readNetwork` and `deleteNetwork` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+
+### Added
+
+* Allowing the API Consumer to assign an own `name` to a dedicated network resource, which is returned when the network is read or listed by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/97
+* Pagination support for the `listNetworks` operation by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/149
+* `createNetwork` gains `404`/`422` responses and four new `DEDICATED_NETWORK.*` error codes by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+* Adding error scenarios and sunny day test definitions for the Networks API by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/177 and https://github.com/camaraproject/DedicatedNetworks/pull/178
+
+### Changed
+
+* Enhancement to use format UUID for the NetworkProfileId and to add a human readable name, consistent with other DN APIs by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* `profileId` renamed to `networkProfileId`; alternatively a `qosProfileName` can be given instead of a network profile by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Service areas refactored into the separate dedicated-network-areas API: the `serviceArea` object is replaced by the required `serviceAreaId` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Implementing range limits for integer, array and string datatypes, as needed by Commonalities by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95
+* Updating API test definitions by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102
+* Adding missing range restriction for strings in query line by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/126
+* Adding the missing mandatory template elements into the info.description section by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/121
+* Documented `ACTIVATED` → `RESERVED` transition removed from NetworkStatus by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+* Aligned with Commonalities r4.4 (0.9.0): replaced the deprecated `Generic*` error responses with the r4.4 common responses and the common `Sink` schema by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* `sinkCredential`: credential types `PLAIN` and `REFRESHTOKEN` removed, `PRIVATE_KEY_JWT` added by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/95 and @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
+* Improved `info.description` wording: the callback description now refers to the network status by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/208
+
+### Fixed
+
+* Fixing `Schema must declare a type or combiner` (S-016), `Write operation must be security-restricted` (S-303) and `Operation must document a 401 response` (S-307) validation errors by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/118
+* Replacing the CloudEvent object definition with a reference and correcting the CloudEvent type to align with Commonalities pattern by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/120
+* Replacing local common data type definitions with direct $ref to CAMARA_common.yaml and removing unused local definitions by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/123
+* Addressing the "missing description" warnings and "Component may be unused" hints by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/124
+* Adding missing x-correlator request parameter and response header by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/141
+* Correcting inconsistencies and errors on the Networks API: lifecycle, response codes, QoS Profile usage by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+* Correcting test definition assertions and aligning with API definitions by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/171, https://github.com/camaraproject/DedicatedNetworks/pull/172 and https://github.com/camaraproject/DedicatedNetworks/pull/183
+* Aligned the test definitions with the API definition (initial network status `REQUESTED`, `INVALID_SINK`, read after create and delete) by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/211
+
+### Removed
+
+* Removed `profileId` (replaced by `networkProfileId`) and `serviceArea` (replaced by `serviceAreaId`) by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87
+* Removed error codes `400 OUT_OF_RANGE` and `403 INVALID_TOKEN_CONTEXT` by @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/194
+* Removed error code `404 IDENTIFIER_NOT_FOUND` from `readNetwork` and `deleteNetwork` by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/174
+
+## dedicated-network-areas 0.1.0
+
+**dedicated-network-areas 0.1.0 is an initial public version of this API.**
+
+- API definition **with inline documentation**:
+  - [View it on ReDoc](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.4/code/API_definitions/dedicated-network-areas.yaml&nocors)
+  - [View it on Swagger Editor](https://camaraproject.github.io/swagger-ui/?url=https://raw.githubusercontent.com/camaraproject/DedicatedNetworks/r2.4/code/API_definitions/dedicated-network-areas.yaml)
+  - OpenAPI [YAML spec file](https://github.com/camaraproject/DedicatedNetworks/blob/r2.4/code/API_definitions/dedicated-network-areas.yaml)
+
+### Breaking changes
+
+* N/A
+
+### Added
+
+* A new API is added which provides information about the geographical areas where consistent service coverage according to one or more network profiles is supported, with paginated results for `retrieveNetworkServiceAreas`, by @hubertp-ericsson in https://github.com/camaraproject/DedicatedNetworks/pull/87 and https://github.com/camaraproject/DedicatedNetworks/pull/149
+* Test definitions for the Areas API with success and error scenarios by @tlohmar in https://github.com/camaraproject/DedicatedNetworks/pull/102 and @jimfengjinhua in https://github.com/camaraproject/DedicatedNetworks/pull/177, https://github.com/camaraproject/DedicatedNetworks/pull/178 and https://github.com/camaraproject/DedicatedNetworks/pull/211
+
+### Changed
+
+* N/A
+
+### Fixed
+
+* N/A
+
+### Removed
+
+* N/A
+
+## New Contributors
+* @hubertp-ericsson made their first contribution in https://github.com/camaraproject/DedicatedNetworks/pull/83
+* @jordijoangimenez made their first contribution in https://github.com/camaraproject/DedicatedNetworks/pull/117
+* @jimfengjinhua made their first contribution in https://github.com/camaraproject/DedicatedNetworks/pull/120
+
+**Full Changelog**: https://github.com/camaraproject/DedicatedNetworks/compare/r1.2...r2.4
 
 # r2.3
 
